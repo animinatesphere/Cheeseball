@@ -1,0 +1,48 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap");
+@import "tailwindcss";
+.se {
+  font-family: "Inter", sans-serif;
+}
+.op {
+  font-family: "Open Sans", sans-serif;
+}
+
+/* Page slide animations */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out-left {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+.slide-in {
+  animation: slide-in-right 350ms ease-out;
+}
+
+.slide-out {
+  animation: slide-out-left 300ms ease-in;
+}
+
+/* Responsive page container */
+.page-container {
+  max-width: 768px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
