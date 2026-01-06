@@ -6,12 +6,11 @@ import BuyCrypto from "./page/BuyCrypto";
 import SellCrypto from "./page/SellCrypto";
 import SeamCrypto from "./page/SeamCrypto";
 import CurrencyPage from "./user/pages/CurrencyPage";
-import Navbar from "./user/components/Navbar";
+// import Navbar from "./user/components/Navbar";
 
 const Routee = () => {
   return (
     <>
-      <Navbar />
       <Routes>
         <Route path="/" element={<Onboarding />} />
         <Route path="/onboarding" element={<Onboarding />} />
