@@ -6,6 +6,8 @@ import BuyCrypto from "./page/BuyCrypto";
 import SellCrypto from "./page/SellCrypto";
 import SeamCrypto from "./page/SeamCrypto";
 import CurrencyPage from "./user/pages/CurrencyPage";
+import CheeseBallLogin from "./admin/auth/CheeseBallLogin";
+import AdminDashboard from "./admin/pages/AdminDashboard";
 // import Navbar from "./user/components/Navbar";
 
 const Routee = () => {
@@ -19,6 +21,8 @@ const Routee = () => {
         <Route path="/sell-crypto" element={<SellCrypto />} />
         <Route path="/seamless-crypto" element={<SeamCrypto />} />
         <Route path="/currency-change" element={<CurrencyPage />} />
+        <Route path="/admin-login" element={<CheeseBallLogin />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
       </Routes>
     </>
   );

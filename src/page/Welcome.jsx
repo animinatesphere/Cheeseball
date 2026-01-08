@@ -23,7 +23,7 @@ const Welcome = () => {
             User
           </button>
         </Link>
-        <Link className="flex items-center" to="/admin">
+        <Link className="flex items-center" to="/admin-login">
           <button className="text-[12px] sm:text-[14px] md:text-[16px] lg:text-[18px] bg-[#E3EAF2] w-full sm:w-[292px] h-[54px] text-[#0063BF] mx-auto rounded-3xl font-bold op mt-3 cursor-pointer hover:animate-pulse">
             Admin
           </button>
