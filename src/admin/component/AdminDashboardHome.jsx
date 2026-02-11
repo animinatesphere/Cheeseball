@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { 
   ChevronDown, 
   Calendar, 
@@ -6,10 +6,38 @@ import {
   TrendingUp, 
   FileText, 
   Wallet, 
-  ChevronRight 
+  ChevronRight,
+  Loader2
 } from "lucide-react";
+import { getAdminStats, getSystemStatus } from "../../lib/api";
 
 const AdminDashboardHome = ({ onNavigate }) => {
+  const [stats, setStats] = useState({ orderCount: 0, currencyCount: 0, volume: "0" });
+  const [systemStatus, setSystemStatus] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const statsData = await getAdminStats();
+      const { data: statusData } = await getSystemStatus();
+      
+      setStats(statsData);
+      setSystemStatus(statusData || []);
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center h-full">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 overflow-y-auto pb-32 animate-fade-in">
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6">
@@ -29,7 +57,7 @@ const AdminDashboardHome = ({ onNavigate }) => {
               <h2 className="text-gray-900 font-black text-xl tracking-tight">Order Velocity</h2>
               <div className="flex items-center gap-2 text-blue-600 bg-blue-50 px-4 py-2 rounded-full text-xs font-black uppercase tracking-widest">
                 <Calendar className="w-4 h-4" />
-                02 Nov, 2023
+                {new Date().toLocaleDateString()}
               </div>
             </div>
 
@@ -51,16 +79,16 @@ const AdminDashboardHome = ({ onNavigate }) => {
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <div className="text-2xl sm:text-3xl font-black text-gray-900 tabular-nums">5,824k</div>
+                  <div className="text-2xl sm:text-3xl font-black text-gray-900 tabular-nums">{stats.volume}</div>
                   <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Volume</div>
                 </div>
               </div>
 
               <div className="space-y-4 flex-1 w-full">
                 {[
-                  { label: "Active Orders", count: "5 Orders", color: "bg-blue-400", bg: "bg-blue-50" },
-                  { label: "Completed", count: "45 Orders", color: "bg-blue-600", bg: "bg-blue-50/50" },
-                  { label: "Canceled", count: "10 Orders", color: "bg-red-400", bg: "bg-red-50" },
+                  { label: "Total Orders", count: `${stats.orderCount} Orders`, color: "bg-blue-600", bg: "bg-blue-50" },
+                  // { label: "Completed", count: "45 Orders", color: "bg-blue-600", bg: "bg-blue-50/50" },
+                  // { label: "Canceled", count: "10 Orders", color: "bg-red-400", bg: "bg-red-50" },
                 ].map((item, idx) => (
                   <div key={idx} className={`${item.bg} p-5 rounded-2xl sm:rounded-3xl flex items-center gap-4 border border-white/50`}>
                     <div className={`w-1.5 h-10 ${item.color} rounded-full`}></div>
@@ -85,7 +113,7 @@ const AdminDashboardHome = ({ onNavigate }) => {
                   <TrendingUp className="w-6 h-6 opacity-50" />
                 </div>
                 <div className="text-blue-100 text-[10px] font-black uppercase tracking-widest mb-1">Active Currencies</div>
-                <div className="text-4xl font-black mb-1 tabular-nums">567</div>
+                <div className="text-4xl font-black mb-1 tabular-nums">{stats.currencyCount}</div>
                 <div className="text-blue-200 text-xs font-bold">+12 since yesterday</div>
               </div>
             </div>
@@ -95,7 +123,7 @@ const AdminDashboardHome = ({ onNavigate }) => {
                 <FileText className="w-6 h-6" />
               </div>
               <div className="text-gray-400 text-[10px] font-black uppercase tracking-widest mb-1">Market Listing</div>
-              <div className="text-4xl font-black text-gray-900 mb-1 tabular-nums">78</div>
+              <div className="text-4xl font-black text-gray-900 mb-1 tabular-nums">{stats.currencyCount}</div>
               <div className="text-gray-400 text-xs font-bold">Managed globally</div>
             </div>
           </div>
@@ -136,19 +164,19 @@ const AdminDashboardHome = ({ onNavigate }) => {
           <div className="bg-gray-50 rounded-[2.5rem] sm:rounded-[3rem] p-8 sm:p-10 border border-gray-100 font-medium">
             <h3 className="text-gray-900 font-black uppercase text-xs tracking-[0.2em] mb-8">System Architecture</h3>
             <div className="space-y-4">
-               {[
-                 { label: "Cloud API Gateway", status: "Healthy" },
-                 { label: "Core Neural Engine", status: "Healthy" },
-                 { label: "Real-time Node Buffer", status: "Active" }
-               ].map((item, i) => (
-                 <div key={i} className="flex justify-between items-center p-5 bg-white rounded-2xl border border-gray-100 hover:border-blue-100 transition-all shadow-sm">
-                   <span className="text-gray-700 font-black text-sm">{item.label}</span>
-                   <div className="flex items-center gap-2">
-                     <span className="text-[10px] font-black uppercase tracking-widest text-green-600">{item.status}</span>
-                     <span className="bg-green-500 w-2.5 h-2.5 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.5)]"></span>
+              {systemStatus.length > 0 ? (
+                systemStatus.map((item, i) => (
+                   <div key={i} className="flex justify-between items-center p-5 bg-white rounded-2xl border border-gray-100 hover:border-blue-100 transition-all shadow-sm">
+                     <span className="text-gray-700 font-black text-sm">{item.name}</span>
+                     <div className="flex items-center gap-2">
+                       <span className={`text-[10px] font-black uppercase tracking-widest ${item.status === 'Healthy' ? 'text-green-600' : 'text-red-500'}`}>{item.status}</span>
+                       <span className={`w-2.5 h-2.5 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.5)] ${item.status === 'Healthy' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                     </div>
                    </div>
-                 </div>
-               ))}
+                 ))
+              ) : (
+                <div className="text-center text-gray-400 text-sm">No system status reported.</div>
+              )}
             </div>
           </div>
         </div>

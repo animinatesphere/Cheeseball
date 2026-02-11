@@ -20,7 +20,7 @@ const Auth = () => {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: window.location.origin + "/buy-crypto",
+        emailRedirectTo: window.location.origin + "/currency-change",
       },
     });
 
@@ -46,7 +46,7 @@ const Auth = () => {
     if (error) {
       setError(error.message);
     } else {
-      navigate("/buy-crypto");
+      navigate("/currency-change");
     }
     setLoading(false);
   };

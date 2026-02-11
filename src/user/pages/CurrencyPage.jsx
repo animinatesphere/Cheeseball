@@ -24,6 +24,7 @@ const CurrencyPage = () => {
   const [currentPage, setCurrentPage] = useState("rates");
   const [selectedCurrency, setSelectedCurrency] = useState(null);
   const [showModal, setShowModal] = useState(null);
+  const [transactionData, setTransactionData] = useState(null);
 
   const handleSelectCurrency = (currency) => {
     setSelectedCurrency(currency);
@@ -66,7 +67,10 @@ const CurrencyPage = () => {
         return (
           <SwapCrypto
             onBack={handleBack}
-            onSwap={() => setCurrentPage("confirm")}
+            onSwap={(data) => {
+              setTransactionData(data);
+              setCurrentPage("confirm");
+            }}
             onNavigate={handleNavigation}
           />
         );
@@ -74,6 +78,7 @@ const CurrencyPage = () => {
       case "confirm":
         return (
           <ConfirmSwap
+            transactionData={transactionData}
             onBack={() => setCurrentPage("swap")}
             onConfirm={() => setCurrentPage("awaiting")}
           />
@@ -86,7 +91,10 @@ const CurrencyPage = () => {
         return (
           <BuyCryptocurrency
             onBack={handleBack}
-            onExchange={() => setShowModal("crypto-exchange")}
+            onExchange={(data) => {
+              setTransactionData(data);
+              setShowModal("crypto-exchange");
+            }}
             onNavigate={handleNavigation}
           />
         );
@@ -102,6 +110,7 @@ const CurrencyPage = () => {
       case "complete-order":
         return (
           <CompleteOrderPage
+            transactionData={transactionData}
             onBack={() => setCurrentPage("buy-address")}
             onBuyWithBankTransfer={() => setCurrentPage("complete-order-email")}
           />

@@ -1,28 +1,54 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Bell,
   TrendingUp,
   TrendingDown,
   Search,
-  ShoppingCart,
-  Clock,
-  User,
+  Loader2,
 } from "lucide-react";
+import { getCurrencies } from "../../lib/api";
 
 const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [currencies, setCurrencies] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const currencies = [
-    { id: 1, name: "AAVE", fullName: "Aave", price: "$69.7100", change: "+2.24%", positive: true, icon: "🔷" },
-    { id: 2, name: "AAVE", fullName: "Aave", price: "$69.7100", change: "+2.24%", positive: true, icon: "🔴" },
-    { id: 3, name: "BTC", fullName: "Bitcoin", price: "$86,244.91", change: "-2.95%", positive: false, icon: "₿" },
-    { id: 4, name: "BNB", fullName: "Binance", price: "$69.7100", change: "+2.24%", positive: true, icon: "🟡" },
-    { id: 5, name: "DOGE", fullName: "Dogecoin", price: "$69.7100", change: "-2.24%", positive: false, icon: "🐕" },
-    { id: 6, name: "ETH", fullName: "Ethereum", price: "$69.7100", change: "+2.24%", positive: true, icon: "◆" },
-    { id: 7, name: "LTC", fullName: "Litecoin", price: "$69.7100", change: "+2.24%", positive: true, icon: "Ł" },
-    { id: 8, name: "SOL", fullName: "Solana", price: "$69.7100", change: "-2.24%", positive: false, icon: "◎" },
-  ];
+  useEffect(() => {
+    const fetchCurrencies = async () => {
+      setLoading(true);
+      const { data } = await getCurrencies();
+      if (data) {
+        const mappedCurrencies = data.map(c => ({
+          id: c.id,
+          name: c.symbol, // Display symbol as main name (e.g. BTC)
+          fullName: c.name, // Display full name (e.g. Bitcoin)
+          price: `$${Number(c.price).toLocaleString()}`,
+          change: c.change_24h,
+          positive: c.is_positive,
+          icon: c.symbol ? c.symbol[0] : '$', // Fallback icon logic, normally use c.icon_url
+          colorClass: c.color_class || 'bg-gray-100'
+        }));
+        setCurrencies(mappedCurrencies);
+      }
+      setLoading(false);
+    };
+
+    fetchCurrencies();
+  }, []);
+
+  const filteredCurrencies = currencies.filter(c => 
+    c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    c.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) {
+     return (
+       <div className="min-h-screen bg-white flex items-center justify-center">
+         <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+       </div>
+     );
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -78,7 +104,7 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 pb-24">
-          {currencies.map((currency) => (
+          {filteredCurrencies.map((currency) => (
             <div
               key={currency.id}
               onClick={() => onSelectCurrency(currency)}
@@ -86,7 +112,7 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
             >
               <div className="flex flex-col h-full">
                 <div className="flex items-center justify-between mb-6 sm:mb-8">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl sm:rounded-2xl flex items-center justify-center text-2xl sm:text-3xl group-hover:scale-110 transition-transform">
+                  <div className={`w-12 h-12 sm:w-14 sm:h-14 ${currency.colorClass} rounded-xl sm:rounded-2xl flex items-center justify-center text-white text-2xl sm:text-3xl font-black shadow-lg group-hover:scale-110 transition-transform`}>
                     {currency.icon}
                   </div>
                   <div className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider ${
@@ -121,6 +147,11 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
               </div>
             </div>
           ))}
+          {filteredCurrencies.length === 0 && (
+             <div className="col-span-full text-center py-12 text-gray-400 font-bold">
+                No active currencies found.
+             </div>
+          )}
         </div>
       </div>
     </div>

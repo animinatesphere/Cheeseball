@@ -1,25 +1,54 @@
-/* eslint-disable no-unused-vars */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ChevronLeft,
   SlidersHorizontal,
   ArrowRight,
   Calendar,
+  Loader2,
 } from "lucide-react";
+import { supabase } from "../../lib/supabaseClient";
+import { getUserTransactions } from "../../lib/api";
 
 const HistoryPage = ({ onNavigate }) => {
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("All");
-  const [selectedStatus, setSelectedStatus] = useState("Waiting");
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const transactions = [
-    { id: 1, date: "02 July 2023", from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" }, to: { amount: "0.002445", currency: "BTC", icon: "₿" }, status: "Waiting", exchangeId: "voec666krovitepmd" },
-    { id: 2, date: "02 July 2023", from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" }, to: { amount: "0.002445", currency: "BTC", icon: "₿" }, status: "Approved", exchangeId: "voec666krovitepmd" },
-    { id: 3, date: "02 July 2023", from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" }, to: { amount: "0.002445", currency: "BTC", icon: "₿" }, status: "Cancel", exchangeId: "voec666krovitepmd" },
-    { id: 4, date: "02 July 2023", from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" }, to: { amount: "0.002445", currency: "BTC", icon: "₿" }, status: "Waiting", exchangeId: "voec666krovitepmd" },
-    { id: 5, date: "02 July 2023", from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" }, to: { amount: "0.002445", currency: "BTC", icon: "₿" }, status: "Approved", exchangeId: "voec666krovitepmd" },
-  ];
+  useEffect(() => {
+    const fetchHistory = async () => {
+      setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        const { data } = await getUserTransactions(session.user.id);
+        if (data) {
+          const mappedTransactions = data.map(t => ({
+            id: t.id,
+            date: new Date(t.created_at).toLocaleDateString("en-GB", { day: '2-digit', month: 'short', year: 'numeric' }),
+            from: { 
+              amount: t.from_amount, 
+              currency: t.from_currency?.symbol || 'USD', 
+              symbol: t.from_token_network, 
+              icon: t.from_currency?.icon_url ? <img src={t.from_currency.icon_url} alt="" className="w-full h-full object-cover rounded-full" /> : (t.from_currency?.symbol?.[0] || 'F')
+            }, 
+            to: { 
+              amount: t.to_amount, 
+              currency: t.to_currency?.symbol || 'BTC', 
+              icon: t.to_currency?.icon_url ? <img src={t.to_currency.icon_url} alt="" className="w-full h-full object-cover rounded-full" /> : (t.to_currency?.symbol?.[0] || 'T')
+            }, 
+            status: t.status.charAt(0).toUpperCase() + t.status.slice(1), 
+            exchangeId: t.exchange_id 
+          }));
+          setTransactions(mappedTransactions);
+        }
+      }
+      setLoading(false);
+    };
+
+    fetchHistory();
+  }, []);
 
   const getStatusStyle = (status) => {
     switch (status) {
@@ -29,6 +58,14 @@ const HistoryPage = ({ onNavigate }) => {
       default: return "text-gray-500 bg-gray-50 border-gray-100";
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white pb-32">
@@ -63,7 +100,7 @@ const HistoryPage = ({ onNavigate }) => {
               <div className="bg-white rounded-[1.5rem] sm:rounded-[2.5rem] p-5 sm:p-8 border border-gray-100 shadow-sm hover:shadow-2xl hover:border-blue-100 transition-all cursor-pointer">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8 mb-6 sm:mb-8">
                   <div className="flex items-center gap-4 w-full sm:w-auto">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-green-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-green-600 font-black text-lg sm:text-xl border border-green-100 shrink-0">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-green-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-green-600 font-black text-lg sm:text-xl border border-green-100 shrink-0 overflow-hidden">
                       {transaction.from.icon}
                     </div>
                     <div>
@@ -86,7 +123,7 @@ const HistoryPage = ({ onNavigate }) => {
                       </p>
                       <p className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider">{transaction.to.currency}</p>
                     </div>
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-orange-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-orange-600 font-black text-xl sm:text-2xl border border-orange-100 sm:order-2 order-1 shrink-0">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-orange-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-orange-600 font-black text-xl sm:text-2xl border border-orange-100 sm:order-2 order-1 shrink-0 overflow-hidden">
                       {transaction.to.icon}
                     </div>
                   </div>
@@ -97,12 +134,17 @@ const HistoryPage = ({ onNavigate }) => {
                     {transaction.status}
                   </span>
                   <p className="text-[10px] sm:text-xs font-black text-blue-600/40 group-hover:text-blue-600 transition-colors uppercase tracking-widest leading-none">
-                    ID: {transaction.exchangeId.slice(-8)}
+                    ID: {transaction.exchangeId.split(':')[1]?.slice(-8) || transaction.exchangeId.slice(-8)}
                   </p>
                 </div>
               </div>
             </div>
           ))}
+          {transactions.length === 0 && (
+             <div className="col-span-full text-center py-12 text-gray-400 font-bold">
+                No history available.
+             </div>
+          )}
         </div>
       </div>
 

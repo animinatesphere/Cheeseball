@@ -1,9 +1,139 @@
-import React, { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { supabase } from "../../lib/supabaseClient";
+import { getCurrencies, getUserPortfolio } from "../../lib/api";
 
 const SwapCrypto = ({ onBack, onSwap, onNavigate }) => {
-  const [fromAmount, setFromAmount] = useState("5000");
-  const [toAmount, setToAmount] = useState("0.010000056");
+  const [fromAmount, setFromAmount] = useState("");
+  const [toAmount, setToAmount] = useState("");
+  const [currencies, setCurrencies] = useState([]);
+  const [portfolio, setPortfolio] = useState({});
+  const [fromCurrency, setFromCurrency] = useState("USDT");
+  const [toCurrency, setToCurrency] = useState("BTC");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      
+      // 1. Fetch Currencies
+      const { data: currData } = await getCurrencies();
+      if (currData) {
+        setCurrencies(currData);
+        if (currData.length > 0) {
+           // Default to first two if not set, or keep defaults
+           // For now, let's try to find USDT and BTC, or fallback
+           const hasUSDT = currData.find(c => c.symbol === 'USDT');
+           const hasBTC = currData.find(c => c.symbol === 'BTC');
+           if (hasUSDT) setFromCurrency(hasUSDT.symbol);
+           if (hasBTC) setToCurrency(hasBTC.symbol);
+        }
+      }
+
+      // 2. Fetch Portfolio
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data: portData } = await getUserPortfolio(session.user.id);
+        if (portData) setPortfolio(portData);
+      }
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  const handleFromChange = (e) => {
+    setFromCurrency(e.target.value);
+  };
+
+  const handleToChange = (e) => {
+    setToCurrency(e.target.value);
+  };
+
+  const getPrice = (symbol) => {
+    // If it's a stablecoin, force 1 USD (optional but good for UX)
+    if (['USDT', 'USDC'].includes(symbol)) return 1;
+
+    // Crypto prices from DB
+    const curr = currencies.find(c => c.symbol === symbol);
+    return curr ? Number(curr.price) : 0;
+  };
+
+  const handleFromAmountChange = (e) => {
+    const value = e.target.value;
+    setFromAmount(value);
+    
+    if (!value || isNaN(value)) {
+      setToAmount("");
+      return;
+    }
+
+    const fromPrice = getPrice(fromCurrency);
+    const toPrice = getPrice(toCurrency);
+
+    if (fromPrice && toPrice) {
+      // Calculate: (Amount * FromPrice) / ToPrice
+      const converted = (parseFloat(value) * fromPrice) / toPrice;
+      setToAmount(converted.toFixed(6));
+    }
+  };
+
+  const handleToAmountChange = (e) => {
+    const value = e.target.value;
+    setToAmount(value);
+
+    // If user types in "Receive", calculate "Send"
+    // Send = (Receive * ToPrice) / FromPrice
+    if (!value || isNaN(value)) {
+      setFromAmount("");
+      return;
+    }
+
+    const fromPrice = getPrice(fromCurrency);
+    const toPrice = getPrice(toCurrency);
+
+    if (fromPrice && toPrice) {
+      const converted = (parseFloat(value) * toPrice) / fromPrice;
+      setFromAmount(converted.toFixed(6));
+    }
+  };
+
+  // Recalculate when currency changes
+  useEffect(() => {
+    if (fromAmount) {
+        const fromPrice = getPrice(fromCurrency);
+        const toPrice = getPrice(toCurrency);
+        if (fromPrice && toPrice) {
+            const converted = (parseFloat(fromAmount) * fromPrice) / toPrice;
+            setToAmount(converted.toFixed(6));
+        }
+    }
+  }, [fromCurrency, toCurrency, currencies]);
+
+  const currentBalance = portfolio[fromCurrency] || 0;
+  const exchangeRate = getPrice(fromCurrency) && getPrice(toCurrency) 
+    ? (getPrice(fromCurrency) / getPrice(toCurrency)).toFixed(6) 
+    : "...";
+  
+  // Simple mock matching for icons/colors based on loaded currencies
+  const getCurrencyIcon = (symbol) => {
+    const curr = currencies.find(c => c.symbol === symbol);
+    return curr?.icon_url ? <img src={curr.icon_url} alt="" className="w-full h-full object-cover rounded-full" /> : (curr?.symbol?.[0] || symbol?.[0]);
+  };
+  
+  const getCurrencyColor = (symbol) => {
+     // fallback color logic or use data from DB if stored
+     return "bg-blue-500"; 
+  };
+
+  if (loading) {
+     return (
+       <div className="min-h-screen bg-white flex items-center justify-center">
+         <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+       </div>
+     );
+  }
 
   return (
     <div className="min-h-screen bg-white animate-fade-in pb-24">
@@ -32,23 +162,27 @@ const SwapCrypto = ({ onBack, onSwap, onNavigate }) => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-4 px-2 text-sm sm:text-base">
               <label className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest">Swap From</label>
               <div className="text-blue-600 font-bold text-[10px] sm:text-xs bg-blue-50 px-3 py-1 rounded-full">
-                Max: 12,000 USDT
+                Max: {currentBalance.toLocaleString()} {fromCurrency}
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6 bg-white rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-6 shadow-sm border border-gray-100 focus-within:border-blue-300 transition-all">
               <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100 w-full sm:w-auto">
-                <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white font-black text-xs shrink-0">
-                  T
+                <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white font-black text-xs shrink-0 overflow-hidden">
+                  {getCurrencyIcon(fromCurrency)}
                 </div>
-                <select className="bg-transparent font-black text-lg outline-none cursor-pointer flex-1 sm:flex-none">
-                  <option>USDT</option>
-                  <option>USDC</option>
+                <select 
+                  value={fromCurrency}
+                  onChange={handleFromChange}
+                  className="bg-transparent font-black text-lg outline-none cursor-pointer flex-1 sm:flex-none"
+                >
+                  {currencies.map(c => <option key={c.id} value={c.symbol}>{c.symbol}</option>)}
                 </select>
               </div>
               <input
-                type="text"
+                type="number"
+                placeholder="0.00"
                 value={fromAmount}
-                onChange={(e) => setFromAmount(e.target.value)}
+                onChange={handleFromAmountChange}
                 className="flex-1 bg-transparent text-left sm:text-right text-2xl sm:text-3xl font-black outline-none text-gray-900 placeholder-gray-200 min-w-0"
               />
             </div>
@@ -76,23 +210,27 @@ const SwapCrypto = ({ onBack, onSwap, onNavigate }) => {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-4 px-2">
               <label className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest">Swap To</label>
               <div className="text-gray-400 font-bold text-[10px] sm:text-xs bg-gray-100 px-3 py-1 rounded-full">
-                Est. Price: 1 BTC = 64,500 USDT
+                Est. Price: 1 {fromCurrency} ≈ {exchangeRate} {toCurrency}
               </div>
             </div>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6 bg-white rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-6 shadow-sm border border-gray-100 focus-within:border-blue-300 transition-all">
               <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100 w-full sm:w-auto">
-                <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white text-xl shrink-0">
-                  ₿
+                <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white text-xl shrink-0 overflow-hidden">
+                  {getCurrencyIcon(toCurrency)}
                 </div>
-                <select className="bg-transparent font-black text-lg outline-none cursor-pointer flex-1 sm:flex-none">
-                  <option>BTC</option>
-                  <option>ETH</option>
+                <select 
+                  value={toCurrency}
+                  onChange={handleToChange}
+                  className="bg-transparent font-black text-lg outline-none cursor-pointer flex-1 sm:flex-none"
+                >
+                   {currencies.map(c => <option key={c.id} value={c.symbol}>{c.symbol}</option>)}
                 </select>
               </div>
               <input
-                type="text"
+                type="number"
+                placeholder="0.00"
                 value={toAmount}
-                onChange={(e) => setToAmount(e.target.value)}
+                onChange={handleToAmountChange}
                 className="flex-1 bg-transparent text-left sm:text-right text-2xl sm:text-3xl font-black outline-none text-gray-900 placeholder-gray-200 min-w-0"
               />
             </div>
@@ -104,7 +242,22 @@ const SwapCrypto = ({ onBack, onSwap, onNavigate }) => {
           </button>
 
           <button
-            onClick={onSwap}
+            onClick={() => {
+              const fromCurrObj = currencies.find(c => c.symbol === fromCurrency);
+              const toCurrObj = currencies.find(c => c.symbol === toCurrency);
+              
+              onSwap({
+                type: 'swap',
+                fromAmount,
+                fromCurrency,
+                fromCurrencyId: fromCurrObj?.id,
+                fromCurrencyIcon: fromCurrObj?.icon_url,
+                toAmount,
+                toCurrency,
+                toCurrencyId: toCurrObj?.id,
+                toCurrencyIcon: toCurrObj?.icon_url,
+              });
+            }}
             className="w-full bg-[#0063BF] hover:bg-blue-700 text-white py-5 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] font-black text-lg sm:text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group"
           >
             <span>Preview Swap</span>

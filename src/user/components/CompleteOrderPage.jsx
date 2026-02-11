@@ -1,7 +1,54 @@
-import React from "react";
-import { Clock } from "lucide-react";
+import React, { useState } from "react";
+import { Clock, Loader2 } from "lucide-react";
+import { supabase } from "../../lib/supabaseClient";
+import { createTransaction } from "../../lib/api";
 
-const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer }) => {
+const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData }) => {
+  const [loading, setLoading] = useState(false);
+
+  const handleBuy = async () => {
+    if (!transactionData) return;
+    setLoading(true);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        setLoading(false);
+        return;
+      }
+
+      const exchangeId = `ID:${Math.random().toString(36).substring(2, 10)}`;
+
+      const payload = {
+        user_id: session.user.id,
+        exchange_id: exchangeId,
+        type: transactionData.type || 'buy',
+        status: 'waiting',
+        from_amount: transactionData.fromAmount,
+        from_currency_id: transactionData.fromCurrencyId,
+        from_token_network: transactionData.fromCurrency, 
+        to_amount: transactionData.toAmount,
+        to_currency_id: transactionData.toCurrencyId,
+        to_token_network: transactionData.toCurrency,
+        created_at: new Date().toISOString()
+      };
+
+      const { error } = await createTransaction(payload);
+      
+      if (error) {
+        console.error("Error creating transaction:", error);
+      } else {
+        onBuyWithBankTransfer();
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!transactionData) return null;
+
   return (
     <div className="min-h-screen bg-white animate-fade-in pb-24">
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
@@ -14,7 +61,7 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer }) => {
               <div className="w-4 h-4 sm:w-6 sm:h-6 rounded-full border-2 border-white/50 flex items-center justify-center">
                 <div className="w-2 h-2 sm:w-3 sm:h-3 bg-green-400 rounded-full shadow-[0_0_10px_rgba(74,222,128,0.5)]"></div>
               </div>
-              <span className="font-black text-[10px] sm:text-sm uppercase tracking-widest whitespace-nowrap">NGN • Nigeria</span>
+              <span className="font-black text-[10px] sm:text-sm uppercase tracking-widest whitespace-nowrap">{transactionData.fromCurrency} • Global</span>
             </div>
           </div>
           <h1 className="text-2xl sm:text-4xl font-black mb-1 sm:mb-2 tracking-tight">Order Confirmation</h1>
@@ -68,34 +115,44 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer }) => {
             <div className="space-y-6 flex-1">
                <div className="bg-gray-50 p-6 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] text-center mb-6 sm:mb-8 border border-gray-100">
                   <p className="text-[9px] sm:text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-3 sm:mb-4">You are buying</p>
-                  <p className="text-2xl sm:text-4xl font-black text-gray-900 mb-1 sm:mb-2 tabular-nums">0.00217609 <span className="text-lg sm:text-xl text-gray-400">BTC</span></p>
-                  <p className="text-blue-600 font-black text-base sm:text-lg">₦4,980,000.00</p>
+                  <p className="text-2xl sm:text-4xl font-black text-gray-900 mb-1 sm:mb-2 tabular-nums">{transactionData.toAmount} <span className="text-lg sm:text-xl text-gray-400">{transactionData.toCurrency}</span></p>
+                  <p className="text-blue-600 font-black text-base sm:text-lg">{Number(transactionData.fromAmount).toLocaleString()} {transactionData.fromCurrency}</p>
                </div>
 
                <div className="space-y-3 sm:space-y-4 px-2 sm:px-4 text-sm sm:text-base">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-400 font-bold">Exchange Rate</span>
-                    <span className="font-black text-gray-900 tabular-nums text-xs sm:text-base">1 BTC = ₦8,962,026.00</span>
+                    <span className="font-black text-gray-900 tabular-nums text-xs sm:text-base">1 {transactionData.toCurrency} = ... {transactionData.fromCurrency}</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-400 font-bold">Service Fee</span>
-                    <span className="font-black text-green-600 tabular-nums">₦20,000.00</span>
+                    <span className="font-black text-green-600 tabular-nums">0.00</span>
                   </div>
                   <div className="pt-4 sm:pt-6 border-t border-gray-100 flex justify-between items-center">
                     <span className="text-gray-900 font-black text-lg sm:text-xl">Total To Pay</span>
-                    <span className="font-black text-2xl sm:text-3xl text-blue-600 tabular-nums">₦5,000,000.00</span>
+                    <span className="font-black text-2xl sm:text-3xl text-blue-600 tabular-nums">{Number(transactionData.fromAmount).toLocaleString()} {transactionData.fromCurrency}</span>
                   </div>
                </div>
             </div>
 
             <button
-              onClick={onBuyWithBankTransfer}
-              className="w-full mt-8 sm:mt-12 bg-[#0063BF] hover:bg-blue-700 text-white py-5 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] font-black text-lg sm:text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group"
+              onClick={handleBuy}
+              disabled={loading}
+              className="w-full mt-8 sm:mt-12 bg-[#0063BF] hover:bg-blue-700 text-white py-5 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] font-black text-lg sm:text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              <span>Confirm & Pay Now</span>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-2 transition-transform">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
+               {loading ? (
+                <>
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                  <span>Processing...</span>
+                </>
+              ) : (
+                <>
+                  <span>Confirm & Pay Now</span>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-2 transition-transform">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                  </svg>
+                </>
+              )}
             </button>
           </div>
         </div>

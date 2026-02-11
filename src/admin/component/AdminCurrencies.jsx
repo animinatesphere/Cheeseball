@@ -1,18 +1,25 @@
-import React, { useState } from "react";
-import { Search, Plus, ArrowLeft } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, Plus, ArrowLeft, Loader2 } from "lucide-react";
+import { getCurrencies } from "../../lib/api";
 
 const AdminCurrencies = ({ onAddCurrency, onBack }) => {
   const [activeView, setActiveView] = useState("active");
   const [searchQuery, setSearchQuery] = useState("");
+  const [currencies, setCurrencies] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const currencies = [
-    { id: 1, name: "AAVE", symbol: "Aave", price: "$69.71", change: "+2.24%", positive: true, color: "bg-blue-500", icon: "A" },
-    { id: 2, name: "SOL", symbol: "Solana", price: "$145.20", change: "-1.15%", positive: false, color: "bg-purple-500", icon: "S" },
-    { id: 3, name: "BTC", symbol: "Bitcoin", price: "$64,500.00", change: "+3.40%", positive: true, color: "bg-orange-500", icon: "₿" },
-    { id: 4, name: "ETH", symbol: "Ethereum", price: "$3,420.00", change: "+1.20%", positive: true, color: "bg-indigo-500", icon: "Ξ" },
-    { id: 5, name: "DOGE", symbol: "Dogecoin", price: "$0.14", change: "-5.30%", positive: false, color: "bg-yellow-600", icon: "Ð" },
-    { id: 6, name: "LTC", symbol: "Litecoin", price: "$82.10", change: "+0.45%", positive: true, color: "bg-blue-600", icon: "Ł" },
-  ];
+  useEffect(() => {
+    const fetchCurrencies = async () => {
+      setLoading(true);
+      const { data } = await getCurrencies();
+      if (data) {
+        setCurrencies(data);
+      }
+      setLoading(false);
+    };
+
+    fetchCurrencies();
+  }, []);
 
   const MiniChart = ({ positive }) => (
     <svg width="60" height="24" viewBox="0 0 60 24" className="opacity-60">
@@ -25,6 +32,20 @@ const AdminCurrencies = ({ onAddCurrency, onBack }) => {
       />
     </svg>
   );
+
+  const filteredCurrencies = currencies.filter((c) => {
+    const matchesSearch = c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.symbol.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesView = activeView === "all" ? true : c.is_active;
+    return matchesSearch && matchesView;
+  });
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center h-full">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 overflow-y-auto pb-32 animate-fade-in">
@@ -82,15 +103,15 @@ const AdminCurrencies = ({ onAddCurrency, onBack }) => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {currencies.map((currency) => (
+          {filteredCurrencies.map((currency) => (
             <div
               key={currency.id}
               className="bg-white rounded-[2rem] p-5 flex items-center gap-5 hover:shadow-2xl hover:border-blue-100 transition-all border border-gray-50 group cursor-pointer"
             >
               <div
-                className={`w-14 h-14 ${currency.color} rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg shrink-0 group-hover:scale-110 transition-transform`}
+                className={`w-14 h-14 ${currency.color_class || 'bg-blue-500'} rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg shrink-0 group-hover:scale-110 transition-transform`}
               >
-                {currency.icon}
+                {currency.symbol ? currency.symbol[0] : '$'}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="font-black text-lg text-gray-900 leading-tight truncate">
@@ -103,12 +124,12 @@ const AdminCurrencies = ({ onAddCurrency, onBack }) => {
               
               <div className="text-right">
                 <div className="font-black text-gray-900 tabular-nums">
-                  {currency.price}
+                  ${currency.price}
                 </div>
                 <div className="flex items-center justify-end gap-2 mt-0.5">
-                   <MiniChart positive={currency.positive} />
-                   <span className={`text-[10px] font-black uppercase ${currency.positive ? "text-green-500" : "text-red-500"}`}>
-                    {currency.change}
+                   <MiniChart positive={currency.is_positive} />
+                   <span className={`text-[10px] font-black uppercase ${currency.is_positive ? "text-green-500" : "text-red-500"}`}>
+                    {currency.change_24h}
                   </span>
                 </div>
               </div>
@@ -116,13 +137,18 @@ const AdminCurrencies = ({ onAddCurrency, onBack }) => {
               {activeView === "all" && (
                 <div className="pl-2 ml-2 border-l border-gray-100">
                   <label className="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" className="sr-only peer" defaultChecked />
+                    <input type="checkbox" className="sr-only peer" defaultChecked={currency.is_active} />
                     <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
                   </label>
                 </div>
               )}
             </div>
           ))}
+          {filteredCurrencies.length === 0 && (
+             <div className="col-span-full text-center py-12 text-gray-400 font-bold">
+                No assets found matching your criteria.
+             </div>
+          )}
         </div>
       </div>
     </div>

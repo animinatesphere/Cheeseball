@@ -1,11 +1,38 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import AdminAccountHeader from "./AdminAccountHeader";
+import { getIncomeLogs } from "../../../lib/api";
+import { Loader2 } from "lucide-react";
 
 const AdminIncome = ({ onBack, onSelectTransaction }) => {
-  const transactions = Array(7).fill({
-    name: "Creative Omotayo",
-    amount: "₦125,500.65",
-  });
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchIncome = async () => {
+      setLoading(true);
+      const { data } = await getIncomeLogs();
+      if (data) {
+        const mappedLogs = data.map(log => ({
+          id: log.id,
+          name: log.source,
+          amount: `₦${Number(log.amount).toLocaleString()}`,
+          description: log.description
+        }));
+        setTransactions(mappedLogs);
+      }
+      setLoading(false);
+    };
+
+    fetchIncome();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center h-full">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 overflow-y-auto pb-32 animate-fade-in">
@@ -37,13 +64,13 @@ const AdminIncome = ({ onBack, onSelectTransaction }) => {
 
         <div className="flex justify-between items-center mb-8 px-2">
           <h2 className="text-xl font-black text-gray-900 tracking-tight">Recent Influx</h2>
-          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1.5 rounded-full">21st May - 25th Aug</span>
+          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1.5 rounded-full">This Month</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {transactions.map((transaction, index) => (
+          {transactions.map((transaction) => (
             <div
-              key={index}
+              key={transaction.id}
               className="bg-white rounded-3xl p-5 flex justify-between items-center shadow-sm border border-gray-50 hover:shadow-2xl hover:border-blue-100 transition-all group cursor-pointer"
             >
               <div className="flex items-center gap-5">
@@ -65,6 +92,11 @@ const AdminIncome = ({ onBack, onSelectTransaction }) => {
               </button>
             </div>
           ))}
+          {transactions.length === 0 && (
+             <div className="col-span-full text-center py-12 text-gray-400 font-bold">
+                No revenue logs recorded.
+             </div>
+          )}
         </div>
       </div>
     </div>

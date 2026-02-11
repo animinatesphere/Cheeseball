@@ -1,14 +1,41 @@
-import React, { useState } from "react";
-import { ChevronLeft, SlidersHorizontal, ArrowRight, Calendar } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ChevronLeft, SlidersHorizontal, ArrowRight, Calendar, Loader2 } from "lucide-react";
+import { getTransactions } from "../../lib/api";
 
 const AdminHistory = ({ onBack }) => {
   const [showFilter, setShowFilter] = useState(false);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const transactions = [
-    { id: 1, date: "02 July 2023", from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" }, to: { amount: "0.002445", currency: "BTC", icon: "₿" }, status: "Waiting", exchangeId: "voec666krovitepmd" },
-    { id: 2, date: "02 July 2023", from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" }, to: { amount: "0.002445", currency: "BTC", icon: "₿" }, status: "Approved", exchangeId: "voec666krovitepmd" },
-    { id: 3, date: "02 July 2023", from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" }, to: { amount: "0.002445", currency: "BTC", icon: "₿" }, status: "Cancel", exchangeId: "voec666krovitepmd" },
-  ];
+  useEffect(() => {
+    const fetchHistory = async () => {
+      setLoading(true);
+      const { data } = await getTransactions();
+      if (data) {
+        const mappedTransactions = data.map(t => ({
+          id: t.id,
+          date: new Date(t.created_at).toLocaleDateString("en-GB", { day: '2-digit', month: 'long', year: 'numeric' }),
+          from: { 
+            amount: t.from_amount, 
+            currency: t.from_currency?.symbol || 'USD', 
+            symbol: t.from_token_network, 
+            icon: t.from_currency?.symbol?.[0] || 'F' 
+          }, 
+          to: { 
+            amount: t.to_amount, 
+            currency: t.to_currency?.symbol || 'BTC', 
+            icon: t.to_currency?.symbol?.[0] || 'T' 
+          }, 
+          status: t.status.charAt(0).toUpperCase() + t.status.slice(1), 
+          exchangeId: t.exchange_id 
+        }));
+        setTransactions(mappedTransactions);
+      }
+      setLoading(false);
+    };
+
+    fetchHistory();
+  }, []);
 
   const getStatusInfo = (status) => {
     switch (status) {
@@ -18,6 +45,14 @@ const AdminHistory = ({ onBack }) => {
       default: return { color: "text-gray-500 bg-gray-50", label: status };
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center h-full">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 overflow-y-auto pb-32 animate-fade-in">
@@ -90,12 +125,17 @@ const AdminHistory = ({ onBack }) => {
                     <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${statusInfo.color}`}>
                       {statusInfo.label}
                     </span>
-                    <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest"> ID: {transaction.exchangeId.slice(-8)} </p>
+                    <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest"> ID: {transaction.exchangeId.split(':')[1]?.slice(-8) || transaction.exchangeId.slice(-8)} </p>
                   </div>
                 </div>
               </div>
             );
           })}
+          {transactions.length === 0 && (
+            <div className="text-center py-12 text-gray-400 font-bold">
+              No audit logs available.
+            </div>
+          )}
         </div>
       </div>
     </div>

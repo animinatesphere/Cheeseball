@@ -1,7 +1,40 @@
-import React from "react";
-import { Plus, ChevronLeft, SendHorizontal } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Plus, ChevronLeft, SendHorizontal, Loader2 } from "lucide-react";
+import { getNotifications } from "../../../lib/api";
 
-const AdminNotifications = ({ notifications, onBack, onAdd }) => {
+const AdminNotifications = ({ notifications: propNotifications, onBack, onAdd }) => {
+  const [notifications, setNotifications] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      setLoading(true);
+      const { data } = await getNotifications();
+      if (data) {
+        const mappedNotifications = data.map(n => ({
+          id: n.id,
+          title: n.title,
+          heading: n.heading,
+          body: n.body,
+          date: new Date(n.created_at).toLocaleDateString("en-GB", { day: '2-digit', month: 'short', year: 'numeric' }),
+          isRead: n.is_read
+        }));
+        setNotifications(mappedNotifications);
+      }
+      setLoading(false);
+    };
+
+    fetchNotifications();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center h-full">
+        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 overflow-y-auto pb-32 animate-fade-in">
       <div className="sticky top-0 bg-white/80 backdrop-blur-md z-10 border-b border-gray-100 px-4 sm:px-6">
@@ -27,11 +60,11 @@ const AdminNotifications = ({ notifications, onBack, onAdd }) => {
           {notifications.map((notification) => (
             <div
               key={notification.id}
-              className="bg-white rounded-[2rem] p-6 sm:p-8 shadow-sm border border-gray-50 hover:shadow-2xl hover:border-blue-100 transition-all group"
+              className={`bg-white rounded-[2rem] p-6 sm:p-8 shadow-sm border border-gray-50 hover:shadow-2xl hover:border-blue-100 transition-all group ${!notification.isRead ? 'border-l-4 border-l-blue-600' : ''}`}
             >
               <div className="flex justify-between items-start mb-4">
                 <div className="flex items-center gap-3">
-                   <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+                   {!notification.isRead && <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>}
                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
                      {notification.title}
                    </span>
@@ -52,6 +85,11 @@ const AdminNotifications = ({ notifications, onBack, onAdd }) => {
               </div>
             </div>
           ))}
+          {notifications.length === 0 && (
+             <div className="text-center py-12 text-gray-400 font-bold">
+                No system alerts found.
+             </div>
+          )}
         </div>
       </div>
     </div>

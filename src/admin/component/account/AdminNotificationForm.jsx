@@ -1,7 +1,28 @@
-import React from "react";
-import { X, BellRing, Calendar, Clock } from "lucide-react";
+import React, { useState } from "react";
+import { X, BellRing, Calendar, Clock, Loader2 } from "lucide-react";
+import { createNotification } from "../../../lib/api";
 
 const AdminNotificationForm = ({ onClose, onSave }) => {
+  const [formData, setFormData] = useState({
+    title: "",
+    heading: "",
+    body: "",
+    type: "system"
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    const { data, error } = await createNotification(formData);
+    setLoading(false);
+
+    if (data) {
+      onSave(data[0]);
+    } else {
+      console.error("Error creating notification:", error);
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm animate-fade-in">
       <div className="bg-white rounded-[2.5rem] w-full max-w-lg shadow-2xl animate-bounce-in overflow-hidden">
@@ -30,42 +51,28 @@ const AdminNotificationForm = ({ onClose, onSave }) => {
             <div className="space-y-6">
               <div>
                 <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 px-1">
-                  Subject Header
+                  Subject Header (Title)
                 </label>
                 <input
                   type="text"
-                  placeholder="Enter transmission title..."
+                  placeholder="e.g. System Update"
+                  value={formData.title}
+                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full px-5 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-blue-100 outline-none transition-all font-bold text-gray-900 shadow-inner"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 px-1">
-                    Release Date
-                  </label>
-                  <div className="relative group">
-                    <input
-                      type="text"
-                      defaultValue="11:00am"
-                      className="w-full pl-12 pr-4 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-blue-100 outline-none transition-all font-bold text-gray-900 shadow-inner"
-                    />
-                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600" />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 px-1">
-                    Release Time
-                  </label>
-                  <div className="relative group">
-                    <input
-                      type="text"
-                      defaultValue="05:00pm"
-                      className="w-full pl-12 pr-4 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-blue-100 outline-none transition-all font-bold text-gray-900 shadow-inner"
-                    />
-                    <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600" />
-                  </div>
-                </div>
+               <div>
+                <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 px-1">
+                  Alert Heading
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Maintenance Scheduled"
+                  value={formData.heading}
+                  onChange={(e) => setFormData({ ...formData, heading: e.target.value })}
+                  className="w-full px-5 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-blue-100 outline-none transition-all font-bold text-gray-900 shadow-inner"
+                />
               </div>
 
               <div>
@@ -74,16 +81,19 @@ const AdminNotificationForm = ({ onClose, onSave }) => {
                 </label>
                 <textarea
                   placeholder="Describe the alert parameters..."
+                  value={formData.body}
+                  onChange={(e) => setFormData({ ...formData, body: e.target.value })}
                   className="w-full px-5 py-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-blue-100 outline-none transition-all font-bold text-gray-900 shadow-inner h-32 resize-none"
                 />
               </div>
             </div>
 
             <button
-              onClick={() => onSave({})}
-              className="w-full mt-4 bg-blue-600 text-white py-5 rounded-[2rem] font-black text-lg shadow-2xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-[0.98]"
+              onClick={handleSubmit}
+              disabled={loading}
+              className="w-full mt-4 bg-blue-600 text-white py-5 rounded-[2rem] font-black text-lg shadow-2xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
             >
-              Initialize Broadcast
+              {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : "Initialize Broadcast"}
             </button>
           </div>
         </div>
