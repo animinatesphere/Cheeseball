@@ -18,6 +18,7 @@ import AddressBook from "../components/AddressBook";
 import SupportPage from "../components/SupportPage";
 import HistoryPage from "../components/HistoryPage";
 import AlertRatesPage from "../components/AlertRatesPage";
+import BottomNav from "../components/BottomNav";
 
 const CurrencyPage = () => {
   const [currentPage, setCurrentPage] = useState("rates");
@@ -66,6 +67,7 @@ const CurrencyPage = () => {
           <SwapCrypto
             onBack={handleBack}
             onSwap={() => setCurrentPage("confirm")}
+            onNavigate={handleNavigation}
           />
         );
 
@@ -196,7 +198,7 @@ const CurrencyPage = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-white">
       <style>{`
         @keyframes fade-in {
           from { opacity: 0; }
@@ -214,8 +216,11 @@ const CurrencyPage = () => {
           animation: bounce-in 0.5s ease-out;
         }
       `}</style>
-      {renderPage()}
+      <div className="pb-32">
+        {renderPage()}
+      </div>
       {renderModal()}
+      <BottomNav currentPage={currentPage} onNavigate={handleNavigation} />
     </div>
   );
 };

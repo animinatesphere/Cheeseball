@@ -2,6 +2,7 @@ import React from "react";
 import logo from "../assets/CHEESEBALL 1.png";
 import un from "../assets/undraw_mobile-pay_yho9 1.png";
 import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
 const SellCrypto = () => {
   const navigate = useNavigate();
@@ -14,50 +15,52 @@ const SellCrypto = () => {
   return (
     <>
       {/* container */}
-      <div className="page-container slide-in">
-        <p
-          className="text-[#0063BF] text-[12px] sm:text-[14px] md:text-[16px] op animate-bounce lg:text-[18px] font-extrabold text-right p-5 cursor-pointer"
-          onClick={handleClick2}
-        >
-          Skip
-        </p>
-        <div>
-          <img src={logo} alt="" className="  max-w-[400px] mx-auto" />
+      <div className="min-h-screen flex flex-col bg-white page-container slide-in">
+        <div className="max-w-7xl mx-auto w-full flex flex-col flex-1 px-4 sm:px-6">
+          <div className="flex justify-end py-4 sm:py-6">
+            <p
+              className="text-[#0063BF] text-base sm:text-lg font-bold cursor-pointer hover:bg-blue-50 px-4 py-2 rounded-full transition-all"
+              onClick={handleClick2}
+            >
+              Skip
+            </p>
+          </div>
+
+          <div className="flex-1 flex flex-col lg:flex-row items-center justify-center lg:justify-between gap-8 sm:gap-12 pb-8 sm:pb-12">
+            <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1 w-full">
+              <img src={logo} alt="Cheeseball Logo" className="w-full max-w-[200px] sm:max-w-[280px] mb-6 sm:mb-8" />
+              <h2 className="text-2xl sm:text-4xl font-black text-gray-900 mb-4 sm:mb-6 op tracking-tight">
+                Sell Your Crypto Asset
+              </h2>
+              <p className="text-gray-600 text-base sm:text-lg mb-8 sm:mb-10 max-w-md font-medium op leading-relaxed">
+                Need to convert your crypto back to fiat? Selling your assets is quick
+                and secure. Choose the cryptocurrency you want to sell, and see your 
+                estimated payout instantly.
+              </p>
+              
+              <div className="flex items-center gap-4 mt-auto">
+                <div className="flex gap-2">
+                  <Link to="/buy-crypto" className="w-2.5 sm:w-3 h-2 bg-gray-200 rounded-full cursor-pointer hover:bg-gray-300 transition-all"></Link>
+                  <div className="w-10 sm:w-12 h-2 bg-[#0063BF] rounded-full"></div>
+                  <div onClick={handleClick2} className="w-2.5 sm:w-3 h-2 bg-gray-200 rounded-full cursor-pointer hover:bg-gray-300 transition-all"></div>
+                </div>
+                <button 
+                  onClick={handleClick2}
+                  className="bg-[#0063BF] hover:bg-blue-700 text-white w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg shadow-blue-200 transition-all hover:translate-x-1"
+                >
+                  <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 flex justify-center order-1 lg:order-2 w-full">
+              <div className="relative group w-full max-w-[320px] sm:max-w-[550px]">
+                <div className="absolute inset-0 bg-blue-100 rounded-full blur-[60px] sm:blur-[100px] opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                <img src={un} alt="Sell Crypto Illustration" className="relative w-full drop-shadow-2xl transition-transform group-hover:scale-105 duration-500" />
+              </div>
+            </div>
+          </div>
         </div>
-        <div>
-          <img src={un} alt="" className="max-w-[500px] mx-auto" />
-        </div>
-        <p
-          className="text-[12px] sm:text-[14px] md:text-[16px] lg:text-[18px] font-bold text-center mt-5"
-          text="BUY, SELL & SWAP CRYPTO op"
-        >
-          Sell Your Crypto Asset
-        </p>
-        <p className="text-[12px] sm:text-[14px] md:text-[16px] lg:text-[18px] op font-semibold max-w-[340px] mx-auto text-center mt-2">
-          Need to convert your crypto back to fiat? Selling your assets is quick
-          and secure. Choose the cryptocurrency you want to sell, enter the
-          amount, and see your estimated payout instantly.
-        </p>
-      </div>
-
-      <div className="flex items-center gap-[15px] justify-center mt-8">
-        <Link
-          to="/buy-crypto"
-          className=" bg-[#E3EAF2] w-[15px] h-[15px] rounded-full"
-        >
-          {" "}
-          <span className="bg-[#E3EAF2] w-[15px] h-[15px] rounded-full"></span>
-        </Link>
-
-        <span
-          className="bg-[#0063BF] cursor-pointer w-[15px] h-[15px] rounded-full"
-          onClick={handleClick}
-        ></span>
-
-        <span
-          onClick={handleClick2}
-          className="bg-[#E3EAF2] cursor-pointer w-[15px] h-[15px] rounded-full"
-        ></span>
       </div>
       {/* end of container */}
     </>

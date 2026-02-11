@@ -11,57 +11,64 @@ export default function CheeseBallLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      {/* Status Bar */}
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center px-6 pt-12">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex flex-col justify-center items-center p-6">
+      <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl shadow-blue-100 p-8 sm:p-12">
         {/* Logo */}
-        <img
-          src={logo}
-          alt="CheeseBall Logo"
-          // className="w-24 h-24 mb-6"
-        />
+        <div className="flex justify-center mb-12">
+          <img
+            src={logo}
+            alt="CheeseBall Logo"
+            className="w-full max-w-[240px]"
+          />
+        </div>
+
+        <h2 className="text-2xl font-bold text-gray-800 mb-8 text-center op">
+          Admin Access
+        </h2>
 
         {/* Form */}
-        <form onSubmit={handleLogin} className="w-full max-w-sm mt-30">
+        <form onSubmit={handleLogin} className="space-y-6">
           {/* Email Field */}
-          <div className="mb-6">
-            <label className="block op text-blue-600 text-sm font-bold mb-2">
+          <div>
+            <label className="block op text-gray-700 text-sm font-bold mb-2 ml-1">
               Email/Username
             </label>
             <input
               type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border-2 op border-blue-600 rounded-lg focus:outline-none focus:border-blue-700 text-gray-700"
-              placeholder="creativeomtayo@gmail.co"
+              className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-500 rounded-2xl focus:outline-none transition-all text-gray-700 op"
+              placeholder="admin@cheeseball.com"
             />
           </div>
 
           {/* Password Field */}
-          <div className="mb-8">
-            <label className="block op text-gray-400 text-sm font-semibold mb-2">
+          <div>
+            <label className="block op text-gray-700 text-sm font-bold mb-2 ml-1">
               Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 op bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:bg-white focus:border-blue-600 text-gray-700"
-              placeholder="Enter your password"
+              className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-500 rounded-2xl focus:outline-none transition-all text-gray-700 op"
+              placeholder="••••••••"
             />
           </div>
-          <Link to="/admin-dashboard">
-            {/* Login Button */}
+
+          <Link to="/admin-dashboard" className="block pt-4">
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white font-semibold py-4 rounded-xl hover:bg-blue-700 transition-colors shadow-md"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 rounded-2xl shadow-lg shadow-blue-200 transition-all hover:scale-[1.02] active:scale-[0.98] op"
             >
-              Login
+              Login to Dashboard
             </button>
           </Link>
         </form>
+
+        <div className="mt-12 text-center text-gray-400 text-sm">
+          <p>Protected by industrial grade encryption</p>
+        </div>
       </div>
     </div>
   );

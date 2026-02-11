@@ -14,302 +14,153 @@ const HistoryPage = ({ onNavigate }) => {
   const [selectedStatus, setSelectedStatus] = useState("Waiting");
 
   const transactions = [
-    {
-      id: 1,
-      date: "02 July 2023",
-      from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" },
-      to: { amount: "0.002445", currency: "BTC", icon: "₿" },
-      status: "Waiting",
-      exchangeId: "Exchange ID:voec666krovitepmd",
-    },
-    {
-      id: 2,
-      date: "02 July 2023",
-      from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" },
-      to: { amount: "0.002445", currency: "BTC", icon: "₿" },
-      status: "Approved",
-      exchangeId: "Exchange ID:voec666krovitepmd",
-    },
-    {
-      id: 3,
-      date: "02 July 2023",
-      from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" },
-      to: { amount: "0.002445", currency: "BTC", icon: "₿" },
-      status: "Cancel",
-      exchangeId: "Exchange ID:voec666krovitepmd",
-    },
-    {
-      id: 4,
-      date: "02 July 2023",
-      from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" },
-      to: { amount: "0.002445", currency: "BTC", icon: "₿" },
-      status: "Waiting",
-      exchangeId: "Exchange ID:voec666krovitepmd",
-    },
-    {
-      id: 5,
-      date: "02 July 2023",
-      from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" },
-      to: { amount: "0.002445", currency: "BTC", icon: "₿" },
-      status: "Approved",
-      exchangeId: "Exchange ID:voec666krovitepmd",
-    },
+    { id: 1, date: "02 July 2023", from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" }, to: { amount: "0.002445", currency: "BTC", icon: "₿" }, status: "Waiting", exchangeId: "voec666krovitepmd" },
+    { id: 2, date: "02 July 2023", from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" }, to: { amount: "0.002445", currency: "BTC", icon: "₿" }, status: "Approved", exchangeId: "voec666krovitepmd" },
+    { id: 3, date: "02 July 2023", from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" }, to: { amount: "0.002445", currency: "BTC", icon: "₿" }, status: "Cancel", exchangeId: "voec666krovitepmd" },
+    { id: 4, date: "02 July 2023", from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" }, to: { amount: "0.002445", currency: "BTC", icon: "₿" }, status: "Waiting", exchangeId: "voec666krovitepmd" },
+    { id: 5, date: "02 July 2023", from: { amount: "5000", currency: "USDT", symbol: "TRC-20", icon: "T" }, to: { amount: "0.002445", currency: "BTC", icon: "₿" }, status: "Approved", exchangeId: "voec666krovitepmd" },
   ];
 
-  const getStatusColor = (status) => {
+  const getStatusStyle = (status) => {
     switch (status) {
-      case "Waiting":
-        return "text-orange-500 bg-orange-50";
-      case "Approved":
-        return "text-green-600 bg-green-50";
-      case "Cancel":
-        return "text-red-500 bg-red-50";
-      default:
-        return "text-gray-500 bg-gray-50";
+      case "Waiting": return "text-orange-600 bg-orange-50 border-orange-100";
+      case "Approved": return "text-green-600 bg-green-50 border-green-100";
+      case "Cancel": return "text-red-600 bg-red-50 border-red-100";
+      default: return "text-gray-500 bg-gray-50 border-gray-100";
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <div className="bg-blue-600 text-white p-4 flex items-center justify-between">
-        <div className="flex items-center">
-          <button onClick={() => onNavigate("rates")} className="mr-4">
-            <ChevronLeft size={24} />
-          </button>
-          <h1 className="text-lg font-semibold">Swap History</h1>
-        </div>
-        <button
-          onClick={() => setShowFilterModal(true)}
-          className="p-2 hover:bg-white/20 rounded-lg transition-colors"
-        >
-          <SlidersHorizontal size={20} />
-        </button>
-      </div>
-
-      {/* Transaction List */}
-      <div className="px-4 py-4 space-y-4">
-        {transactions.map((transaction, index) => (
-          <div key={transaction.id}>
-            {(index === 0 ||
-              transactions[index - 1].date !== transaction.date) && (
-              <h3 className="text-sm font-semibold text-gray-700 mb-3 mt-2">
-                {transaction.date}
-              </h3>
-            )}
-            <div className="bg-white rounded-xl p-4 shadow-sm">
-              <div className="flex items-center justify-between mb-3">
-                {/* From Currency */}
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-teal-500 rounded-full flex items-center justify-center text-white font-bold">
-                    {transaction.from.icon}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">
-                      {transaction.from.amount} {transaction.from.currency}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {transaction.from.symbol}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Arrow */}
-                <ArrowRight
-                  className="text-blue-600 flex-shrink-0 mx-2"
-                  size={20}
-                />
-
-                {/* To Currency */}
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold">
-                    {transaction.to.icon}
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">
-                      {transaction.to.amount} {transaction.to.currency}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {transaction.to.currency}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Status and Exchange ID */}
-              <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
-                    transaction.status
-                  )}`}
-                >
-                  {transaction.status}
-                </span>
-                <p className="text-xs text-blue-600 font-medium">
-                  {transaction.exchangeId}
-                </p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Filter Modal */}
-      {showFilterModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-end">
-          <div className="bg-white w-full rounded-t-3xl p-6 animate-slide-up">
-            <div className="flex justify-between items-center mb-6">
-              <button onClick={() => setShowFilterModal(false)}>
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-              <h2 className="text-lg font-bold">Filter</h2>
-              <div className="w-6"></div>
-            </div>
-
-            {/* Time Filter */}
-            <div className="flex space-x-2 mb-6">
-              {["All", "Today", "Week", "Month"].map((filter) => (
-                <button
-                  key={filter}
-                  onClick={() => setSelectedFilter(filter)}
-                  className={`flex-1 py-2 rounded-lg font-medium transition-all ${
-                    selectedFilter === filter
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-600"
-                  }`}
-                >
-                  {filter === "All" && (
-                    <svg
-                      className="w-4 h-4 inline mr-1"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  )}
-                  {filter}
-                </button>
-              ))}
-            </div>
-
-            {/* Custom Dates */}
-            <h3 className="font-bold text-gray-900 mb-3">Custom dates</h3>
-            <div className="flex items-center space-x-4 mb-6">
-              <div className="flex-1">
-                <label className="text-sm text-gray-600 mb-1 block">From</label>
-                <div className="flex items-center bg-gray-100 rounded-lg px-3 py-2">
-                  <span className="flex-1 text-sm text-gray-700">20/07/25</span>
-                  <Calendar size={16} className="text-gray-400" />
-                </div>
-              </div>
-              <div className="flex-1">
-                <label className="text-sm text-gray-600 mb-1 block">To</label>
-                <div className="flex items-center bg-gray-100 rounded-lg px-3 py-2">
-                  <span className="flex-1 text-sm text-blue-600">20/07/25</span>
-                  <Calendar size={16} className="text-gray-400" />
-                </div>
-              </div>
-            </div>
-
-            {/* Currencies */}
-            <h3 className="font-bold text-gray-900 mb-3">Currencies</h3>
-            <div className="mb-3">
-              <p className="text-sm text-gray-600 mb-2">You send</p>
-              <div className="flex items-center justify-between bg-gray-100 rounded-lg p-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold">
-                    ₿
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">Bitcoin</p>
-                    <p className="text-xs text-gray-500">BTC</p>
-                  </div>
-                </div>
-                <svg
-                  className="w-5 h-5 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
-            </div>
-
-            <div className="mb-6">
-              <p className="text-sm text-gray-600 mb-2">You get</p>
-              <div className="flex items-center justify-between bg-gray-100 rounded-lg p-3">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-teal-500 rounded-full flex items-center justify-center text-white font-bold">
-                    T
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900">5000 USDT</p>
-                    <p className="text-xs text-gray-500">TRC-20</p>
-                  </div>
-                </div>
-                <svg
-                  className="w-5 h-5 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </div>
-            </div>
-
-            {/* Status */}
-            <h3 className="font-bold text-gray-900 mb-3">Status</h3>
-            <div className="flex space-x-2 mb-6">
-              {["Waiting", "Waiting", "Waiting"].map((status, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setSelectedStatus(status)}
-                  className={`flex-1 py-2 rounded-lg font-medium transition-all ${
-                    idx === 1
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-600"
-                  }`}
-                >
-                  {status}
-                  {idx === 1 && " ✕"}
-                </button>
-              ))}
-            </div>
-
-            {/* Actions */}
-            <button className="text-blue-600 font-semibold mb-3 w-full text-center">
-              Clear all
+    <div className="min-h-screen bg-white pb-32">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+          <div className="flex justify-between items-center mb-6 sm:mb-8">
+            <button onClick={() => onNavigate("rates")} className="p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 rounded-xl sm:rounded-2xl transition-all border border-white/10">
+              <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
-            <button className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold">
-              Ok, I got it
+            <button
+              onClick={() => setShowFilterModal(true)}
+              className="p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 rounded-xl sm:rounded-2xl transition-all border border-white/10"
+            >
+              <SlidersHorizontal className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+          </div>
+          <h1 className="text-2xl sm:text-4xl font-black tracking-tight">Swap History</h1>
+          <p className="text-blue-200 text-sm sm:text-base font-medium">Tracking your global transactions</p>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-8 sm:mt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+          {transactions.map((transaction, index) => (
+            <div key={transaction.id} className="group">
+              {(index === 0 || transactions[index - 1].date !== transaction.date) && (
+                <div className="flex items-center gap-4 mb-4 sm:mb-6 px-2 sm:px-4">
+                  <span className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-[0.2em]">{transaction.date}</span>
+                  <div className="h-px bg-gray-100 flex-1"></div>
+                </div>
+              )}
+              <div className="bg-white rounded-[1.5rem] sm:rounded-[2.5rem] p-5 sm:p-8 border border-gray-100 shadow-sm hover:shadow-2xl hover:border-blue-100 transition-all cursor-pointer">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8 mb-6 sm:mb-8">
+                  <div className="flex items-center gap-4 w-full sm:w-auto">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-green-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-green-600 font-black text-lg sm:text-xl border border-green-100 shrink-0">
+                      {transaction.from.icon}
+                    </div>
+                    <div>
+                      <p className="font-black text-lg sm:text-xl text-gray-900 leading-none mb-1">
+                        {transaction.from.amount} <span className="text-gray-400 text-xs sm:text-sm">{transaction.from.currency}</span>
+                      </p>
+                      <p className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider">{transaction.from.symbol}</p>
+                    </div>
+                  </div>
+
+                  <div className="hidden sm:block p-3 rounded-full bg-blue-50 text-blue-600">
+                    <ArrowRight size={20} className="stroke-[3px]" />
+                  </div>
+                  <div className="sm:hidden w-full h-px bg-gray-50"></div>
+
+                  <div className="flex items-center gap-4 w-full sm:w-auto sm:text-right">
+                    <div className="sm:order-1 order-2 flex-1 sm:flex-none">
+                       <p className="font-black text-lg sm:text-xl text-gray-900 leading-none mb-1">
+                        {transaction.to.amount} <span className="text-gray-400 text-xs sm:text-sm">{transaction.to.currency}</span>
+                      </p>
+                      <p className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider">{transaction.to.currency}</p>
+                    </div>
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-orange-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-orange-600 font-black text-xl sm:text-2xl border border-orange-100 sm:order-2 order-1 shrink-0">
+                      {transaction.to.icon}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-4 sm:pt-6 border-t border-gray-50">
+                  <span className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider border ${getStatusStyle(transaction.status)}`}>
+                    {transaction.status}
+                  </span>
+                  <p className="text-[10px] sm:text-xs font-black text-blue-600/40 group-hover:text-blue-600 transition-colors uppercase tracking-widest leading-none">
+                    ID: {transaction.exchangeId.slice(-8)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Simplified Filter Modal for Full-Width */}
+      {showFilterModal && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-6 backdrop-blur-sm">
+          <div className="bg-white w-full max-w-xl rounded-[3rem] p-10 animate-bounce-in shadow-2xl">
+            <div className="flex justify-between items-center mb-10">
+              <h2 className="text-3xl font-black text-gray-900 tracking-tight">Filter Results</h2>
+              <button onClick={() => setShowFilterModal(false)} className="p-2 hover:bg-gray-100 rounded-xl transition-all">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            <div className="space-y-8">
+              <div>
+                <label className="text-gray-400 font-black uppercase text-xs tracking-widest mb-4 block">Time Range</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {["Today", "Week", "Month", "All"].map((filter) => (
+                    <button
+                      key={filter}
+                      onClick={() => setSelectedFilter(filter)}
+                      className={`py-4 rounded-2xl font-black transition-all border-2 ${
+                        selectedFilter === filter ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-100" : "border-gray-100 text-gray-500 hover:border-blue-200"
+                      }`}
+                    >
+                      {filter}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-gray-400 font-black uppercase text-xs tracking-widest mb-4 block">Custom Range</label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <p className="text-[10px] font-black uppercase text-gray-400 mb-1">Start Date</p>
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-gray-900">20/07/25</span>
+                      <Calendar size={18} className="text-blue-600" />
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <p className="text-[10px] font-black uppercase text-gray-400 mb-1">End Date</p>
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold text-gray-900">Today</span>
+                      <Calendar size={18} className="text-blue-600" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowFilterModal(false)}
+              className="w-full mt-10 bg-[#0063BF] text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl shadow-blue-200 hover:bg-blue-700 transition-all"
+            >
+              Apply Filter
             </button>
           </div>
         </div>

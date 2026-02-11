@@ -1,0 +1,132 @@
+import React, { useState } from "react";
+import { Search, Plus, ArrowLeft } from "lucide-react";
+
+const AdminCurrencies = ({ onAddCurrency, onBack }) => {
+  const [activeView, setActiveView] = useState("active");
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const currencies = [
+    { id: 1, name: "AAVE", symbol: "Aave", price: "$69.71", change: "+2.24%", positive: true, color: "bg-blue-500", icon: "A" },
+    { id: 2, name: "SOL", symbol: "Solana", price: "$145.20", change: "-1.15%", positive: false, color: "bg-purple-500", icon: "S" },
+    { id: 3, name: "BTC", symbol: "Bitcoin", price: "$64,500.00", change: "+3.40%", positive: true, color: "bg-orange-500", icon: "₿" },
+    { id: 4, name: "ETH", symbol: "Ethereum", price: "$3,420.00", change: "+1.20%", positive: true, color: "bg-indigo-500", icon: "Ξ" },
+    { id: 5, name: "DOGE", symbol: "Dogecoin", price: "$0.14", change: "-5.30%", positive: false, color: "bg-yellow-600", icon: "Ð" },
+    { id: 6, name: "LTC", symbol: "Litecoin", price: "$82.10", change: "+0.45%", positive: true, color: "bg-blue-600", icon: "Ł" },
+  ];
+
+  const MiniChart = ({ positive }) => (
+    <svg width="60" height="24" viewBox="0 0 60 24" className="opacity-60">
+      <path
+        d="M0,18 Q10,14 20,12 T40,10 T60,6"
+        fill="none"
+        stroke={positive ? "#22C55E" : "#EF4444"}
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+
+  return (
+    <div className="flex-1 overflow-y-auto pb-32 animate-fade-in">
+      <div className="sticky top-0 bg-white/80 backdrop-blur-md z-10 border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between py-6">
+            <div className="flex items-center gap-4">
+              <button onClick={onBack} className="p-2.5 hover:bg-gray-100 rounded-xl transition-all active:scale-95">
+                <ArrowLeft className="w-6 h-6 text-gray-900" />
+              </button>
+              <h1 className="text-2xl font-black text-gray-900 tracking-tight">Market Assets</h1>
+            </div>
+            <button
+              onClick={onAddCurrency}
+              className="bg-blue-600 text-white p-3 rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-2"
+            >
+              <Plus className="w-5 h-5" />
+              <span className="hidden sm:inline font-black uppercase text-[10px] tracking-widest px-1">Add New</span>
+            </button>
+          </div>
+
+          <div className="pb-6 flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search global assets..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-12 pr-6 py-4 bg-gray-50 rounded-[1.5rem] border-2 border-transparent focus:border-blue-100 focus:bg-white outline-none transition-all font-bold text-gray-900 shadow-inner"
+              />
+            </div>
+
+            <div className="flex gap-2 p-1.5 bg-gray-50 rounded-2xl sm:w-auto">
+              <button
+                onClick={() => setActiveView("active")}
+                className={`px-6 py-2.5 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all ${
+                  activeView === "active" ? "bg-white text-blue-600 shadow-md" : "text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                Active
+              </button>
+              <button
+                onClick={() => setActiveView("all")}
+                className={`px-6 py-2.5 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all ${
+                  activeView === "all" ? "bg-white text-blue-600 shadow-md" : "text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                Global List
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {currencies.map((currency) => (
+            <div
+              key={currency.id}
+              className="bg-white rounded-[2rem] p-5 flex items-center gap-5 hover:shadow-2xl hover:border-blue-100 transition-all border border-gray-50 group cursor-pointer"
+            >
+              <div
+                className={`w-14 h-14 ${currency.color} rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg shrink-0 group-hover:scale-110 transition-transform`}
+              >
+                {currency.icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-black text-lg text-gray-900 leading-tight truncate">
+                  {currency.name}
+                </div>
+                <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                  {currency.symbol}
+                </div>
+              </div>
+              
+              <div className="text-right">
+                <div className="font-black text-gray-900 tabular-nums">
+                  {currency.price}
+                </div>
+                <div className="flex items-center justify-end gap-2 mt-0.5">
+                   <MiniChart positive={currency.positive} />
+                   <span className={`text-[10px] font-black uppercase ${currency.positive ? "text-green-500" : "text-red-500"}`}>
+                    {currency.change}
+                  </span>
+                </div>
+              </div>
+
+              {activeView === "all" && (
+                <div className="pl-2 ml-2 border-l border-gray-100">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" className="sr-only peer" defaultChecked />
+                    <div className="w-10 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                  </label>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AdminCurrencies;

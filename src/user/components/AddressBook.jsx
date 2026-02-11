@@ -4,26 +4,10 @@ import { Search, Bookmark, ChevronLeft } from "lucide-react";
 const AddressBook = ({ onBack }) => {
   const [activeTab, setActiveTab] = useState("saved");
   const [addresses, setAddresses] = useState([
-    {
-      id: 1,
-      address: "0x52d39886F8022764880FF788DdE280F6C5D3CCb",
-      saved: true,
-    },
-    {
-      id: 2,
-      address: "0x52d39886F8022764880FF788DdE280F6C5D3CCb",
-      saved: true,
-    },
-    {
-      id: 3,
-      address: "0x52d39886F8022764880FF788DdE280F6C5D3CCb",
-      saved: true,
-    },
-    {
-      id: 4,
-      address: "0x52d39886F8022764880FF788DdE280F6C5D3CCb",
-      saved: true,
-    },
+    { id: 1, address: "0x52d39886F8022764880FF788DdE280F6C5D3CCb", saved: true },
+    { id: 2, address: "0x52d39886F8022764880FF788DdE280F6C5D3CCb", saved: true },
+    { id: 3, address: "0x52d39886F8022764880FF788DdE280F6C5D3CCb", saved: true },
+    { id: 4, address: "0x52d39886F8022764880FF788DdE280F6C5D3CCb", saved: true },
   ]);
 
   const toggleSave = (id) => {
@@ -38,90 +22,74 @@ const AddressBook = ({ onBack }) => {
     activeTab === "saved" ? addresses.filter((addr) => addr.saved) : addresses;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-blue-600 text-white p-4 flex items-center">
-        <button onClick={onBack} className="mr-4">
-          <ChevronLeft size={24} />
-        </button>
-        <h1 className="text-lg font-semibold">Address book</h1>
-      </div>
-
-      {/* Tabs */}
-      <div className="bg-white px-6 pt-6">
-        <div className="flex bg-gray-100 rounded-lg p-1">
-          <button
-            onClick={() => setActiveTab("recent")}
-            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === "recent"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600"
-            }`}
-          >
-            Recent
+    <div className="min-h-screen bg-white pb-32">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <button onClick={onBack} className="mb-8 p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10">
+            <ChevronLeft size={24} />
           </button>
-          <button
-            onClick={() => setActiveTab("saved")}
-            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === "saved"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600"
-            }`}
-          >
-            Saved
-          </button>
-        </div>
-
-        {/* Search Bar */}
-        <div className="mt-4 mb-4">
-          <div className="relative">
-            <Search
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              size={20}
-            />
-            <input
-              type="text"
-              placeholder="Enter an address or name"
-              className="w-full pl-10 pr-4 py-3 bg-gray-100 rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+          <h1 className="text-4xl font-black mb-2 tracking-tight">Address Book</h1>
+          <p className="text-blue-200 font-medium">Manage your favorite crypto destinations</p>
         </div>
       </div>
 
-      {/* Address List */}
-      <div className="bg-white px-6 pb-6">
-        {filteredAddresses.map((addr) => (
-          <div
-            key={addr.id}
-            className="flex items-center py-4 border-b border-gray-100 last:border-b-0"
-          >
-            {/* Bitcoin Icon */}
-            <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center mr-3 flex-shrink-0">
-              <span className="text-white font-bold text-lg">₿</span>
-            </div>
-
-            {/* Address Info */}
-            <div className="flex-1 min-w-0">
-              <p className="text-xs text-gray-500 mb-1">address</p>
-              <p className="text-xs font-mono text-gray-900 truncate">
-                {addr.address}
-              </p>
-            </div>
-
-            {/* Bookmark Button */}
-            <button
-              onClick={() => toggleSave(addr.id)}
-              className="ml-3 flex-shrink-0"
-            >
-              <Bookmark
-                size={20}
-                className={`${
-                  addr.saved ? "fill-blue-600 text-blue-600" : "text-gray-400"
+      <div className="max-w-7xl mx-auto px-6 -mt-8">
+        <div className="bg-white rounded-[2rem] shadow-xl p-8 lg:p-12 border border-gray-100 flex flex-col gap-10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="bg-gray-100 rounded-[1.5rem] p-1.5 flex w-full md:w-80">
+              <button
+                onClick={() => setActiveTab("recent")}
+                className={`flex-1 py-3 rounded-[1.2rem] font-black tracking-tight transition-all ${
+                  activeTab === "recent" ? "bg-white text-blue-600 shadow-lg shadow-blue-50" : "text-gray-400 hover:text-gray-600"
                 }`}
+              >
+                Recent
+              </button>
+              <button
+                onClick={() => setActiveTab("saved")}
+                className={`flex-1 py-3 rounded-[1.2rem] font-black tracking-tight transition-all ${
+                  activeTab === "saved" ? "bg-white text-blue-600 shadow-lg shadow-blue-50" : "text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                Saved
+              </button>
+            </div>
+
+            <div className="relative flex-1 group">
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={24} />
+              <input
+                type="text"
+                placeholder="Search by address or label..."
+                className="w-full pl-16 pr-8 py-5 bg-gray-50 border-2 border-transparent focus:border-blue-100 rounded-[1.5rem] font-bold text-gray-900 placeholder-gray-300 outline-none transition-all"
               />
-            </button>
+            </div>
           </div>
-        ))}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {filteredAddresses.map((addr) => (
+              <div
+                key={addr.id}
+                className="group bg-white rounded-[2rem] p-6 border border-gray-100 hover:border-blue-200 hover:shadow-2xl hover:-translate-y-1 transition-all"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-600 font-black text-2xl border border-orange-100">
+                    ₿
+                  </div>
+                  <button onClick={() => toggleSave(addr.id)} className="p-2 hover:bg-blue-50 rounded-xl transition-all">
+                    <Bookmark size={24} className={addr.saved ? "fill-blue-600 text-blue-600" : "text-gray-300"} />
+                  </button>
+                </div>
+                
+                <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-2 px-1">Receiver Address</p>
+                <div className="bg-gray-50 p-4 rounded-xl">
+                  <p className="text-xs font-mono font-bold text-gray-600 break-all leading-relaxed">
+                    {addr.address}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -6,254 +6,97 @@ const AlertRatesPage = ({ onNavigate, onBack }) => {
   const [activeTab, setActiveTab] = useState("all");
 
   const alerts = [
-    {
-      id: 1,
-      from: {
-        amount: "0.5",
-        currency: "BTC",
-        icon: "₿",
-        color: "bg-orange-500",
-      },
-      to: {
-        amount: "44000",
-        currency: "USDT",
-        icon: "T",
-        color: "bg-teal-500",
-      },
-    },
-    {
-      id: 2,
-      from: {
-        amount: "0.5",
-        currency: "BTC",
-        icon: "₿",
-        color: "bg-orange-500",
-      },
-      to: {
-        amount: "44000",
-        currency: "USDT",
-        icon: "T",
-        color: "bg-teal-500",
-      },
-    },
-    {
-      id: 3,
-      from: {
-        amount: "0.5",
-        currency: "BTC",
-        icon: "₿",
-        color: "bg-orange-500",
-      },
-      to: {
-        amount: "44000",
-        currency: "USDT",
-        icon: "T",
-        color: "bg-teal-500",
-      },
-    },
-    {
-      id: 4,
-      from: {
-        amount: "0.5",
-        currency: "BTC",
-        icon: "₿",
-        color: "bg-orange-500",
-      },
-      to: {
-        amount: "44000",
-        currency: "USDT",
-        icon: "T",
-        color: "bg-teal-500",
-      },
-    },
+    { id: 1, from: { amount: "0.5", currency: "BTC", icon: "₿", color: "bg-orange-500" }, to: { amount: "44000", currency: "USDT", icon: "T", color: "bg-teal-500" } },
+    { id: 2, from: { amount: "0.5", currency: "BTC", icon: "₿", color: "bg-orange-500" }, to: { amount: "44000", currency: "USDT", icon: "T", color: "bg-teal-500" } },
+    { id: 3, from: { amount: "0.5", currency: "BTC", icon: "₿", color: "bg-orange-500" }, to: { amount: "44000", currency: "USDT", icon: "T", color: "bg-teal-500" } },
+    { id: 4, from: { amount: "0.5", currency: "BTC", icon: "₿", color: "bg-orange-500" }, to: { amount: "44000", currency: "USDT", icon: "T", color: "bg-teal-500" } },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
-      <div className="bg-blue-600 text-white p-4 flex items-center justify-between">
-        <div className="flex items-center">
-          <button onClick={onBack} className="mr-4">
-            <ChevronLeft size={24} />
-          </button>
-          <h1 className="text-lg font-semibold">Alert rates</h1>
-        </div>
-        <button className="p-2 bg-white/20 rounded-lg">
-          <Bell size={20} />
-        </button>
-      </div>
-
-      {/* Search Bar */}
-      <div className="px-4 pt-4">
-        <div className="relative">
-          <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-            size={20}
-          />
-          <input
-            type="text"
-            placeholder="Type a currency or ticker"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-white rounded-lg text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+    <div className="min-h-screen bg-white pb-32">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="flex justify-between items-center mb-8">
+            <button onClick={onBack} className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10">
+              <ChevronLeft size={24} />
+            </button>
+            <button className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10 relative">
+              <Bell size={24} />
+              <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-blue-700"></span>
+            </button>
+          </div>
+          <h1 className="text-4xl font-black mb-2 tracking-tight">Price Alerts</h1>
+          <p className="text-blue-200 font-medium">Get notified when rates hit your target</p>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="px-4 pt-4">
-        <div className="bg-white rounded-lg p-1 flex shadow-sm">
-          <button
-            onClick={() => setActiveTab("all")}
-            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === "all"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600"
-            }`}
-          >
-            All Currencies
-          </button>
-          <button
-            onClick={() => setActiveTab("favorites")}
-            className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === "favorites"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600"
-            }`}
-          >
-            Favorite Currencies
-          </button>
-        </div>
-      </div>
-
-      {/* Alert List */}
-      <div className="px-4 pt-4 space-y-3">
-        {alerts.map((alert) => (
-          <div
-            key={alert.id}
-            className="bg-white rounded-xl p-4 shadow-sm flex items-center justify-between"
-          >
-            {/* From Currency */}
-            <div className="flex items-center space-x-3">
-              <div
-                className={`w-10 h-10 ${alert.from.color} rounded-full flex items-center justify-center text-white font-bold text-lg`}
+      <div className="max-w-7xl mx-auto px-6 -mt-8">
+        <div className="bg-white rounded-[2rem] shadow-xl p-8 lg:p-12 border border-gray-100 flex flex-col gap-10">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="bg-gray-100 rounded-[1.5rem] p-1.5 flex w-full md:w-96">
+              <button
+                onClick={() => setActiveTab("all")}
+                className={`flex-1 py-3 rounded-[1.2rem] font-black tracking-tight transition-all ${
+                  activeTab === "all" ? "bg-white text-blue-600 shadow-lg shadow-blue-50" : "text-gray-400 hover:text-gray-600"
+                }`}
               >
-                {alert.from.icon}
-              </div>
-              <div>
-                <p className="font-semibold text-gray-900">
-                  {alert.from.amount} {alert.from.currency}
-                </p>
-              </div>
+                All Currencies
+              </button>
+              <button
+                onClick={() => setActiveTab("favorites")}
+                className={`flex-1 py-3 rounded-[1.2rem] font-black tracking-tight transition-all ${
+                  activeTab === "favorites" ? "bg-white text-blue-600 shadow-lg shadow-blue-50" : "text-gray-400 hover:text-gray-600"
+                }`}
+              >
+                Favorites
+              </button>
             </div>
 
-            {/* Arrow */}
-            <div className="px-4">
-              <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                <ArrowRight className="text-blue-600" size={20} />
-              </div>
-            </div>
-
-            {/* To Currency */}
-            <div className="flex items-center space-x-3">
-              <div
-                className={`w-10 h-10 ${alert.to.color} rounded-full flex items-center justify-center text-white font-bold text-lg`}
-              >
-                {alert.to.icon}
-              </div>
-              <div>
-                <p className="font-semibold text-gray-900">
-                  {alert.to.amount} {alert.to.currency}
-                </p>
-              </div>
+            <div className="relative flex-1 group">
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={24} />
+              <input
+                type="text"
+                placeholder="Search alerts..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-16 pr-8 py-5 bg-gray-50 border-2 border-transparent focus:border-blue-100 rounded-[1.5rem] font-bold text-gray-900 placeholder-gray-300 outline-none transition-all"
+              />
             </div>
           </div>
-        ))}
-      </div>
 
-      {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-        <div className="max-w-4xl mx-auto px-6 py-3">
-          <div className="flex justify-around">
-            <button
-              onClick={() => onNavigate("rates")}
-              className="flex flex-col items-center space-y-1 text-blue-600"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
+            {alerts.map((alert) => (
+              <div
+                key={alert.id}
+                className="group bg-white rounded-[2rem] p-8 border border-gray-100 hover:border-blue-200 hover:shadow-2xl transition-all flex items-center justify-between gap-6"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                />
-              </svg>
-              <span className="text-xs font-semibold">Rate</span>
-            </button>
+                <div className="flex items-center gap-6">
+                  <div className={`w-14 h-14 ${alert.from.color} rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg`}>
+                    {alert.from.icon}
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1">Alert threshold</p>
+                    <p className="text-xl font-black text-gray-900">{alert.from.amount} <span className="text-gray-400">{alert.from.currency}</span></p>
+                  </div>
+                </div>
 
-            <button
-              onClick={() => onNavigate("buy")}
-              className="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition-colors"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-              <span className="text-xs font-semibold">Buy</span>
-            </button>
+                <div className="flex-1 flex justify-center">
+                  <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 group-hover:translate-x-1 transition-transform">
+                    <ArrowRight size={24} strokeWidth={3} />
+                  </div>
+                </div>
 
-            <button
-              onClick={() => onNavigate("history")}
-              className="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition-colors"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-              <span className="text-xs font-semibold">History</span>
-            </button>
-
-            <button
-              onClick={() => onNavigate("support")}
-              className="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition-colors"
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                />
-              </svg>
-              <span className="text-xs font-semibold">Support</span>
-            </button>
+                <div className="flex items-center gap-6 text-right">
+                  <div>
+                    <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1">Target Price</p>
+                    <p className="text-xl font-black text-gray-900">{alert.to.amount} <span className="text-gray-400">{alert.to.currency}</span></p>
+                  </div>
+                  <div className={`w-14 h-14 ${alert.to.color} rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg`}>
+                    {alert.to.icon}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

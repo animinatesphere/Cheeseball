@@ -1,109 +1,117 @@
 import React, { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 
-const SwapCrypto = ({ onBack, onSwap }) => {
+const SwapCrypto = ({ onBack, onSwap, onNavigate }) => {
   const [fromAmount, setFromAmount] = useState("5000");
   const [toAmount, setToAmount] = useState("0.010000056");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 animate-fade-in">
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 shadow-lg">
-          <button onClick={onBack} className="mb-4">
+    <div className="min-h-screen bg-white animate-fade-in pb-24">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <button onClick={onBack} className="mb-8 p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10">
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-2xl font-bold mb-2">Swap Cryptocurrency</h1>
-          <p className="text-blue-100">
-            Swap Crypto currencies from one asset to another
-          </p>
+          <h1 className="text-4xl font-black mb-2 tracking-tight">Swap Assets</h1>
+          <p className="text-blue-200 font-medium">Instant conversion with zero slippage</p>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8">
+        <div className="bg-white rounded-[1.5rem] sm:rounded-[2rem] shadow-xl p-1.5 flex border border-gray-100 mb-8 sm:mb-12 max-w-md mx-auto">
+          <button onClick={() => onNavigate("buy")} className="flex-1 py-3 sm:py-4 rounded-[1.2rem] sm:rounded-[1.5rem] text-gray-500 font-bold hover:bg-gray-50 transition-all text-sm sm:text-base">
+            Buy/Sell
+          </button>
+          <button className="flex-1 py-3 sm:py-4 rounded-[1.2rem] sm:rounded-[1.5rem] bg-blue-600 text-white font-black shadow-lg shadow-blue-100 text-sm sm:text-base">
+            Swap
+          </button>
         </div>
 
-        <div className="px-6 mt-6">
-          <div className="bg-white rounded-xl shadow-sm p-1 flex">
-            <button className="flex-1 py-3 rounded-lg text-gray-600 font-semibold hover:bg-gray-100 transition-all">
-              Buy/Sell/Crypto
-            </button>
-            <button className="flex-1 py-3 rounded-lg bg-blue-600 text-white font-semibold shadow-md">
-              Swap Crypto
-            </button>
-          </div>
-        </div>
-
-        <div className="px-6 mt-8">
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="mb-6">
-              <div className="flex justify-between mb-2">
-                <label className="text-gray-600 font-semibold">From</label>
-                <label className="text-gray-600 font-semibold">Network</label>
+        <div className="max-w-3xl mx-auto bg-gray-50 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 lg:p-12 border border-gray-100 shadow-sm">
+          <div className="mb-8 sm:mb-10">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-4 px-2 text-sm sm:text-base">
+              <label className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest">Swap From</label>
+              <div className="text-blue-600 font-bold text-[10px] sm:text-xs bg-blue-50 px-3 py-1 rounded-full">
+                Max: 12,000 USDT
               </div>
-              <div className="flex items-center space-x-3 bg-gray-50 rounded-xl p-4">
-                <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+            </div>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6 bg-white rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-6 shadow-sm border border-gray-100 focus-within:border-blue-300 transition-all">
+              <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100 w-full sm:w-auto">
+                <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white font-black text-xs shrink-0">
                   T
                 </div>
-                <select className="bg-transparent font-bold text-lg outline-none">
+                <select className="bg-transparent font-black text-lg outline-none cursor-pointer flex-1 sm:flex-none">
                   <option>USDT</option>
+                  <option>USDC</option>
                 </select>
-                <input
-                  type="text"
-                  value={fromAmount}
-                  onChange={(e) => setFromAmount(e.target.value)}
-                  className="flex-1 bg-transparent text-right text-xl font-bold outline-none"
-                />
-                <span className="text-gray-400 text-sm">TRC-20</span>
               </div>
+              <input
+                type="text"
+                value={fromAmount}
+                onChange={(e) => setFromAmount(e.target.value)}
+                className="flex-1 bg-transparent text-left sm:text-right text-2xl sm:text-3xl font-black outline-none text-gray-900 placeholder-gray-200 min-w-0"
+              />
             </div>
+          </div>
 
-            <div className="flex justify-center -my-3 relative z-10">
-              <button className="w-12 h-12 bg-white border-4 border-blue-100 rounded-full flex items-center justify-center hover:bg-blue-50 transition-all shadow-md">
-                <svg
-                  className="w-6 h-6 text-blue-600"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-                  />
-                </svg>
-              </button>
-            </div>
-
-            <div className="mt-6">
-              <label className="text-gray-600 font-semibold mb-2 block">
-                To
-              </label>
-              <div className="flex items-center space-x-3 bg-gray-50 rounded-xl p-4">
-                <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white text-xl">
-                  ₿
-                </div>
-                <select className="bg-transparent font-bold text-lg outline-none">
-                  <option>BTC</option>
-                </select>
-                <input
-                  type="text"
-                  value={toAmount}
-                  onChange={(e) => setToAmount(e.target.value)}
-                  className="flex-1 bg-transparent text-right text-xl font-bold outline-none"
+          <div className="flex justify-center -my-10 sm:-my-14 relative z-10">
+            <button className="w-12 h-12 sm:w-16 sm:h-16 bg-white border-4 sm:border-8 border-gray-50 rounded-[1rem] sm:rounded-[1.5rem] flex items-center justify-center hover:scale-110 transition-all shadow-xl group">
+              <svg
+                className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600 group-hover:rotate-180 transition-transform duration-500"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={3}
+                  d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
                 />
-                <span className="text-gray-400 text-sm">BTC</span>
-              </div>
-            </div>
-
-            <button className="w-full mt-6 border-2 border-blue-600 text-blue-600 py-3 rounded-xl font-semibold hover:bg-blue-50 transition-all flex items-center justify-between px-4">
-              <span>Add the refund details</span>
-              <ArrowLeft className="w-5 h-5 rotate-180" />
-            </button>
-
-            <button
-              onClick={onSwap}
-              className="w-full mt-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
-            >
-              Swap
+              </svg>
             </button>
           </div>
+
+          <div className="mt-10 sm:mt-14 mb-8 sm:mb-10">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-4 px-2">
+              <label className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest">Swap To</label>
+              <div className="text-gray-400 font-bold text-[10px] sm:text-xs bg-gray-100 px-3 py-1 rounded-full">
+                Est. Price: 1 BTC = 64,500 USDT
+              </div>
+            </div>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6 bg-white rounded-[1.5rem] sm:rounded-[2rem] p-4 sm:p-6 shadow-sm border border-gray-100 focus-within:border-blue-300 transition-all">
+              <div className="flex items-center gap-3 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100 w-full sm:w-auto">
+                <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white text-xl shrink-0">
+                  ₿
+                </div>
+                <select className="bg-transparent font-black text-lg outline-none cursor-pointer flex-1 sm:flex-none">
+                  <option>BTC</option>
+                  <option>ETH</option>
+                </select>
+              </div>
+              <input
+                type="text"
+                value={toAmount}
+                onChange={(e) => setToAmount(e.target.value)}
+                className="flex-1 bg-transparent text-left sm:text-right text-2xl sm:text-3xl font-black outline-none text-gray-900 placeholder-gray-200 min-w-0"
+              />
+            </div>
+          </div>
+
+          <button className="w-full mb-6 sm:mb-8 border-2 border-dashed border-gray-200 text-gray-500 py-4 sm:py-5 rounded-[1.5rem] sm:rounded-[2rem] font-bold hover:border-blue-300 hover:text-blue-600 transition-all flex items-center justify-between px-6 sm:px-8 group text-sm sm:text-base">
+            <span>Add refund address</span>
+            <ArrowLeft className="w-5 h-5 rotate-180 group-hover:translate-x-1 transition-transform" />
+          </button>
+
+          <button
+            onClick={onSwap}
+            className="w-full bg-[#0063BF] hover:bg-blue-700 text-white py-5 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] font-black text-lg sm:text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group"
+          >
+            <span>Preview Swap</span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-2 transition-transform">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </button>
         </div>
       </div>
     </div>

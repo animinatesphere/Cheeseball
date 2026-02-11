@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f9; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 24px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,99,191,0.05); }
+    .header { background: #0063BF; padding: 40px; text-align: center; }
+    .header h1 { color: #ffffff; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -1px; }
+    .content { padding: 48px; text-align: center; }
+    .content h2 { color: #1a1a1a; margin-top: 0; font-size: 24px; font-weight: 700; }
+    .content p { color: #666666; font-size: 16px; line-height: 1.6; margin-bottom: 32px; }
+    .otp-code { background: #f0f7ff; color: #0063BF; font-size: 32px; font-weight: 800; padding: 20px 40px; border-radius: 16px; display: inline-block; letter-spacing: 4px; margin-bottom: 32px; border: 2px dashed #0063BF; }
+    .button { background: #0063BF; color: #ffffff; text-decoration: none; padding: 18px 36px; border-radius: 16px; font-weight: 700; font-size: 16px; display: inline-block; transition: all 0.3s; }
+    .footer { padding: 32px; text-align: center; color: #999999; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>CHEESEBALL</h1>
+    </div>
+    <div class="content">
+      <h2>Security Verification</h2>
+      <p>Use the code below to securely sign in to your Cheeseball account. For your security, this code expires in 10 minutes.</p>
+      
+      <div class="otp-code">{{ .Token }}</div>
+      
+      <p>If you didn't request this, you can safely ignore this email.</p>
+      
+      <div style="margin-top: 40px;">
+        <a href="{{ .ConfirmationURL }}" class="button">Quick Verification Link</a>
+      </div>
+    </div>
+    <div class="footer">
+      &copy; 2025 Cheeseball Inc. • Secure Digital Asset Exchange
+    </div>
+  </div>
+</body>
+</html>
