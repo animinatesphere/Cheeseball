@@ -1,7 +1,7 @@
 import React from "react";
 import { X, Copy, ChevronRight, MoreVertical } from "lucide-react";
 
-const AdminOrderDetails = ({ order, onBack, onShowDetails }) => {
+const AdminOrderDetails = ({ order, onBack, onShowDetails, onUpdateStatus }) => {
   const isApproved = order.status === "Approved";
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -101,12 +101,29 @@ const AdminOrderDetails = ({ order, onBack, onShowDetails }) => {
             </div>
           </div>
 
-          <button
-            onClick={onBack}
-            className="w-full bg-blue-600 text-white py-6 rounded-3xl font-black text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all active:scale-[0.98] mt-8"
-          >
-            System Verification Done
-          </button>
+          {order.status === "Waiting" ? (
+            <div className="flex gap-4 mt-8">
+              <button
+                onClick={() => onUpdateStatus(order.id, "Declined")}
+                className="flex-1 bg-red-50 text-red-600 py-6 rounded-3xl font-black text-xl hover:bg-red-100 transition-all active:scale-[0.98]"
+              >
+                Decline
+              </button>
+              <button
+                onClick={() => onUpdateStatus(order.id, "Approved")}
+                className="flex-1 bg-blue-600 text-white py-6 rounded-3xl font-black text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all active:scale-[0.98]"
+              >
+                Approve Order
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={onBack}
+              className="w-full bg-gray-100 text-gray-500 py-6 rounded-3xl font-black text-xl hover:bg-gray-200 transition-all active:scale-[0.98] mt-8"
+            >
+              Close Details
+            </button>
+          )} 
         </div>
       </div>
     </div>
