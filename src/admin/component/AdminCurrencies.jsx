@@ -1,25 +1,71 @@
 import React, { useState, useEffect } from "react";
 import { Search, Plus, ArrowLeft, Loader2 } from "lucide-react";
-import { getCurrencies } from "../../lib/api";
+import { getCurrencies, createCurrency, updateCurrency } from "../../lib/api"; // Ensure updateCurrency is imported
+import { fetchTopCurrencies } from "../../utils/cryptoApi"; // Import the utility
 
 const AdminCurrencies = ({ onAddCurrency, onBack }) => {
   const [activeView, setActiveView] = useState("active");
   const [searchQuery, setSearchQuery] = useState("");
   const [currencies, setCurrencies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false); // State for sync loading
+
+  const fetchCurrencies = async () => {
+    setLoading(true);
+    const { data } = await getCurrencies();
+    if (data) {
+      setCurrencies(data);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const fetchCurrencies = async () => {
-      setLoading(true);
-      const { data } = await getCurrencies();
-      if (data) {
-        setCurrencies(data);
-      }
-      setLoading(false);
-    };
-
     fetchCurrencies();
   }, []);
+
+  const handleSyncData = async () => {
+    setSyncing(true);
+    try {
+        const topCoins = await fetchTopCurrencies(50);
+        
+        // Upsert logic (simplistic: check if exists, then update or insert)
+        // Ideally use supabase upsert if constraint exists on symbol/name
+        // For now, let's just loop and update/insert
+        
+        for (const coin of topCoins) {
+            // Check if currency exists by symbol
+            const existing = currencies.find(c => c.symbol === coin.symbol.toUpperCase());
+            
+            const currencyData = {
+                name: coin.name,
+                symbol: coin.symbol.toUpperCase(),
+                price: coin.current_price,
+                change_24h: (coin.price_change_percentage_24h > 0 ? '+' : '') + coin.price_change_percentage_24h.toFixed(2) + '%',
+                is_positive: coin.price_change_percentage_24h >= 0,
+                icon_url: coin.image,
+                is_active: true,
+                // Assign a color class loosely based on change or random? Keeping existing logic or default
+                color_class: existing?.color_class || (coin.price_change_percentage_24h >= 0 ? 'bg-green-500' : 'bg-red-500') 
+            };
+
+            if (existing) {
+                await updateCurrency(existing.id, currencyData);
+            } else {
+                await createCurrency(currencyData);
+            }
+        }
+        
+        // Refresh list
+        await fetchCurrencies();
+
+    } catch (err) {
+        console.error("Sync failed", err);
+        alert("Failed to sync data. Please try again.");
+    } finally {
+        setSyncing(false);
+    }
+  };
+
 
   const MiniChart = ({ positive }) => (
     <svg width="60" height="24" viewBox="0 0 60 24" className="opacity-60">
@@ -58,13 +104,25 @@ const AdminCurrencies = ({ onAddCurrency, onBack }) => {
               </button>
               <h1 className="text-2xl font-black text-gray-900 tracking-tight">Market Assets</h1>
             </div>
-            <button
-              onClick={onAddCurrency}
-              className="bg-blue-600 text-white p-3 rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              <span className="hidden sm:inline font-black uppercase text-[10px] tracking-widest px-1">Add New</span>
-            </button>
+            
+            <div className="flex items-center gap-3">
+                 <button
+                  onClick={handleSyncData}
+                  disabled={syncing}
+                  className="bg-gray-900 text-white p-3 rounded-xl shadow-lg hover:bg-gray-800 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {syncing ? <Loader2 className="w-5 h-5 animate-spin" /> : <div className="w-5 h-5 flex items-center justify-center font-bold">↻</div>}
+                  <span className="hidden sm:inline font-black uppercase text-[10px] tracking-widest px-1">Sync Data</span>
+                </button>
+                
+                <button
+                  onClick={onAddCurrency}
+                  className="bg-blue-600 text-white p-3 rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span className="hidden sm:inline font-black uppercase text-[10px] tracking-widest px-1">Add New</span>
+                </button>
+            </div>
           </div>
 
           <div className="pb-6 flex flex-col sm:flex-row gap-4">
