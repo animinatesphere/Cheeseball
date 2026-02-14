@@ -7,6 +7,15 @@ const ConfirmSwap = ({ onBack, onConfirm, transactionData }) => {
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const handlePaste = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      setAddress(text);
+    } catch (err) {
+      console.error('Failed to read clipboard', err);
+    }
+  };
+
   const handleConfirm = async () => {
     if (!transactionData) return;
     setLoading(true);
@@ -76,7 +85,7 @@ const ConfirmSwap = ({ onBack, onConfirm, transactionData }) => {
                 <div>
                   <p className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest mb-1">Send</p>
                   <p className="font-black text-xl sm:text-2xl text-gray-900 leading-none">{transactionData.fromAmount} {transactionData.fromCurrency}</p>
-                  <p className="text-green-600 font-bold text-xs sm:text-sm mt-1">TRC-20</p>
+                  <p className="text-green-600 font-bold text-xs sm:text-sm mt-1">{transactionData.fromCurrency} Network</p>
                 </div>
               </div>
               
@@ -109,7 +118,10 @@ const ConfirmSwap = ({ onBack, onConfirm, transactionData }) => {
                 placeholder={`Enter ${transactionData.toCurrency} address...`}
                 className="w-full px-6 sm:px-8 py-5 sm:py-6 bg-gray-50 rounded-[1.5rem] sm:rounded-[2rem] border-2 border-transparent focus:border-blue-300 outline-none transition-all text-base sm:text-lg font-bold text-gray-900 placeholder-gray-300 shadow-inner"
               />
-              <button className="sm:absolute sm:right-3 sm:top-1/2 sm:transform sm:-translate-y-1/2 flex items-center justify-center gap-2 bg-[#0063BF] text-white font-black px-6 py-4 rounded-xl sm:rounded-[1.5rem] hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+              <button 
+                onClick={handlePaste}
+                className="sm:absolute sm:right-3 sm:top-1/2 sm:transform sm:-translate-y-1/2 flex items-center justify-center gap-2 bg-[#0063BF] text-white font-black px-6 py-4 rounded-xl sm:rounded-[1.5rem] hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 active:scale-95"
+              >
                 <span>Paste</span>
                 <Copy className="w-4 h-4" />
               </button>
@@ -121,7 +133,7 @@ const ConfirmSwap = ({ onBack, onConfirm, transactionData }) => {
 
           <button
             onClick={handleConfirm}
-            disabled={loading}
+            disabled={loading || !address}
             className="w-full bg-[#0063BF] hover:bg-blue-700 text-white py-5 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] font-black text-lg sm:text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group disabled:opacity-70 disabled:cursor-not-allowed"
           >
              {loading ? (

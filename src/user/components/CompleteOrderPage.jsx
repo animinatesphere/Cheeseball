@@ -1,10 +1,95 @@
 import React, { useState } from "react";
-import { Clock, Loader2 } from "lucide-react";
+import { Clock, Loader2, CreditCard } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient";
 import { createTransaction } from "../../lib/api";
+import { usePaystackPayment } from "react-paystack";
+import { PAYSTACK_PUBLIC_KEY } from "../../lib/paystack";
 
-const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData }) => {
+const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData, onNavigate }) => {
   const [loading, setLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("bank"); // 'bank' or 'card'
+  const [userEmail, setUserEmail] = useState("user@example.com");
+
+  React.useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.email) {
+        setUserEmail(session.user.email);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  const config = {
+    reference: (new Date()).getTime().toString(),
+    email: userEmail,
+    amount: Math.round(Number(transactionData?.fromAmount || 0) * 100), // Paystack expects amount in kobo/cents
+    publicKey: PAYSTACK_PUBLIC_KEY,
+  };
+
+  const onSuccess = (reference) => {
+    handleTransactionSuccess(reference);
+  };
+
+  const onClose = () => {
+    setLoading(false);
+  };
+
+  const initializePayment = usePaystackPayment(config);
+
+  const handleTransactionSuccess = async (reference) => {
+    if (!transactionData) return;
+    setLoading(true);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        setLoading(false);
+        return;
+      }
+
+      const exchangeId = `ID:${Math.random().toString(36).substring(2, 10)}`;
+
+      const payload = {
+        user_id: session.user.id,
+        exchange_id: exchangeId,
+        type: transactionData.type || 'buy',
+        status: 'approved', // Automatically approve if payment is successful
+        from_amount: transactionData.fromAmount,
+        from_currency_id: transactionData.fromCurrencyId,
+        from_token_network: transactionData.fromCurrency, 
+        to_amount: transactionData.toAmount,
+        to_currency_id: transactionData.toCurrencyId,
+        to_token_network: transactionData.toCurrency,
+        transaction_hash: reference.reference,
+        wallet_address: transactionData.wallet_address,
+        created_at: new Date().toISOString()
+      };
+
+      const { error } = await createTransaction(payload);
+      
+      if (error) {
+        console.error("Error creating transaction:", error);
+      } else {
+        // Show success modal via CurrencyPage by navigating to rates and showing modal
+        // For now, let's assume CurrencyPage handles "onContinue" to show success
+        onBuyWithBankTransfer(); 
+      }
+    } catch (err) {
+      console.error("Unexpected error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleConfirm = async () => {
+    if (paymentMethod === "card") {
+      setLoading(true);
+      initializePayment(onSuccess, onClose);
+    } else {
+      handleBuy();
+    }
+  };
 
   const handleBuy = async () => {
     if (!transactionData) return;
@@ -30,6 +115,7 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData }) =
         to_amount: transactionData.toAmount,
         to_currency_id: transactionData.toCurrencyId,
         to_token_network: transactionData.toCurrency,
+        wallet_address: transactionData.wallet_address,
         created_at: new Date().toISOString()
       };
 
@@ -75,24 +161,32 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData }) =
             <div className="bg-gray-50 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 border border-gray-100">
                <label className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest mb-4 sm:mb-6 block px-1">Payment Method</label>
                <div className="grid grid-cols-1 gap-4">
-                  <label className="flex items-center justify-between bg-white px-6 sm:px-8 py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] cursor-pointer border-2 border-blue-600 shadow-xl shadow-blue-50 transition-all">
+                  <label 
+                    onClick={() => setPaymentMethod("bank")}
+                    className={`flex items-center justify-between px-6 sm:px-8 py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] cursor-pointer border-2 transition-all ${paymentMethod === 'bank' ? 'border-blue-600 bg-white shadow-xl shadow-blue-50' : 'border-transparent bg-gray-50'}`}
+                  >
                     <div className="flex items-center gap-4 sm:gap-6">
-                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-4 border-blue-600 flex items-center justify-center">
-                        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                      <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-4 flex items-center justify-center ${paymentMethod === 'bank' ? 'border-blue-600' : 'border-gray-300'}`}>
+                        {paymentMethod === 'bank' && <div className="w-2 h-2 bg-blue-600 rounded-full"></div>}
                       </div>
-                      <span className="font-black text-lg sm:text-xl text-blue-600">Bank Transfer</span>
+                      <span className={`font-black text-lg sm:text-xl ${paymentMethod === 'bank' ? 'text-blue-600' : 'text-gray-400'}`}>Bank Transfer</span>
                     </div>
                     <div className="text-2xl sm:text-3xl">🏦</div>
                   </label>
 
-                  <label className="flex items-center justify-between bg-gray-50 px-6 sm:px-8 py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] cursor-not-allowed border-2 border-transparent opacity-50 transition-all">
+                  <label 
+                    onClick={() => setPaymentMethod("card")}
+                    className={`flex items-center justify-between px-6 sm:px-8 py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] cursor-pointer border-2 transition-all ${paymentMethod === 'card' ? 'border-blue-600 bg-white shadow-xl shadow-blue-50' : 'border-transparent bg-gray-50'}`}
+                  >
                     <div className="flex items-center gap-4 sm:gap-6">
-                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-gray-300"></div>
-                      <span className="font-black text-lg sm:text-xl text-gray-400">Debit Card</span>
+                      <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-4 flex items-center justify-center ${paymentMethod === 'card' ? 'border-blue-600' : 'border-gray-300'}`}>
+                        {paymentMethod === 'card' && <div className="w-2 h-2 bg-blue-600 rounded-full"></div>}
+                      </div>
+                      <span className={`font-black text-lg sm:text-xl ${paymentMethod === 'card' ? 'text-blue-600' : 'text-gray-400'}`}>Debit Card (Paystack)</span>
                     </div>
                     <div className="flex gap-2 sm:gap-4 scale-75 sm:scale-100">
-                       <img className="h-3 sm:h-4 grayscale" src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" />
-                       <img className="h-4 sm:h-6 grayscale" src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" />
+                       <img className="h-3 sm:h-4" src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" />
+                       <img className="h-4 sm:h-6" src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" />
                     </div>
                   </label>
                </div>
@@ -136,7 +230,7 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData }) =
             </div>
 
             <button
-              onClick={handleBuy}
+              onClick={handleConfirm}
               disabled={loading}
               className="w-full mt-8 sm:mt-12 bg-[#0063BF] hover:bg-blue-700 text-white py-5 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] font-black text-lg sm:text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group disabled:opacity-70 disabled:cursor-not-allowed"
             >

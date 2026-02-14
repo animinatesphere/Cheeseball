@@ -1,12 +1,33 @@
 import React, { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { usePaystackPayment } from "react-paystack";
+import { PAYSTACK_PUBLIC_KEY } from "../../lib/paystack";
+import { supabase } from "../../lib/supabaseClient";
 
-const BankTransferDetails = ({ onBack, onContinue }) => {
+const BankTransferDetails = ({ onBack, onContinue, transactionData }) => {
+  const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState({
     account: false,
     name: false,
     bank: false,
   });
+
+  const config = {
+    reference: (new Date()).getTime().toString(),
+    email: "user@example.com", 
+    amount: Math.round(Number(transactionData?.fromAmount || 0) * 100),
+    publicKey: PAYSTACK_PUBLIC_KEY,
+  };
+
+  const onSuccess = (reference) => {
+    onContinue(); // Success modal via CurrencyPage
+  };
+
+  const onClose = () => {
+    setLoading(false);
+  };
+
+  const initializePayment = usePaystackPayment(config);
 
   const handleCopy = (field, value) => {
     navigator.clipboard.writeText(value);
@@ -39,7 +60,7 @@ const BankTransferDetails = ({ onBack, onContinue }) => {
             <div className="bg-gray-50 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 border border-gray-100">
                <label className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest mb-4 sm:mb-6 block px-1">Payment Method</label>
                <div className="grid grid-cols-1 gap-4">
-                  <label className="flex items-center justify-between bg-white px-6 sm:px-8 py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] cursor-pointer border-2 border-blue-600 shadow-xl shadow-blue-50 transition-all">
+                  <div className="flex items-center justify-between bg-white px-6 sm:px-8 py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] border-2 border-blue-600 shadow-xl shadow-blue-50">
                     <div className="flex items-center gap-4 sm:gap-6">
                       <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-4 border-blue-600 flex items-center justify-center">
                         <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
@@ -47,18 +68,25 @@ const BankTransferDetails = ({ onBack, onContinue }) => {
                       <span className="font-black text-lg sm:text-xl text-blue-600">Bank Transfer</span>
                     </div>
                     <div className="text-2xl sm:text-3xl">🏦</div>
-                  </label>
+                  </div>
 
-                  <label className="flex items-center justify-between bg-gray-50 px-6 sm:px-8 py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] cursor-not-allowed border-2 border-transparent opacity-50 transition-all">
+                  <button 
+                    onClick={() => {
+                        setLoading(true);
+                        initializePayment(onSuccess, onClose);
+                    }}
+                    disabled={loading}
+                    className="flex items-center justify-between bg-white px-6 sm:px-8 py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] border-2 border-transparent hover:border-blue-100 transition-all group"
+                  >
                     <div className="flex items-center gap-4 sm:gap-6">
-                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-gray-300"></div>
-                      <span className="font-black text-lg sm:text-xl text-gray-400">Debit Card</span>
+                      <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full border-2 border-gray-300 group-hover:border-blue-400"></div>
+                      <span className="font-black text-lg sm:text-xl text-gray-500 group-hover:text-blue-600">Pay with Card</span>
                     </div>
                     <div className="flex gap-2 sm:gap-2">
                        <span className="px-2 py-0.5 sm:py-1 bg-gray-200 rounded text-[9px] sm:text-[10px] font-black text-gray-500 uppercase">Visa</span>
                        <span className="px-2 py-0.5 sm:py-1 bg-gray-200 rounded text-[9px] sm:text-[10px] font-black text-gray-500 uppercase">Master</span>
                     </div>
-                  </label>
+                  </button>
                </div>
             </div>
 

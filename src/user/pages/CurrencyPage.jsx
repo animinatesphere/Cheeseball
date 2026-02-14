@@ -85,7 +85,7 @@ const CurrencyPage = () => {
         );
 
       case "awaiting":
-        return <AwaitingDeposit onBack={handleBack} />;
+        return <AwaitingDeposit transactionData={transactionData} onBack={handleBack} />;
 
       case "buy":
         return (
@@ -102,8 +102,12 @@ const CurrencyPage = () => {
       case "buy-address":
         return (
           <BuyCryptoAddress
+            transactionData={transactionData}
             onBack={() => setCurrentPage("buy")}
-            onCreateExchange={() => setShowModal("exchange-page")}
+            onCreateExchange={(address) => {
+              setTransactionData(prev => ({ ...prev, wallet_address: address }));
+              setShowModal("exchange-page");
+            }}
           />
         );
 
@@ -112,7 +116,7 @@ const CurrencyPage = () => {
           <CompleteOrderPage
             transactionData={transactionData}
             onBack={() => setCurrentPage("buy-address")}
-            onBuyWithBankTransfer={() => setCurrentPage("complete-order-email")}
+            onBuyWithBankTransfer={() => setCurrentPage("bank-transfer")}
           />
         );
 
@@ -143,7 +147,8 @@ const CurrencyPage = () => {
       case "bank-transfer":
         return (
           <BankTransferDetails
-            onBack={() => setCurrentPage("personal-data")}
+            transactionData={transactionData}
+            onBack={() => setCurrentPage("complete-order")}
             onContinue={() => setShowModal("payment-success")}
           />
         );

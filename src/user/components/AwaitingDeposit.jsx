@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft, Share2, Copy } from "lucide-react";
 
-const AwaitingDeposit = ({ onBack }) => {
-  const depositAddress = "0x52d39886F8022764880Fff88DdE280F6C5D3CcD";
+const AwaitingDeposit = ({ onBack, transactionData }) => {
+  const depositAddress = "0x52d39886F8022764880Fff88DdE280F6C5D3CcD"; // In a real app, this might come from API/Admin
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -20,6 +20,8 @@ const AwaitingDeposit = ({ onBack }) => {
     const timer = setTimeout(() => setQrSquares(squares), 0);
     return () => clearTimeout(timer);
   }, []);
+
+  if (!transactionData) return null;
 
   return (
     <div className="min-h-screen bg-white animate-fade-in pb-24">
@@ -46,12 +48,14 @@ const AwaitingDeposit = ({ onBack }) => {
               <div className="relative z-10 text-center">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-200 mb-6">Swap Intent</p>
                 <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6 backdrop-blur-md">
-                   <div className="w-12 h-12 bg-green-400 rounded-xl flex items-center justify-center text-green-900 font-black text-xl shadow-lg">T</div>
+                   <div className="w-12 h-12 bg-green-400 rounded-xl flex items-center justify-center text-green-900 font-black text-xl shadow-lg shrink-0 overflow-hidden">
+                      {transactionData.fromCurrencyIcon ? <img src={transactionData.fromCurrencyIcon} alt="" className="w-full h-full object-cover"/> : transactionData.fromCurrency?.[0]}
+                   </div>
                 </div>
-                <p className="text-5xl font-black mb-2 tabular-nums">5,000.00 <span className="text-xl text-blue-200">USDT</span></p>
-                <p className="text-blue-100 font-bold uppercase tracking-widest text-sm">TRC-20 Network</p>
+                <p className="text-3xl sm:text-5xl font-black mb-2 tabular-nums">{Number(transactionData.fromAmount).toLocaleString()} <span className="text-xl text-blue-200">{transactionData.fromCurrency}</span></p>
+                <p className="text-blue-100 font-bold uppercase tracking-widest text-sm">{transactionData.fromCurrency} Network</p>
                 <div className="mt-8 pt-8 border-t border-white/10 flex justify-between items-center">
-                  <span className="text-blue-300 text-xs font-bold">SWAP ID: Hhdf-u678-jdHD</span>
+                  <span className="text-blue-300 text-[10px] sm:text-xs font-bold uppercase tracking-widest">Awaiting Deposit</span>
                   <span className="bg-green-400/20 text-green-400 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter">Status: Pending</span>
                 </div>
               </div>
@@ -62,16 +66,16 @@ const AwaitingDeposit = ({ onBack }) => {
                 <div className="w-10 h-10 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center border border-orange-200">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 </div>
-                <p className="text-sm font-bold text-gray-900">Only send <span className="text-orange-600">TRC-20</span> assets. Other networks will result in permanent loss.</p>
+                <p className="text-sm font-bold text-gray-900">Only send <span className="text-orange-600">{transactionData.fromCurrency}</span> assets. Other networks will result in permanent loss.</p>
               </div>
               
               <div className="flex items-center justify-center gap-6">
-                <div className="w-12 h-12 bg-orange-600 rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg shadow-orange-100">
-                  ₿
+                <div className="w-12 h-12 bg-orange-600 rounded-2xl flex items-center justify-center text-white text-3xl shadow-lg shadow-orange-100 shrink-0 overflow-hidden">
+                   {transactionData.toCurrencyIcon ? <img src={transactionData.toCurrencyIcon} alt="" className="w-full h-full object-cover"/> : <span>₿</span>}
                 </div>
                 <div>
                   <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1">Expected Return</p>
-                  <p className="font-black text-2xl text-gray-900 leading-none">0.002445 <span className="text-sm text-gray-400">BTC</span></p>
+                  <p className="font-black text-2xl text-gray-900 leading-none">{transactionData.toAmount} <span className="text-sm text-gray-400">{transactionData.toCurrency}</span></p>
                 </div>
               </div>
             </div>
