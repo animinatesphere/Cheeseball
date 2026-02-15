@@ -26,6 +26,7 @@ const Routee = () => {
         <Route path="/currency-change" element={<CurrencyPage />} />
         <Route path="/admin-login" element={<CheeseBallLogin />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/auth" element={<Auth />} />
         <Route path="/signup" element={<Signup />} />
       </Routes>
     </>
