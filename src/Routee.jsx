@@ -10,6 +10,7 @@ import CheeseBallLogin from "./admin/auth/CheeseBallLogin";
 import AdminDashboard from "./admin/pages/AdminDashboard";
 import Auth from "./user/pages/Auth";
 import LandingPage from "./user/pages/LandingPage";
+import Signup from "./user/pages/Signup";
 // import Navbar from "./user/components/Navbar";
 
 const Routee = () => {
@@ -25,7 +26,7 @@ const Routee = () => {
         <Route path="/currency-change" element={<CurrencyPage />} />
         <Route path="/admin-login" element={<CheeseBallLogin />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
-        <Route path="/auth" element={<Auth />} />
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </>
   );
