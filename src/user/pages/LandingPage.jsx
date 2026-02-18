@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowRight,
@@ -8,11 +8,33 @@ import {
   Smartphone,
   CreditCard,
   ChevronRight,
+  UserPlus,
+  ShieldCheck,
+  TrendingUp,
 } from "lucide-react";
 import logo from "../../assets/CHEESEBALL 1.png"; // Assuming logo exists here
 
 const LandingPage = () => {
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const observerOptions = {
+      threshold: 0.1,
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("active");
+        }
+      });
+    }, observerOptions);
+
+    const revealElements = document.querySelectorAll(".reveal");
+    revealElements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="min-h-screen bg-white font-sans selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
@@ -59,6 +81,41 @@ const LandingPage = () => {
         </div>
       </nav>
 
+      {/* Rates Marquee */}
+      <div className="fixed top-20 w-full z-40 bg-blue-600 overflow-hidden py-2 border-y border-blue-500/20 backdrop-blur-sm">
+        <div className="flex animate-marquee whitespace-nowrap gap-12 items-center">
+          {[
+            { coin: "BTC", price: "$52,430.12", change: "+2.4%" },
+            { coin: "ETH", price: "$2,845.65", change: "+1.8%" },
+            { coin: "USDT", price: "₦1,540.00", change: "+0.1%" },
+            { coin: "SOL", price: "$112.30", change: "+4.2%" },
+            { coin: "BNB", price: "$354.20", change: "-0.5%" },
+            { coin: "NGN/USD", price: "₦1,542.10", change: "+0.3%" },
+          ].map((item, i) => (
+            <div key={i} className="flex items-center gap-3 text-white">
+              <span className="font-black text-xs tracking-tighter opacity-60">{item.coin}</span>
+              <span className="font-black text-sm">{item.price}</span>
+              <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${item.change.startsWith('+') ? 'bg-green-400 text-green-900' : 'bg-red-400 text-red-900'}`}>{item.change}</span>
+            </div>
+          ))}
+          {/* Duplicate for seamless loop */}
+          {[
+             { coin: "BTC", price: "$52,430.12", change: "+2.4%" },
+             { coin: "ETH", price: "$2,845.65", change: "+1.8%" },
+             { coin: "USDT", price: "₦1,540.00", change: "+0.1%" },
+             { coin: "SOL", price: "$112.30", change: "+4.2%" },
+             { coin: "BNB", price: "$354.20", change: "-0.5%" },
+             { coin: "NGN/USD", price: "₦1,542.10", change: "+0.3%" },
+          ].map((item, i) => (
+            <div key={`dup-${i}`} className="flex items-center gap-3 text-white">
+              <span className="font-black text-xs tracking-tighter opacity-60">{item.coin}</span>
+              <span className="font-black text-sm">{item.price}</span>
+              <span className={`text-[10px] font-black px-1.5 py-0.5 rounded-md ${item.change.startsWith('+') ? 'bg-green-400 text-green-900' : 'bg-red-400 text-red-900'}`}>{item.change}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
         <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-blue-50 to-transparent -z-10"></div>
@@ -70,17 +127,16 @@ const LandingPage = () => {
               <span className="w-2 h-2 bg-blue-600 rounded-full animate-ping"></span>
               Live Rates Available
             </div>
-            <h1 className="text-5xl lg:text-7xl font-black text-gray-900 tracking-tight leading-[1.1]">
-              The{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">
-                Fastest
+            <h1 className="text-5xl lg:text-8xl font-black text-gray-900 tracking-tighter leading-[0.9] lg:leading-[0.85]">
+              Trade Crypto{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-400">
+                Faster
               </span>{" "}
-              Way to Trade Crypto.
+              Than Ever.
             </h1>
-            <p className="text-xl text-gray-500 font-medium leading-relaxed max-w-lg">
-              Experience lightning-fast transactions, bank-grade security, and
-              the best rates in Nigeria. Join thousands of users trading on
-              Cheeseball today.
+            <p className="text-xl text-gray-500 font-bold leading-relaxed max-w-lg">
+              Experience lightning-fast transactions, institutional-grade security, and
+              the most competitive rates in Nigeria. No delays, no limits.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <button
@@ -153,14 +209,48 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* How it Works */}
+      <section className="py-24 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center max-w-2xl mx-auto mb-20 reveal">
+            <h2 className="text-4xl lg:text-6xl font-black text-gray-900 tracking-tighter mb-4">
+              Simple. Fast. Secured.
+            </h2>
+            <p className="text-gray-500 font-bold text-lg">
+              Three simple steps to start trading like a pro.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-12 relative">
+            {/* Connecting Line (Desktop) */}
+            <div className="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gray-100 -translate-y-1/2 z-0"></div>
+            
+            {[
+              { step: "01", title: "Create Account", desc: "Sign up in seconds with just your email address. No complex forms.", icon: <UserPlus className="w-6 h-6 text-blue-600" /> },
+              { step: "02", title: "Verify & Fund", desc: "Verify your identity and fund your wallet using our secure gateways.", icon: <ShieldCheck className="w-6 h-6 text-blue-600" /> },
+              { step: "03", title: "Start Trading", desc: "Buy or sell your favorite crypto assets at the best rates instantly.", icon: <TrendingUp className="w-6 h-6 text-blue-600" /> },
+            ].map((item, i) => (
+              <div key={i} className={`relative z-10 bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-100/50 reveal delay-${i+1}00`}>
+                <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mb-8 border border-blue-100">
+                  {item.icon}
+                </div>
+                <div className="text-4xl font-black text-blue-600/10 mb-4">{item.step}</div>
+                <h3 className="text-2xl font-black text-gray-900 mb-4">{item.title}</h3>
+                <p className="text-gray-500 font-bold leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Grid */}
       <section id="features" className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center max-w-2xl mx-auto mb-20">
-            <h2 className="text-4xl font-black text-gray-900 tracking-tight mb-4">
-              Why Choose Cheeseball?
+          <div className="text-center max-w-2xl mx-auto mb-20 reveal">
+            <h2 className="text-4xl lg:text-5xl font-black text-gray-900 tracking-tight mb-4">
+              Built for Scale.
             </h2>
-            <p className="text-gray-500 font-medium text-lg">
+            <p className="text-gray-500 font-bold text-lg">
               We provide the most reliable infrastructure for your crypto
               journey.
             </p>
@@ -189,7 +279,7 @@ const LandingPage = () => {
             ].map((feature, i) => (
               <div
                 key={i}
-                className="bg-white p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all border border-gray-100 hover:-translate-y-2"
+                className={`bg-white p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all border border-gray-100 hover:-translate-y-2 reveal delay-${i+1}00`}
               >
                 <div
                   className={`w-16 h-16 ${feature.color} rounded-2xl flex items-center justify-center mb-6`}
@@ -208,28 +298,77 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24">
+      {/* market stats */}
+      <section className="py-24 bg-white reveal">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="bg-[#0063BF] rounded-[3rem] p-12 lg:p-24 text-center relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+          <div className="bg-gray-900 rounded-[3rem] p-12 lg:p-20 overflow-hidden relative">
+            <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.2),transparent)]"></div>
+            <div className="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+               <div>
+                 <h2 className="text-4xl lg:text-5xl font-black text-white tracking-tighter mb-6">
+                    Real-time Market Insights. 
+                 </h2>
+                 <p className="text-gray-400 text-lg font-medium mb-8">
+                    Stay ahead of the market with our advanced analytics and real-time pricing engine. 
+                    We provide the data you need to make informed decisions.
+                 </p>
+                 <div className="grid grid-cols-2 gap-6">
+                    <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                       <div className="text-3xl font-black text-white mb-1">$2.4B+</div>
+                       <div className="text-gray-500 text-xs font-bold uppercase tracking-widest">Market Cap tracked</div>
+                    </div>
+                    <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                       <div className="text-3xl font-black text-white mb-1">99.9%</div>
+                       <div className="text-gray-500 text-xs font-bold uppercase tracking-widest">Uptime Guaranteed</div>
+                    </div>
+                 </div>
+               </div>
+               <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-[2.5rem] p-8 lg:p-12 shadow-2xl rotate-3 hover:rotate-0 transition-all duration-500">
+                  <div className="flex justify-between items-center mb-10">
+                     <div className="w-12 h-12 bg-white/20 rounded-full"></div>
+                     <TrendingUp className="text-white w-8 h-8" />
+                  </div>
+                  <div className="space-y-4">
+                     <div className="h-2 bg-white/20 rounded-full w-full"></div>
+                     <div className="h-2 bg-white/20 rounded-full w-3/4"></div>
+                     <div className="h-32 bg-white/10 rounded-3xl border border-white/10 flex items-center justify-center">
+                        <Zap className="text-white/40 w-12 h-12 animate-pulse" />
+                     </div>
+                  </div>
+               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 reveal">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="bg-[#0063BF] rounded-[3rem] p-12 lg:p-24 text-center relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-125 transition-transform duration-700"></div>
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 group-hover:scale-125 transition-transform duration-700"></div>
 
             <div className="relative z-10 max-w-3xl mx-auto">
-              <h2 className="text-4xl lg:text-6xl font-black text-white tracking-tight mb-8">
-                Ready to start your journey?
+              <h2 className="text-4xl lg:text-7xl font-black text-white tracking-tighter mb-8 leading-[0.9]">
+                Start Trading Like a Pro Today.
               </h2>
               <p className="text-blue-100 text-xl font-medium mb-12">
-                Join thousands of Nigerians who trust Cheeseball for their daily
+                Join 50,000+ Nigerians who trust Cheeseball for their daily
                 crypto transactions.
               </p>
-              <button
-                onClick={() => navigate("/auth")}
-                className="bg-white text-blue-600 px-10 py-6 rounded-[2rem] font-black text-xl hover:shadow-2xl hover:scale-105 transition-all inline-flex items-center gap-2"
-              >
-                Create Free Account
-                <ChevronRight className="w-6 h-6" />
-              </button>
+              <div className="flex flex-col sm:flex-row justify-center gap-6">
+                  <button
+                    onClick={() => navigate("/auth")}
+                    className="bg-white text-blue-600 px-10 py-6 rounded-[2rem] font-black text-xl hover:shadow-2xl hover:scale-105 transition-all inline-flex items-center justify-center gap-2"
+                  >
+                    Get Started
+                    <ArrowRight className="w-6 h-6" />
+                  </button>
+                  <button className="bg-transparent border-2 border-white/30 text-white px-10 py-6 rounded-[2rem] font-black text-xl hover:bg-white/10 transition-all inline-flex items-center justify-center gap-2">
+                    <Smartphone className="w-6 h-6" />
+                    Download App
+                  </button>
+              </div>
             </div>
           </div>
         </div>
@@ -261,19 +400,19 @@ const LandingPage = () => {
               </h4>
               <ul className="space-y-4 text-gray-400 font-medium">
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <button onClick={() => navigate("/about")} className="hover:text-white transition-colors">
                     About Us
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <button onClick={() => navigate("/careers")} className="hover:text-white transition-colors text-left">
                     Careers
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <button onClick={() => navigate("/press")} className="hover:text-white transition-colors">
                     Press
-                  </a>
+                  </button>
                 </li>
               </ul>
             </div>
@@ -283,19 +422,19 @@ const LandingPage = () => {
               </h4>
               <ul className="space-y-4 text-gray-400 font-medium">
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <button onClick={() => navigate("/terms")} className="hover:text-white transition-colors text-left">
                     Terms of Service
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <button onClick={() => navigate("/privacy")} className="hover:text-white transition-colors text-left">
                     Privacy Policy
-                  </a>
+                  </button>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-white transition-colors">
+                  <button onClick={() => navigate("/aml")} className="hover:text-white transition-colors text-left">
                     AML Policy
-                  </a>
+                  </button>
                 </li>
               </ul>
             </div>
@@ -313,15 +452,29 @@ const LandingPage = () => {
       </footer>
 
       <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-20px); }
+        @keyframes marquee {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+          animation: marquee 30s linear infinite;
         }
         .animate-float {
           animation: float 6s ease-in-out infinite;
         }
         .animate-fade-in-up {
-          animation: fade-in-up 0.8s ease-out;
+          animation: fade-in-up 0.8s ease-out forwards;
+        }
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .reveal {
+           opacity: 0;
+           transform: translateY(30px);
+           transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+           opacity: 1;
+           transform: translateY(0);
         }
         @keyframes fade-in-up {
           from { opacity: 0; transform: translateY(20px); }

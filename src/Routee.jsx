@@ -11,7 +11,11 @@ import AdminDashboard from "./admin/pages/AdminDashboard";
 import Auth from "./user/pages/Auth";
 import LandingPage from "./user/pages/LandingPage";
 import Signup from "./user/pages/Signup";
-// import Navbar from "./user/components/Navbar";
+import AboutUs from "./user/pages/AboutUs";
+import TermsOfService from "./user/pages/TermsOfService";
+import PrivacyPolicy from "./user/pages/PrivacyPolicy";
+import AMLPolicy from "./user/pages/AMLPolicy";
+import { Careers, Press } from "./user/pages/CompanyPages";
 
 const Routee = () => {
   return (
@@ -28,6 +32,12 @@ const Routee = () => {
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/aml" element={<AMLPolicy />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/press" element={<Press />} />
       </Routes>
     </>
   );
