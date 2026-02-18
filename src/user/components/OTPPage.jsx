@@ -31,17 +31,47 @@ const OTPPage = ({ onBack, onContinue, email }) => {
     });
 
     if (error) {
-      const isRateLimit = error.code === 'over_email_send_rate_limit' || error.message?.includes("rate limit");
+      const errorStr = typeof error === 'string' ? error : (error.message || JSON.stringify(error));
+      const isRateLimit = error.code === 'over_email_send_rate_limit' || errorStr.toLowerCase().includes("rate limit");
+      
       setToast({
         message: isRateLimit
           ? "You've requested too many codes. Please wait 90 seconds before trying again." 
-          : (error.message || "Verification failed. Please try again."),
+          : (error.message || "Request failed. Please try again."),
         type: "error"
       });
       if (isRateLimit) setCountdown(90);
     } else {
       setToast({ message: "Verification code resent successfully!", type: "success" });
       setCountdown(90);
+    }
+    setLoading(false);
+  };
+
+  const handleVerify = async () => {
+    if (!otp || otp.length < 6 || loading) return;
+    
+    setLoading(true);
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: otp,
+      type: "magiclink",
+    });
+
+    if (error) {
+      const errorStr = typeof error === 'string' ? error : (error.message || JSON.stringify(error));
+      const isRateLimit = error.code === 'over_email_send_rate_limit' || errorStr.toLowerCase().includes("rate limit");
+      const isExpired = errorStr.toLowerCase().includes("expired");
+
+      setToast({
+        message: isRateLimit 
+          ? "Too many attempt. Please wait a moment." 
+          : (isExpired ? "Code expired. Please resend." : (error.message || "Verification failed")),
+        type: "error"
+      });
+    } else {
+      setToast({ message: "Email verified successfully!", type: "success" });
+      setTimeout(onContinue, 1000);
     }
     setLoading(false);
   };
@@ -81,17 +111,17 @@ const OTPPage = ({ onBack, onContinue, email }) => {
              </svg>
           </div>
           
-          <h2 className="text-3xl font-black text-gray-900 tracking-tight text-center mb-4">Enter 6-Digit Code</h2>
-          <p className="text-gray-500 font-medium text-center mb-12">We just sent a verification code to <span className="text-blue-600 break-all">{email}</span></p>
+          <h2 className="text-3xl font-black text-gray-900 tracking-tight text-center mb-4">Enter Verification Code</h2>
+          <p className="text-gray-500 font-medium text-center mb-12">We just sent a code to <span className="text-blue-600 break-all">{email}</span></p>
           
           <div className="w-full max-w-md mb-12">
             <input
               type="text"
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
-              placeholder="••••••"
+              placeholder="000000"
               className="w-full px-8 py-8 bg-gray-50 border-2 border-transparent focus:border-blue-100 rounded-[2.5rem] font-black text-gray-900 placeholder-gray-300 outline-none transition-all text-center text-4xl tracking-[0.5em] shadow-inner"
-              maxLength="6"
+              maxLength="8"
             />
           </div>
 
@@ -119,13 +149,17 @@ const OTPPage = ({ onBack, onContinue, email }) => {
           </div>
 
           <button
-            onClick={onContinue}
+            onClick={handleVerify}
             className="w-full bg-[#0063BF] hover:bg-blue-700 text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group"
           >
-            <span>Verify & Continue</span>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-2 transition-transform">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
+            {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
+              <>
+                <span>Verify & Continue</span>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-2 transition-transform">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </>
+            )}
           </button>
           
           <p className="mt-12 text-gray-400 text-sm font-black uppercase tracking-widest">Cryptopowered by Paystack</p>

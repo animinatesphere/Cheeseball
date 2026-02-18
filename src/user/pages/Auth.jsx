@@ -38,10 +38,13 @@ const Auth = () => {
     });
 
     if (error) {
-      const isRateLimit = error.code === 'over_email_send_rate_limit' || error.message?.includes("rate limit");
+      const errorStr = typeof error === 'string' ? error : (error.message || JSON.stringify(error));
+      const isRateLimit = error.code === 'over_email_send_rate_limit' || errorStr.toLowerCase().includes("rate limit");
+      
       const msg = isRateLimit
         ? "You've requested too many codes. Please wait 90 seconds before trying again." 
         : (error.message || "An unexpected error occurred. Please try again.");
+        
       setError(msg);
       setToast({ message: msg, type: "error" });
       if (isRateLimit) setCountdown(90);
@@ -70,9 +73,15 @@ const Auth = () => {
     });
 
     if (error) {
-      const msg = error.message.includes("expired") 
-        ? "This code has expired. Please request a new one." 
-        : error.message;
+      const errorStr = typeof error === 'string' ? error : (error.message || JSON.stringify(error));
+      const isRateLimit = error.code === 'over_email_send_rate_limit' || errorStr.toLowerCase().includes("rate limit");
+      
+      const msg = isRateLimit 
+        ? "Too many attempts. Please wait a moment before trying again."
+        : (errorStr.toLowerCase().includes("expired") 
+          ? "This code has expired. Please request a new one." 
+          : (error.message || "Verification failed."));
+          
       setError(msg);
       setToast({ message: msg, type: "error" });
     } else {
