@@ -1,24 +1,60 @@
 import React, { useState, useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
-const OTPPage = ({ onBack, onContinue }) => {
+import { ArrowLeft, Loader2 } from "lucide-react";
+import { supabase } from "../../lib/supabaseClient";
+import Toast from "./Toast";
+
+const OTPPage = ({ onBack, onContinue, email }) => {
   const [otp, setOtp] = useState("");
-  const [countdown, setCountdown] = useState(15);
+  const [countdown, setCountdown] = useState(90);
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setCountdown((c) => {
-        if (c <= 0) {
-          clearInterval(id);
-          return 0;
-        }
-        return c - 1;
-      });
-    }, 1000);
+    let id;
+    if (countdown > 0) {
+      id = setInterval(() => {
+        setCountdown((c) => c - 1);
+      }, 1000);
+    }
     return () => clearInterval(id);
-  }, []);
+  }, [countdown]);
+
+  const handleResend = async () => {
+    if (countdown > 0 || loading) return;
+
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: window.location.origin + "/currency-change",
+      },
+    });
+
+    if (error) {
+      const isRateLimit = error.code === 'over_email_send_rate_limit' || error.message?.includes("rate limit");
+      setToast({
+        message: isRateLimit
+          ? "You've requested too many codes. Please wait 90 seconds before trying again." 
+          : (error.message || "Verification failed. Please try again."),
+        type: "error"
+      });
+      if (isRateLimit) setCountdown(90);
+    } else {
+      setToast({ message: "Verification code resent successfully!", type: "success" });
+      setCountdown(90);
+    }
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-white animate-fade-in pb-24">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex justify-between items-center mb-8">
@@ -46,7 +82,7 @@ const OTPPage = ({ onBack, onContinue }) => {
           </div>
           
           <h2 className="text-3xl font-black text-gray-900 tracking-tight text-center mb-4">Enter 6-Digit Code</h2>
-          <p className="text-gray-500 font-medium text-center mb-12">We just sent a verification code to your email</p>
+          <p className="text-gray-500 font-medium text-center mb-12">We just sent a verification code to <span className="text-blue-600 break-all">{email}</span></p>
           
           <div className="w-full max-w-md mb-12">
             <input
@@ -60,14 +96,24 @@ const OTPPage = ({ onBack, onContinue }) => {
           </div>
 
           <div className="w-full flex flex-col md:flex-row justify-between items-center gap-6 mb-12 px-4">
-            <button className="text-blue-600 font-black flex items-center gap-2 hover:translate-x-1 transition-transform">
+            <button 
+              onClick={handleResend}
+              disabled={countdown > 0 || loading}
+              className={`text-blue-600 font-black flex items-center gap-2 transition-all ${
+                countdown > 0 || loading ? "opacity-50 cursor-not-allowed" : "hover:translate-x-1"
+              }`}
+            >
+              {loading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0120.49 15"/>
+                </svg>
+              )}
               <span>Resend Verification Code</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0120.49 15"/>
-              </svg>
             </button>
             <div className="flex items-center gap-3">
-               <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>
+               <div className={`w-2 h-2 rounded-full ${countdown > 0 ? "bg-blue-600 animate-pulse" : "bg-gray-300"}`}></div>
                <span className="text-gray-400 font-bold">Resend in <span className="text-blue-900 tabular-nums">{countdown}s</span></span>
             </div>
           </div>

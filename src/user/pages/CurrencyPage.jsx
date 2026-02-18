@@ -25,6 +25,7 @@ const CurrencyPage = () => {
   const [selectedCurrency, setSelectedCurrency] = useState(null);
   const [showModal, setShowModal] = useState(null);
   const [transactionData, setTransactionData] = useState(null);
+  const [email, setEmail] = useState("");
 
   const handleSelectCurrency = (currency) => {
     setSelectedCurrency(currency);
@@ -36,6 +37,7 @@ const CurrencyPage = () => {
     setShowModal(null);
     if (page === "rates") {
       setSelectedCurrency(null);
+      setEmail("");
     }
   };
 
@@ -124,13 +126,17 @@ const CurrencyPage = () => {
         return (
           <CompleteOrderEmail
             onBack={() => setCurrentPage("complete-order")}
-            onContinue={() => setCurrentPage("otp")}
+            onContinue={(emailVal) => {
+              setEmail(emailVal);
+              setCurrentPage("otp");
+            }}
           />
         );
 
       case "otp":
         return (
           <OTPPage
+            email={email}
             onBack={() => setCurrentPage("complete-order-email")}
             onContinue={() => setCurrentPage("personal-data")}
           />

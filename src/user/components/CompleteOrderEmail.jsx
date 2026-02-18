@@ -96,7 +96,7 @@ const CompleteOrderEmail = ({ onBack, onContinue }) => {
             </div>
 
             <button
-              onClick={onContinue}
+              onClick={() => onContinue(email)}
               className="w-full mt-12 bg-[#0063BF] hover:bg-blue-700 text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group"
             >
               <span>Verify My Email</span>

@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabaseClient";
 import logo from "../../assets/CHEESEBALL 1.png";
-import { ArrowRight, Mail, KeyRound, Loader2 } from "lucide-react";
+import { ArrowRight, Mail, KeyRound, Loader2, ArrowLeft } from "lucide-react";
+import Toast from "../components/Toast";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -10,10 +11,22 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState("email"); // 'email' or 'otp'
   const [error, setError] = useState(null);
+  const [toast, setToast] = useState(null);
+  const [countdown, setCountdown] = useState(90);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    let id;
+    if (step === "otp" && countdown > 0) {
+      id = setInterval(() => {
+        setCountdown((c) => c - 1);
+      }, 1000);
+    }
+    return () => clearInterval(id);
+  }, [step, countdown]);
+
   const handleSendOtp = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     setLoading(true);
     setError(null);
 
@@ -25,11 +38,24 @@ const Auth = () => {
     });
 
     if (error) {
-      setError(error.message);
+      const isRateLimit = error.code === 'over_email_send_rate_limit' || error.message?.includes("rate limit");
+      const msg = isRateLimit
+        ? "You've requested too many codes. Please wait 90 seconds before trying again." 
+        : (error.message || "An unexpected error occurred. Please try again.");
+      setError(msg);
+      setToast({ message: msg, type: "error" });
+      if (isRateLimit) setCountdown(90);
     } else {
       setStep("otp");
+      setCountdown(90);
+      setToast({ message: "Access code sent to your email!", type: "success" });
     }
     setLoading(false);
+  };
+
+  const handleResend = () => {
+    if (countdown > 0 || loading) return;
+    handleSendOtp();
   };
 
   const handleVerifyOtp = async (e) => {
@@ -40,20 +66,41 @@ const Auth = () => {
     const { error } = await supabase.auth.verifyOtp({
       email,
       token: otp,
-      type: "magiclink", // or 'signup' depending on configuration
+      type: "magiclink",
     });
 
     if (error) {
-      setError(error.message);
+      const msg = error.message.includes("expired") 
+        ? "This code has expired. Please request a new one." 
+        : error.message;
+      setError(msg);
+      setToast({ message: msg, type: "error" });
     } else {
-      navigate("/currency-change");
+      setToast({ message: "Sign in successful! Redirecting...", type: "success" });
+      setTimeout(() => navigate("/currency-change"), 1000);
     }
     setLoading(false);
   };
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-white to-blue-50 page-container slide-in justify-center items-center py-12">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
       <div className="max-w-md w-full bg-white p-8 sm:p-12 rounded-[2.5rem] shadow-2xl shadow-blue-100 border border-blue-50 relative overflow-hidden">
+        {/* Back Button */}
+        <button 
+          onClick={() => navigate("/")}
+          className="absolute top-8 left-8 p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all group"
+        >
+          <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+        </button>
+
         {/* Abstract background element */}
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/5 rounded-full blur-3xl"></div>
         
@@ -67,7 +114,10 @@ const Auth = () => {
             <p className="text-gray-500 text-sm font-medium op">
               {step === "email" 
                 ? "Enter your email to receive a secure access code" 
-                : `We've sent a secure code to ${email}`}
+                : `We've sent a secure code to `}
+              {step === "otp" && (
+                <span className="text-blue-600 font-bold block sm:inline break-all">{email}</span>
+              )}
             </p>
           </div>
 
@@ -88,19 +138,42 @@ const Auth = () => {
                 </div>
               </div>
             ) : (
-              <div className="relative group">
-                <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 px-1">Security Code</label>
-                <div className="relative">
-                  <KeyRound className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
-                  <input
-                    type="text"
-                    required
-                    maxLength={8}
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    placeholder="0 0 0 0 0 0 0 0"
-                    className="w-full pl-14 pr-6 py-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-blue-100 outline-none transition-all font-black text-center text-xl sm:text-2xl tracking-[0.3em] text-gray-900 shadow-inner"
-                  />
+              <div className="space-y-6">
+                <div className="relative group">
+                  <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 px-1">Security Code</label>
+                  <div className="relative">
+                    <KeyRound className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                    <input
+                      type="text"
+                      required
+                      maxLength={8}
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      placeholder="0 0 0 0 0 0 0 0"
+                      className="w-full pl-14 pr-6 py-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-blue-100 outline-none transition-all font-black text-center text-xl sm:text-2xl tracking-[0.3em] text-gray-900 shadow-inner"
+                    />
+                  </div>
+                </div>
+
+                {/* Resend Logic UI */}
+                <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-2">
+                   <button 
+                    type="button"
+                    onClick={handleResend}
+                    disabled={countdown > 0 || loading}
+                    className={`text-xs font-black uppercase tracking-widest flex items-center gap-2 transition-all ${
+                      countdown > 0 || loading ? "text-gray-300 cursor-not-allowed" : "text-blue-600 hover:text-blue-700 active:scale-95"
+                    }`}
+                  >
+                    {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+                    Resend Code
+                  </button>
+                  <div className="flex items-center gap-2">
+                     <div className={`w-1.5 h-1.5 rounded-full ${countdown > 0 ? "bg-blue-600 animate-pulse" : "bg-gray-200"}`}></div>
+                     <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                        Available in <span className="text-blue-900 tabular-nums">{countdown}s</span>
+                     </span>
+                  </div>
                 </div>
               </div>
             )}
@@ -130,8 +203,11 @@ const Auth = () => {
 
           {step === "otp" && (
             <button
-              onClick={() => setStep("email")}
-              className="w-full mt-6 text-blue-600 text-sm font-black uppercase tracking-widest hover:text-blue-700 transition-colors"
+              onClick={() => {
+                setStep("email");
+                setError(null);
+              }}
+              className="w-full mt-6 text-blue-600 text-[10px] font-black uppercase tracking-[0.2em] hover:text-blue-700 transition-colors"
             >
               Change Email
             </button>
