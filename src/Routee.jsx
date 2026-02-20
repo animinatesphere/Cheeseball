@@ -31,6 +31,7 @@ const Routee = () => {
         <Route path="/admin-login" element={<CheeseBallLogin />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/login" element={<Auth />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/terms" element={<TermsOfService />} />
