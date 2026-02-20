@@ -5,19 +5,18 @@ import Toast from "./Toast";
 
 const OTPPage = ({ onBack, onContinue, email }) => {
   const [otp, setOtp] = useState("");
-  const [countdown, setCountdown] = useState(90);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
+  const [countdown, setCountdown] = useState(0);
 
   useEffect(() => {
     let id;
     if (countdown > 0) {
-      id = setInterval(() => {
-        setCountdown((c) => c - 1);
-      }, 1000);
+      id = setInterval(() => setCountdown(c => c - 1), 1000);
     }
     return () => clearInterval(id);
   }, [countdown]);
+
 
   const handleResend = async () => {
     if (countdown > 0 || loading) return;
@@ -36,14 +35,14 @@ const OTPPage = ({ onBack, onContinue, email }) => {
       
       setToast({
         message: isRateLimit
-          ? "You've requested too many codes. Please wait 90 seconds before trying again." 
+          ? "You've requested too many codes. Please wait 30 seconds before trying again." 
           : (error.message || "Request failed. Please try again."),
         type: "error"
       });
-      if (isRateLimit) setCountdown(90);
+      if (isRateLimit) setCountdown(30);
     } else {
-      setToast({ message: "Verification code resent successfully!", type: "success" });
-      setCountdown(90);
+      setToast({ message: "Verification code sent successfully!", type: "success" });
+      setCountdown(30);
     }
     setLoading(false);
   };
@@ -128,9 +127,9 @@ const OTPPage = ({ onBack, onContinue, email }) => {
           <div className="w-full flex flex-col md:flex-row justify-between items-center gap-6 mb-12 px-4">
             <button 
               onClick={handleResend}
-              disabled={countdown > 0 || loading}
+              disabled={loading || countdown > 0}
               className={`text-blue-600 font-black flex items-center gap-2 transition-all ${
-                countdown > 0 || loading ? "opacity-50 cursor-not-allowed" : "hover:translate-x-1"
+                loading || countdown > 0 ? "opacity-50 cursor-not-allowed" : "hover:translate-x-1"
               }`}
             >
               {loading ? (
@@ -142,10 +141,12 @@ const OTPPage = ({ onBack, onContinue, email }) => {
               )}
               <span>Resend Verification Code</span>
             </button>
-            <div className="flex items-center gap-3">
-               <div className={`w-2 h-2 rounded-full ${countdown > 0 ? "bg-blue-600 animate-pulse" : "bg-gray-300"}`}></div>
-               <span className="text-gray-400 font-bold">Resend in <span className="text-blue-900 tabular-nums">{countdown}s</span></span>
-            </div>
+            {countdown > 0 && (
+              <div className="flex items-center gap-3">
+                 <div className={`w-2 h-2 rounded-full bg-blue-600 animate-pulse`}></div>
+                 <span className="text-gray-400 font-bold">Wait <span className="text-blue-900 tabular-nums">{countdown}s</span></span>
+              </div>
+            )}
           </div>
 
           <button

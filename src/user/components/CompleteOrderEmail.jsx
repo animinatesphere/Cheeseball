@@ -1,11 +1,65 @@
 import React, { useState } from "react";
-import { ArrowLeft, Clock } from "lucide-react";
+import { ArrowLeft, Clock, Loader2 } from "lucide-react";
+import { supabase } from "../../lib/supabaseClient";
+import Toast from "./Toast";
+
 const CompleteOrderEmail = ({ onBack, onContinue }) => {
   const [email, setEmail] = useState("");
   const [receiveUpdates, setReceiveUpdates] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState(null);
+  const [countdown, setCountdown] = useState(0);
+
+  React.useEffect(() => {
+    let id;
+    if (countdown > 0) {
+      id = setInterval(() => setCountdown(c => c - 1), 1000);
+    }
+    return () => clearInterval(id);
+  }, [countdown]);
+
+
+  const handleSendOtp = async () => {
+    if (loading || countdown > 0) return;
+    if (!email || !email.includes("@")) {
+       setToast({ message: "Please enter a valid email address.", type: "error" });
+       return;
+    }
+
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: window.location.origin + "/currency-change",
+      },
+    });
+
+    if (error) {
+      const errorStr = typeof error === 'string' ? error : (error.message || JSON.stringify(error));
+      const isRateLimit = error.code === 'over_email_send_rate_limit' || errorStr.toLowerCase().includes("rate limit");
+      
+      const msg = isRateLimit
+        ? "You've requested too many codes. Please wait 30 seconds before trying again." 
+        : (error.message || "Failed to send code. Please try again.");
+        
+      setToast({ message: msg, type: "error" });
+      if (isRateLimit) setCountdown(30);
+    } else {
+      setCountdown(30);
+      onContinue(email);
+    }
+    setLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-white animate-fade-in pb-24">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex justify-between items-center mb-8">
@@ -96,13 +150,22 @@ const CompleteOrderEmail = ({ onBack, onContinue }) => {
             </div>
 
             <button
-              onClick={() => onContinue(email)}
-              className="w-full mt-12 bg-[#0063BF] hover:bg-blue-700 text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group"
+              onClick={handleSendOtp}
+              disabled={loading || countdown > 0}
+              className="w-full mt-12 bg-[#0063BF] hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex flex-col items-center justify-center gap-1 group"
             >
-              <span>Verify My Email</span>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-2 transition-transform">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
+               <div className="flex items-center gap-4">
+                {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
+                  <>
+                    <span>{countdown > 0 ? `Wait ${countdown}s` : "Verify My Email"}</span>
+                    {countdown === 0 && (
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-2 transition-transform">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                      </svg>
+                    )}
+                  </>
+                )}
+              </div>
             </button>
             
             <p className="mt-8 text-center text-gray-400 text-xs font-bold leading-relaxed px-4">
