@@ -33,12 +33,19 @@ const Auth = () => {
     });
 
     if (error) {
-      const msg = error.message || "Login failed. Please try again.";
+      const raw = error.message?.toLowerCase() || "";
+      const msg = raw.includes("invalid login credentials") || raw.includes("invalid email or password")
+        ? "Wrong email or password. Please double-check and try again."
+        : raw.includes("email not confirmed")
+        ? "You haven't confirmed your email yet. Check your inbox for a verification link."
+        : raw.includes("too many requests") || raw.includes("rate limit")
+        ? "Too many sign-in attempts. Please wait a moment and try again."
+        : "Something went wrong while signing in. Please try again.";
       setError(msg);
       setToast({ message: msg, type: "error" });
     } else {
       setToast({
-        message: "Login successful! Redirecting...",
+        message: "Welcome back! Taking you to your account...",
         type: "success",
       });
       setTimeout(() => navigate("/currency-change"), 1000);
@@ -130,6 +137,17 @@ const Auth = () => {
                   )}
                 </button>
               </div>
+            </div>
+
+            {/* Forgot Password link */}
+            <div className="text-right -mt-2">
+              <button
+                type="button"
+                onClick={() => navigate("/forgot-password")}
+                className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors"
+              >
+                Forgot Password?
+              </button>
             </div>
 
             {error && (

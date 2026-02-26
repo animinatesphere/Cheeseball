@@ -16,6 +16,7 @@ import TermsOfService from "./user/pages/TermsOfService";
 import PrivacyPolicy from "./user/pages/PrivacyPolicy";
 import AMLPolicy from "./user/pages/AMLPolicy";
 import { Careers, Press } from "./user/pages/CompanyPages";
+import ForgotPassword from "./user/pages/ForgotPassword";
 
 const Routee = () => {
   return (
@@ -37,6 +38,7 @@ const Routee = () => {
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/aml" element={<AMLPolicy />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/press" element={<Press />} />
       </Routes>

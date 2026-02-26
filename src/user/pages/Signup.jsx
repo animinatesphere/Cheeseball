@@ -31,7 +31,7 @@ const Signup = () => {
 
     // Validation
     if (password !== confirmPassword) {
-      const msg = "Passwords do not match";
+      const msg = "Those passwords don't match. Please make sure both fields are the same.";
       setError(msg);
       setToast({ message: msg, type: "error" });
       setLoading(false);
@@ -39,7 +39,7 @@ const Signup = () => {
     }
 
     if (password.length < 6) {
-      const msg = "Password must be at least 6 characters";
+      const msg = "Your password needs to be at least 6 characters long.";
       setError(msg);
       setToast({ message: msg, type: "error" });
       setLoading(false);
@@ -55,12 +55,19 @@ const Signup = () => {
     });
 
     if (error) {
-      const msg = error.message || "Signup failed. Please try again.";
+      const raw = error.message?.toLowerCase() || "";
+      const msg = raw.includes("already registered") || raw.includes("already exists")
+        ? "Looks like you already have an account with that email. Try signing in instead!"
+        : raw.includes("invalid email")
+        ? "That doesn't look like a valid email address. Please check it."
+        : raw.includes("password")
+        ? "Your password needs to be at least 6 characters long."
+        : "Something went wrong while creating your account. Please try again.";
       setError(msg);
       setToast({ message: msg, type: "error" });
     } else {
       setToast({
-        message: "Signup successful! You can now log in.",
+        message: "Account created! Check your email to confirm, then sign in.",
         type: "success",
       });
       setTimeout(() => navigate("/login"), 2000);
