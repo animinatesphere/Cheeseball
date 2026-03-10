@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft, Share2, Copy } from "lucide-react";
 
+// Platform receiving wallet addresses per currency
+const RECEIVING_ADDRESSES = {
+  BTC: "bc1qekdrxarvwha8lcce0vjtxevuqyt2562fzttn4y",
+  ETH: "0x65Ba0540abb8B1dB8D18BA903bADbdbd86168858",
+  USDT: "0x65Ba0540abb8B1dB8D18BA903bADbdbd86168858",
+};
+
 const AwaitingDeposit = ({ onBack, transactionData }) => {
-  const depositAddress = "0x52d39886F8022764880Fff88DdE280F6C5D3CcD"; // In a real app, this might come from API/Admin
+  const fromSymbol = transactionData?.fromCurrency?.toUpperCase();
+  const depositAddress = RECEIVING_ADDRESSES[fromSymbol] || RECEIVING_ADDRESSES.USDT;
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {

@@ -3,9 +3,12 @@ import { ArrowLeft, Copy, Loader2 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient";
 import { createTransaction } from "../../lib/api";
 
+const FEE_RATE = 0.01; // 1% service fee
+
 const ConfirmSwap = ({ onBack, onConfirm, transactionData }) => {
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
+  const feeAmount = transactionData ? (Number(transactionData.fromAmount) * FEE_RATE) : 0;
 
   const handlePaste = async () => {
     try {
@@ -42,6 +45,7 @@ const ConfirmSwap = ({ onBack, onConfirm, transactionData }) => {
         to_currency_id: transactionData.toCurrencyId,
         to_token_network: transactionData.toCurrency,
         wallet_address: address,
+        fee: feeAmount,
         created_at: new Date().toISOString()
       };
 
@@ -103,6 +107,17 @@ const ConfirmSwap = ({ onBack, onConfirm, transactionData }) => {
                   <p className="text-orange-600 font-bold text-xs sm:text-sm mt-1">{transactionData.toCurrency} Network</p>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 rounded-[1.5rem] sm:rounded-[2rem] p-5 sm:p-6 border border-gray-100 mb-8 sm:mb-12">
+            <div className="flex justify-between items-center text-sm sm:text-base mb-3">
+              <span className="text-gray-400 font-bold">Service Fee (1%)</span>
+              <span className="font-black text-gray-600 tabular-nums">{feeAmount.toFixed(6)} {transactionData.fromCurrency}</span>
+            </div>
+            <div className="flex justify-between items-center text-sm sm:text-base pt-3 border-t border-gray-200">
+              <span className="text-gray-900 font-black">Total You Send</span>
+              <span className="font-black text-blue-600 tabular-nums">{(Number(transactionData.fromAmount) + feeAmount).toFixed(6)} {transactionData.fromCurrency}</span>
             </div>
           </div>
 

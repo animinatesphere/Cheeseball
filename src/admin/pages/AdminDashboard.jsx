@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import AdminBottomNav from "../component/AdminBottomNav";
 import AdminDashboardHome from "../component/AdminDashboardHome";
 import AdminCurrencies from "../component/AdminCurrencies";
@@ -8,6 +9,14 @@ import AdminAccount from "../component/AdminAccount";
 import AdminAddCurrencyModal from "../component/AdminAddCurrencyModal";
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const isAdmin = sessionStorage.getItem("cheeseball_admin");
+    if (!isAdmin) {
+      navigate("/admin-login", { replace: true });
+    }
+  }, [navigate]);
   const [currentScreen, setCurrentScreen] = useState("dashboard");
   const [showAddModal, setShowAddModal] = useState(false);
 

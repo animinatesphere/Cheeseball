@@ -1,13 +1,32 @@
 import React, { useState } from "react";
 import logo from "../../assets/CHEESEBALL 1.png";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { Loader2 } from "lucide-react";
+
+const ADMIN_EMAIL = "cheeseballadmin@gmail.com";
+const ADMIN_PASSWORD = "cheeseballadmin";
+
 export default function CheeseBallLogin() {
-  const [email, setEmail] = useState("creativeomtayo@gmail.co");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = (e) => {
     e.preventDefault();
-    console.log("Login attempted with:", email);
+    setError("");
+    setLoading(true);
+
+    setTimeout(() => {
+      if (email.trim().toLowerCase() === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+        sessionStorage.setItem("cheeseball_admin", "true");
+        navigate("/admin-dashboard");
+      } else {
+        setError("Wrong email or password. Please try again.");
+      }
+      setLoading(false);
+    }, 600);
   };
 
   return (
@@ -39,6 +58,7 @@ export default function CheeseBallLogin() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-500 rounded-2xl focus:outline-none transition-all text-gray-700 op"
               placeholder="admin@cheeseball.com"
+              required
             />
           </div>
 
@@ -53,17 +73,33 @@ export default function CheeseBallLogin() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent focus:border-blue-500 rounded-2xl focus:outline-none transition-all text-gray-700 op"
               placeholder="••••••••"
+              required
             />
           </div>
 
-          <Link to="/admin-dashboard" className="block pt-4">
+          {error && (
+            <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm font-bold border border-red-100 flex items-center gap-3">
+              <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></div>
+              {error}
+            </div>
+          )}
+
+          <div className="block pt-4">
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 rounded-2xl shadow-lg shadow-blue-200 transition-all hover:scale-[1.02] active:scale-[0.98] op"
+              disabled={loading}
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-bold py-5 rounded-2xl shadow-lg shadow-blue-200 transition-all hover:scale-[1.02] active:scale-[0.98] op flex items-center justify-center gap-3"
             >
-              Login to Dashboard
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                "Login to Dashboard"
+              )}
             </button>
-          </Link>
+          </div>
         </form>
 
         <div className="mt-12 text-center text-gray-400 text-sm">

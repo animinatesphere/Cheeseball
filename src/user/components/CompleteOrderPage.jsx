@@ -5,10 +5,15 @@ import { createTransaction } from "../../lib/api";
 import { usePaystackPayment } from "react-paystack";
 import { PAYSTACK_PUBLIC_KEY } from "../../lib/paystack";
 
+const FEE_RATE = 0.01; // 1% service fee
+
 const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData, onNavigate }) => {
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("bank"); // 'bank' or 'card'
   const [userEmail, setUserEmail] = useState("user@example.com");
+
+  const feeAmount = transactionData ? (Number(transactionData.fromAmount) * FEE_RATE) : 0;
+  const totalToPay = transactionData ? (Number(transactionData.fromAmount) + feeAmount) : 0;
 
   React.useEffect(() => {
     const fetchUser = async () => {
@@ -23,7 +28,7 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData, onN
   const config = {
     reference: (new Date()).getTime().toString(),
     email: userEmail,
-    amount: Math.round(Number(transactionData?.fromAmount || 0) * 100), // Paystack expects amount in kobo/cents
+    amount: Math.round(totalToPay * 100), // Paystack expects amount in kobo/cents (includes 1% fee)
     publicKey: PAYSTACK_PUBLIC_KEY,
   };
 
@@ -55,14 +60,15 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData, onN
         exchange_id: exchangeId,
         type: transactionData.type || 'buy',
         status: 'approved', // Automatically approve if payment is successful
-        from_amount: transactionData.fromAmount,
+        from_amount: totalToPay,
         from_currency_id: transactionData.fromCurrencyId,
-        from_token_network: transactionData.fromCurrency, 
+        from_token_network: transactionData.fromCurrency,
         to_amount: transactionData.toAmount,
         to_currency_id: transactionData.toCurrencyId,
         to_token_network: transactionData.toCurrency,
         transaction_hash: reference.reference,
         wallet_address: transactionData.wallet_address,
+        fee: feeAmount,
         created_at: new Date().toISOString()
       };
 
@@ -109,13 +115,14 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData, onN
         exchange_id: exchangeId,
         type: transactionData.type || 'buy',
         status: 'waiting',
-        from_amount: transactionData.fromAmount,
+        from_amount: totalToPay,
         from_currency_id: transactionData.fromCurrencyId,
-        from_token_network: transactionData.fromCurrency, 
+        from_token_network: transactionData.fromCurrency,
         to_amount: transactionData.toAmount,
         to_currency_id: transactionData.toCurrencyId,
         to_token_network: transactionData.toCurrency,
         wallet_address: transactionData.wallet_address,
+        fee: feeAmount,
         created_at: new Date().toISOString()
       };
 
@@ -219,12 +226,12 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData, onN
                     <span className="font-black text-gray-900 tabular-nums text-xs sm:text-base">1 {transactionData.toCurrency} = ... {transactionData.fromCurrency}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400 font-bold">Service Fee</span>
-                    <span className="font-black text-green-600 tabular-nums">0.00</span>
+                    <span className="text-gray-400 font-bold">Service Fee (1%)</span>
+                    <span className="font-black text-gray-600 tabular-nums">{feeAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {transactionData.fromCurrency}</span>
                   </div>
                   <div className="pt-4 sm:pt-6 border-t border-gray-100 flex justify-between items-center">
                     <span className="text-gray-900 font-black text-lg sm:text-xl">Total To Pay</span>
-                    <span className="font-black text-2xl sm:text-3xl text-blue-600 tabular-nums">{Number(transactionData.fromAmount).toLocaleString()} {transactionData.fromCurrency}</span>
+                    <span className="font-black text-2xl sm:text-3xl text-blue-600 tabular-nums">{totalToPay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {transactionData.fromCurrency}</span>
                   </div>
                </div>
             </div>
