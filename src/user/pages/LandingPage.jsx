@@ -12,11 +12,13 @@ import {
   ShieldCheck,
   TrendingUp,
   HelpCircle,
-  CheckCircle2,
-  DollarSign,
-  Bitcoin,
 } from "lucide-react";
-import logo from "../../assets/CHEESEBALL 1.png"; // Assuming logo exists here
+import logo from "../../assets/CHEESEBALL 1.png";
+import btcIcon from "../../assets/bitcoin_3d.png";
+import ethIcon from "../../assets/ethereum_3d.png";
+import usdtIcon from "../../assets/usdt_3d.png";
+import solIcon from "../../assets/solana_3d.png";
+import appleGC from "../../assets/apple_gc_3d.png";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -361,16 +363,25 @@ const LandingPage = () => {
             {/* Crypto Grid */}
             <div className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm reveal delay-100">
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
-                  <Bitcoin className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center overflow-hidden">
+                  <img src={btcIcon} alt="" className="w-10 h-10 object-contain" />
                 </div>
                 <h3 className="text-2xl font-black text-gray-900">Cryptocurrencies</h3>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                {['Bitcoin (BTC)', 'Ethereum (ETH)', 'Tether (USDT)', 'Solana (SOL)', 'Binance Coin (BNB)', 'Cardano (ADA)'].map((coin, i) => (
-                  <div key={i} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl hover:bg-blue-50 transition-colors cursor-default border border-transparent hover:border-blue-100">
-                    <CheckCircle2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                    <span className="font-bold text-sm text-gray-700">{coin}</span>
+                {[
+                  { name: 'Bitcoin (BTC)', img: btcIcon, color: 'hover:bg-orange-50 hover:border-orange-100' },
+                  { name: 'Ethereum (ETH)', img: ethIcon, color: 'hover:bg-purple-50 hover:border-purple-100' },
+                  { name: 'Tether (USDT)', img: usdtIcon, color: 'hover:bg-green-50 hover:border-green-100' },
+                  { name: 'Solana (SOL)', img: solIcon, color: 'hover:bg-indigo-50 hover:border-indigo-100' },
+                  { name: 'BNB', img: null, color: 'hover:bg-yellow-50 hover:border-yellow-100', fallback: 'BNB' },
+                  { name: 'Cardano', img: null, color: 'hover:bg-blue-50 hover:border-blue-100', fallback: 'ADA' }
+                ].map((coin, i) => (
+                  <div key={i} className={`flex items-center gap-3 p-4 bg-gray-50 rounded-2xl transition-all cursor-default border border-transparent ${coin.color}`}>
+                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-white shadow-sm flex items-center justify-center font-black text-[10px]">
+                      {coin.img ? <img src={coin.img} alt="" className="w-full h-full object-cover" /> : coin.fallback}
+                    </div>
+                    <span className="font-bold text-sm text-gray-700">{coin.name}</span>
                   </div>
                 ))}
               </div>
@@ -379,16 +390,25 @@ const LandingPage = () => {
             {/* Gift Card Grid */}
             <div className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm reveal delay-200">
               <div className="flex items-center gap-4 mb-8">
-                <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center">
-                  <CreditCard className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center overflow-hidden">
+                   <img src={appleGC} alt="" className="w-10 h-10 object-contain" />
                 </div>
                 <h3 className="text-2xl font-black text-gray-900">Gift Cards</h3>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                {['iTunes / Apple', 'Amazon', 'Steam', 'Google Play', 'Sephora', 'Nordstrom'].map((card, i) => (
-                  <div key={i} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl hover:bg-orange-50 transition-colors cursor-default border border-transparent hover:border-orange-100">
-                    <CheckCircle2 className="w-4 h-4 text-orange-600 flex-shrink-0" />
-                    <span className="font-bold text-sm text-gray-700">{card}</span>
+                {[
+                  { name: 'Apple / iTunes', img: appleGC, color: 'hover:bg-blue-50 hover:border-blue-100' },
+                  { name: 'Amazon', img: null, color: 'hover:bg-yellow-50 hover:border-yellow-100', fallback: 'AMZ' },
+                  { name: 'Steam', img: null, color: 'hover:bg-indigo-50 hover:border-indigo-100', fallback: 'STM' },
+                  { name: 'Google Play', img: null, color: 'hover:bg-green-50 hover:border-green-100', fallback: 'GPL' },
+                  { name: 'Sephora', img: null, color: 'hover:bg-pink-50 hover:border-pink-100', fallback: 'SEP' },
+                  { name: 'Nordstrom', img: null, color: 'hover:bg-gray-100 hover:border-gray-200', fallback: 'NOR' }
+                ].map((card, i) => (
+                  <div key={i} className={`flex items-center gap-3 p-4 bg-gray-50 rounded-2xl transition-all cursor-default border border-transparent ${card.color}`}>
+                    <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 bg-white shadow-sm flex items-center justify-center font-black text-[10px]">
+                      {card.img ? <img src={card.img} alt="" className="w-full h-full object-cover" /> : card.fallback}
+                    </div>
+                    <span className="font-bold text-sm text-gray-700">{card.name}</span>
                   </div>
                 ))}
               </div>
