@@ -1,10 +1,8 @@
 import React, { useState } from "react";
+import { supabase } from "../../lib/supabaseClient";
 import logo from "../../assets/CHEESEBALL 1.png";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-
-const ADMIN_EMAIL = "cheeseballadmin@gmail.com";
-const ADMIN_PASSWORD = "cheeseballadmin";
 
 export default function CheeseBallLogin() {
   const [email, setEmail] = useState("");
@@ -13,20 +11,38 @@ export default function CheeseBallLogin() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    setTimeout(() => {
-      if (email.trim().toLowerCase() === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password: password
+      });
+
+      if (authError) throw authError;
+
+      // Check if user has admin role
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profile?.role === 'admin') {
         sessionStorage.setItem("cheeseball_admin", "true");
         navigate("/admin-dashboard");
       } else {
-        setError("Wrong email or password. Please try again.");
+        await supabase.auth.signOut();
+        setError("Access denied. You do not have admin permissions.");
       }
+    } catch (err) {
+      setError(err.message || "Login failed. Please check your credentials.");
+    } finally {
       setLoading(false);
-    }, 600);
+    }
   };
 
   return (

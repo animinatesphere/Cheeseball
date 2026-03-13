@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft, Share2, Copy } from "lucide-react";
+import ScreenshotUpload from "./ScreenshotUpload";
 
 // Platform receiving wallet addresses per currency
 const RECEIVING_ADDRESSES = {
@@ -8,10 +9,11 @@ const RECEIVING_ADDRESSES = {
   USDT: "0x65Ba0540abb8B1dB8D18BA903bADbdbd86168858",
 };
 
-const AwaitingDeposit = ({ onBack, transactionData }) => {
+const AwaitingDeposit = ({ onBack, onContinue, transactionData }) => {
   const fromSymbol = transactionData?.fromCurrency?.toUpperCase();
   const depositAddress = RECEIVING_ADDRESSES[fromSymbol] || RECEIVING_ADDRESSES.USDT;
   const [copied, setCopied] = useState(false);
+  const [screenshotUrl, setScreenshotUrl] = useState(null);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(depositAddress);
@@ -103,7 +105,7 @@ const AwaitingDeposit = ({ onBack, transactionData }) => {
               </div>
             </div>
 
-            <div className="w-full relative group mb-12">
+            <div className="w-full relative group mb-8">
               <div className="bg-gray-50 px-8 py-6 rounded-[2rem] border-2 border-transparent group-hover:border-blue-100 transition-all">
                 <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-2">Wallet Address</p>
                 <p className="font-mono text-sm font-bold text-gray-900 break-all leading-relaxed">
@@ -119,9 +121,20 @@ const AwaitingDeposit = ({ onBack, transactionData }) => {
               </button>
             </div>
 
+            <div className="w-full mb-8">
+               <ScreenshotUpload 
+                 onUploadComplete={(url) => setScreenshotUrl(url)} 
+                 label="Upload Proof of Transfer"
+               />
+            </div>
+
             <button
-              onClick={onBack}
-              className="w-full bg-[#0063BF] hover:bg-blue-700 text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group"
+              onClick={() => {
+                if (onContinue) onContinue({ screenshotUrl });
+                else onBack();
+              }}
+              disabled={!screenshotUrl}
+              className="w-full bg-[#0063BF] hover:bg-blue-700 text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group disabled:opacity-50"
             >
               <span>Verify & Complete</span>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-2 transition-transform">

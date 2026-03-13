@@ -149,11 +149,11 @@ const SwapCrypto = ({ onBack, onSwap, onNavigate }) => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8">
         <div className="bg-white rounded-[1.5rem] sm:rounded-[2rem] shadow-xl p-1.5 flex border border-gray-100 mb-8 sm:mb-12 max-w-md mx-auto">
-          <button onClick={() => onNavigate("buy")} className="flex-1 py-3 sm:py-4 rounded-[1.2rem] sm:rounded-[1.5rem] text-gray-500 font-bold hover:bg-gray-50 transition-all text-sm sm:text-base">
-            Buy/Sell
-          </button>
           <button className="flex-1 py-3 sm:py-4 rounded-[1.2rem] sm:rounded-[1.5rem] bg-blue-600 text-white font-black shadow-lg shadow-blue-100 text-sm sm:text-base">
-            Swap
+            Crypto Swap
+          </button>
+          <button onClick={() => onNavigate("giftcard-swap")} className="flex-1 py-3 sm:py-4 rounded-[1.2rem] sm:rounded-[1.5rem] text-gray-500 font-bold hover:bg-gray-50 transition-all text-sm sm:text-base">
+            Gift Card
           </button>
         </div>
 

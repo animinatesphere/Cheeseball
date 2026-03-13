@@ -205,7 +205,7 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData, onN
                </div>
                <div>
                   <p className="text-blue-900 font-black text-base sm:text-lg leading-tight">Rate matches current market</p>
-                  <p className="text-blue-600 font-bold text-xs sm:text-sm">Update in <span className="text-red-600 tabular-nums">5 seconds</span></p>
+                  <p className="text-blue-600 font-bold text-xs sm:text-sm">Update in <span className="text-red-600 tabular-nums">30 seconds</span></p>
                </div>
             </div>
           </div>

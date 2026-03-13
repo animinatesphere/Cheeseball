@@ -1,10 +1,11 @@
-import React from "react";
-import { TrendingUp, ShoppingCart, Clock, User } from "lucide-react";
+import { TrendingUp, ArrowDownCircle, ArrowUpCircle, Repeat, Wallet, Clock, User } from "lucide-react";
 
 const BottomNav = ({ currentPage, onNavigate }) => {
   const navItems = [
     { id: "rates", icon: TrendingUp, label: "Market" },
-    { id: "buy", icon: ShoppingCart, label: "Trade" },
+    { id: "buy", icon: ArrowDownCircle, label: "Buy" },
+    { id: "sell", icon: ArrowUpCircle, label: "Sell" },
+    { id: "swap", icon: Repeat, label: "Swap" },
     { id: "history", icon: Clock, label: "History" },
     { id: "support", icon: User, label: "Support" },
   ];
@@ -12,7 +13,10 @@ const BottomNav = ({ currentPage, onNavigate }) => {
   const isActive = (pageId) => {
     if (pageId === "support") return currentPage === "support" || currentPage === "address-book";
     if (pageId === "buy") return ["buy", "buy-address", "complete-order", "complete-order-email", "otp", "personal-data", "bank-transfer"].includes(currentPage);
-    if (pageId === "rates") return ["rates", "detail", "swap", "confirm", "awaiting"].includes(currentPage);
+    if (pageId === "sell") return ["sell"].includes(currentPage);
+    if (pageId === "swap") return ["swap", "confirm", "awaiting", "giftcard-swap"].includes(currentPage);
+    if (pageId === "cards") return ["cards"].includes(currentPage);
+    if (pageId === "rates") return ["rates", "detail"].includes(currentPage);
     return currentPage === pageId;
   };
 

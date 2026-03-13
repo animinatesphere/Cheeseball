@@ -11,6 +11,10 @@ import {
   UserPlus,
   ShieldCheck,
   TrendingUp,
+  HelpCircle,
+  CheckCircle2,
+  DollarSign,
+  Bitcoin,
 } from "lucide-react";
 import logo from "../../assets/CHEESEBALL 1.png"; // Assuming logo exists here
 
@@ -42,10 +46,10 @@ const LandingPage = () => {
       <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="Cheeseball" className="h-10 w-auto" />
-            <span className="font-black text-xl tracking-tight text-blue-900 hidden sm:block">
+            <img src={logo} alt="Cheeseball" className="h-20 w-auto rounded-full" />
+            {/* <span className="font-black text-xl tracking-tight text-blue-900 hidden sm:block">
               CHEESEBALL
-            </span>
+            </span> */}
           </div>
           <div className="hidden md:flex items-center gap-8 font-bold text-sm text-gray-500">
             <a
@@ -341,6 +345,93 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* Supported Assets */}
+      <section id="rates" className="py-24 bg-gray-50 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center max-w-2xl mx-auto mb-20 reveal">
+            <h2 className="text-4xl lg:text-5xl font-black text-gray-900 tracking-tight mb-4">
+              Supported Assets.
+            </h2>
+            <p className="text-gray-500 font-bold text-lg">
+              We support a wide range of cryptocurrencies and global gift cards.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Crypto Grid */}
+            <div className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm reveal delay-100">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
+                  <Bitcoin className="w-6 h-6 text-blue-600" />
+                </div>
+                <h3 className="text-2xl font-black text-gray-900">Cryptocurrencies</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {['Bitcoin (BTC)', 'Ethereum (ETH)', 'Tether (USDT)', 'Solana (SOL)', 'Binance Coin (BNB)', 'Cardano (ADA)'].map((coin, i) => (
+                  <div key={i} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl hover:bg-blue-50 transition-colors cursor-default border border-transparent hover:border-blue-100">
+                    <CheckCircle2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                    <span className="font-bold text-sm text-gray-700">{coin}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Gift Card Grid */}
+            <div className="bg-white p-8 rounded-[3rem] border border-gray-100 shadow-sm reveal delay-200">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center">
+                  <CreditCard className="w-6 h-6 text-orange-600" />
+                </div>
+                <h3 className="text-2xl font-black text-gray-900">Gift Cards</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {['iTunes / Apple', 'Amazon', 'Steam', 'Google Play', 'Sephora', 'Nordstrom'].map((card, i) => (
+                  <div key={i} className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl hover:bg-orange-50 transition-colors cursor-default border border-transparent hover:border-orange-100">
+                    <CheckCircle2 className="w-4 h-4 text-orange-600 flex-shrink-0" />
+                    <span className="font-bold text-sm text-gray-700">{card}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section id="support" className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center max-w-2xl mx-auto mb-20 reveal">
+            <h2 className="text-4xl lg:text-5xl font-black text-gray-900 tracking-tight mb-4">
+              Got Questions?
+            </h2>
+            <p className="text-gray-500 font-bold text-lg">
+              Everything you need to know about trading on Cheeseball.
+            </p>
+          </div>
+
+          <div className="max-w-3xl mx-auto space-y-6">
+            {[
+              { q: "How fast are the transactions processed?", a: "Most transactions are processed instantly. Crypto sales typically hit your bank account within 2-5 minutes after network confirmation." },
+              { q: "What are your trading limits?", a: "We support both small trades and high-volume transactions. Limits vary based on your verification level, starting from $10 up to $50,000 daily." },
+              { q: "Is my personal data safe?", a: "Absolutely. We use bank-grade AES-256 encryption to protect your data and assets. We never share your information with third parties." },
+              { q: "How do I contact support?", a: "Our dedicated support team is available 24/7 via live chat in the app or by emailing support@cheeseball.com." }
+            ].map((faq, i) => (
+              <div key={i} className="bg-gray-50 p-8 rounded-[2.5rem] border border-transparent hover:border-blue-100 transition-all reveal">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0 mt-1">
+                    <HelpCircle className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-black text-gray-900 mb-3">{faq.q}</h4>
+                    <p className="text-gray-500 font-bold leading-relaxed">{faq.a}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-24 reveal">
         <div className="max-w-7xl mx-auto px-6">
@@ -350,11 +441,10 @@ const LandingPage = () => {
 
             <div className="relative z-10 max-w-3xl mx-auto">
               <h2 className="text-4xl lg:text-7xl font-black text-white tracking-tighter mb-8 leading-[0.9]">
-                Start Trading Like a Pro Today.
+                Buy Sell Swap
               </h2>
               <p className="text-blue-100 text-xl font-medium mb-12">
-                Join 50,000+ Nigerians who trust Cheeseball for their daily
-                crypto transactions.
+                Crypto Currency and gift cards
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-6">
                   <button
@@ -380,14 +470,10 @@ const LandingPage = () => {
           <div className="grid md:grid-cols-4 gap-12 mb-16">
             <div className="col-span-2">
               <div className="flex items-center gap-2 mb-6">
-                <img
-                  src={logo}
-                  alt="Cheeseball"
-                  className="h-8 w-auto brightness-0 invert"
-                />
-                <span className="font-black text-xl tracking-tight">
+               <img src={logo} alt="Cheeseball" className="h-20 w-auto rounded-full" />
+                {/* <span className="font-black text-xl tracking-tight">
                   CHEESEBALL
-                </span>
+                </span> */}
               </div>
               <p className="text-gray-400 font-medium max-w-sm">
                 The most trusted cryptocurrency exchange platform for seamless
@@ -441,7 +527,7 @@ const LandingPage = () => {
           </div>
           <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-gray-500 text-sm font-bold">
-              © 2024 Cheeseball. All rights reserved.
+              © {new Date().getFullYear()} Cheeseball. All rights reserved.
             </p>
             <div className="flex gap-6">
               <CreditCard className="w-6 h-6 text-gray-600" />

@@ -164,7 +164,7 @@ const AdminDashboardHome = ({ onNavigate }) => {
           <div className="bg-gray-50 rounded-[2.5rem] sm:rounded-[3rem] p-8 sm:p-10 border border-gray-100 font-medium">
             <h3 className="text-gray-900 font-black uppercase text-xs tracking-[0.2em] mb-8">System Architecture</h3>
             <div className="space-y-4">
-              {systemStatus.length > 0 ? (
+              {systemStatus && systemStatus.length > 0 ? (
                 systemStatus.map((item, i) => (
                    <div key={i} className="flex justify-between items-center p-5 bg-white rounded-2xl border border-gray-100 hover:border-blue-100 transition-all shadow-sm">
                      <span className="text-gray-700 font-black text-sm">{item.name}</span>
@@ -175,7 +175,10 @@ const AdminDashboardHome = ({ onNavigate }) => {
                    </div>
                  ))
               ) : (
-                <div className="text-center text-gray-400 text-sm">No system status reported.</div>
+                <div className="text-center py-8">
+                  <p className="text-gray-400 text-sm font-bold">No system status reported.</p>
+                  <p className="text-[10px] text-gray-400 uppercase tracking-widest mt-1">Check database connection</p>
+                </div>
               )}
             </div>
           </div>

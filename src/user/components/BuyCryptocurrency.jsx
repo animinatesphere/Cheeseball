@@ -151,21 +151,12 @@ const BuyCryptocurrency = ({ onBack, onExchange, onNavigate }) => {
           <button onClick={onBack} className="mb-8 p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10">
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-4xl font-black mb-2 tracking-tight">Trade Crypto</h1>
-          <p className="text-blue-200 font-medium">Fast, secure cryptocurrency exchange</p>
+          <h1 className="text-4xl font-black mb-2 tracking-tight">Buy Crypto</h1>
+          <p className="text-blue-200 font-medium">Purchase assets with fiat instantly</p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8">
-        <div className="bg-white rounded-[1.5rem] sm:rounded-[2rem] shadow-xl p-1.5 flex border border-gray-100 mb-8 sm:mb-12 max-w-md mx-auto">
-          <button className="flex-1 py-3 sm:py-4 rounded-[1.2rem] sm:rounded-[1.5rem] bg-blue-600 text-white font-black shadow-lg shadow-blue-100 text-sm sm:text-base">
-            Buy/Sell
-          </button>
-          <button onClick={() => onNavigate("swap")} className="flex-1 py-3 sm:py-4 rounded-[1.2rem] sm:rounded-[1.5rem] text-gray-500 font-bold hover:bg-gray-50 transition-all text-sm sm:text-base">
-            Swap
-          </button>
-        </div>
-
         <div className="max-w-3xl mx-auto bg-gray-50 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 lg:p-12 border border-gray-100 shadow-sm text-sm sm:text-base">
           <div className="mb-8 sm:mb-10">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-4 px-2">

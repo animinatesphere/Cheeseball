@@ -19,48 +19,9 @@ const ConfirmSwap = ({ onBack, onConfirm, transactionData }) => {
     }
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
     if (!transactionData) return;
-    setLoading(true);
-
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) {
-        console.error("No user session");
-        setLoading(false);
-        return;
-      }
-
-      const exchangeId = `ID:${Math.random().toString(36).substring(2, 10)}`;
-
-      const payload = {
-        user_id: session.user.id,
-        exchange_id: exchangeId,
-        type: transactionData.type || 'swap',
-        status: 'waiting',
-        from_amount: transactionData.fromAmount,
-        from_currency_id: transactionData.fromCurrencyId,
-        from_token_network: transactionData.fromCurrency, // Using symbol as network/token for now if not separate
-        to_amount: transactionData.toAmount,
-        to_currency_id: transactionData.toCurrencyId,
-        to_token_network: transactionData.toCurrency,
-        wallet_address: address,
-        fee: feeAmount,
-        created_at: new Date().toISOString()
-      };
-
-      const { error } = await createTransaction(payload);
-      
-      if (error) {
-        console.error("Error creating transaction:", error);
-      } else {
-        onConfirm();
-      }
-    } catch (err) {
-      console.error("Unexpected error:", err);
-    } finally {
-      setLoading(false);
-    }
+    onConfirm();
   };
 
   if(!transactionData) return null;

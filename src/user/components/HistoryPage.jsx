@@ -7,7 +7,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient";
-import { getUserTransactions } from "../../lib/api";
+import { getUserTransactions, getUserGiftCardTrades } from "../../lib/api";
 
 const HistoryPage = ({ onNavigate }) => {
   const [showFilterModal, setShowFilterModal] = useState(false);
@@ -22,27 +22,54 @@ const HistoryPage = ({ onNavigate }) => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session?.user) {
-        const { data } = await getUserTransactions(session.user.id);
-        if (data) {
-          const mappedTransactions = data.map(t => ({
+        const { data: transactions } = await getUserTransactions(session.user.id);
+        const { data: gcTrades } = await getUserGiftCardTrades(session.user.id);
+
+        let allHistory = [];
+
+        if (transactions) {
+          allHistory = [...allHistory, ...transactions.map(t => ({
             id: t.id,
             date: new Date(t.created_at).toLocaleDateString("en-GB", { day: '2-digit', month: 'short', year: 'numeric' }),
             from: { 
               amount: t.from_amount, 
-              currency: t.from_currency?.symbol || 'USD', 
-              symbol: t.from_token_network, 
-              icon: t.from_currency?.icon_url ? <img src={t.from_currency.icon_url} alt="" className="w-full h-full object-cover rounded-full" /> : (t.from_currency?.symbol?.[0] || 'F')
+              currency: t.from_currency?.symbol || t.from_token_network || 'USD', 
+              symbol: t.from_token_network || t.from_currency?.symbol || 'USD', 
+              icon: t.from_currency?.icon_url ? <img src={t.from_currency.icon_url} alt="" className="w-full h-full object-cover rounded-full" /> : <div className="p-3 bg-blue-100 rounded-xl text-blue-600 font-bold">{(t.from_currency?.symbol?.[0] || t.from_token_network?.[0] || 'F')}</div>
             }, 
             to: { 
               amount: t.to_amount, 
-              currency: t.to_currency?.symbol || 'BTC', 
-              icon: t.to_currency?.icon_url ? <img src={t.to_currency.icon_url} alt="" className="w-full h-full object-cover rounded-full" /> : (t.to_currency?.symbol?.[0] || 'T')
+              currency: t.to_currency?.symbol || t.to_token_network || 'NGN', 
+              icon: t.to_currency?.icon_url ? <img src={t.to_currency.icon_url} alt="" className="w-full h-full object-cover rounded-full" /> : <div className="p-3 bg-green-100 rounded-xl text-green-600 font-bold">{(t.to_currency?.symbol?.[0] || t.to_token_network?.[0] || 'T')}</div>
             }, 
             status: t.status.charAt(0).toUpperCase() + t.status.slice(1), 
-            exchangeId: t.exchange_id 
-          }));
-          setTransactions(mappedTransactions);
+            exchangeId: t.exchange_id,
+            createdAt: new Date(t.created_at)
+          }))];
         }
+
+        if (gcTrades) {
+          allHistory = [...allHistory, ...gcTrades.map(t => ({
+            id: t.id,
+            date: new Date(t.created_at).toLocaleDateString("en-GB", { day: '2-digit', month: 'short', year: 'numeric' }),
+            from: { 
+              amount: t.amount, 
+              currency: 'USD', 
+              symbol: t.card_type, 
+              icon: <div className="p-3 bg-blue-100 rounded-xl text-blue-600 font-bold">GC</div>
+            }, 
+            to: { 
+              amount: t.fiat_amount, 
+              currency: 'NGN', 
+              icon: <div className="p-3 bg-green-100 rounded-xl text-green-600 font-bold">₦</div>
+            }, 
+            status: t.status.charAt(0).toUpperCase() + t.status.slice(1), 
+            exchangeId: `GC:${t.id.slice(0, 8)}`,
+            createdAt: new Date(t.created_at)
+          }))];
+        }
+
+        setTransactions(allHistory.sort((a, b) => b.createdAt - a.createdAt));
       }
       setLoading(false);
     };

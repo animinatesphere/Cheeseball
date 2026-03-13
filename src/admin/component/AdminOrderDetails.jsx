@@ -29,7 +29,9 @@ const AdminOrderDetails = ({ order, onBack, onShowDetails, onUpdateStatus }) => 
           <div className="bg-gray-50 rounded-[2.5rem] p-6 sm:p-10 border border-gray-100 shadow-sm transition-all hover:bg-white hover:shadow-2xl group">
              <div className="flex flex-col sm:flex-row items-center justify-between gap-8">
                <div className="flex items-center gap-5 w-full sm:w-auto">
-                 <div className="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-blue-50 group-hover:scale-110 transition-transform">T</div>
+                 <div className="w-14 h-14 bg-blue-500 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-blue-50 group-hover:scale-110 transition-transform overflow-hidden">
+                    {order.fromIcon?.length > 2 ? <img src={order.fromIcon} alt="" className="w-full h-full object-cover"/> : order.fromIcon}
+                  </div>
                  <div>
                    <div className="font-black text-gray-900 text-xl leading-tight">{order.fromAmount}</div>
                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mt-1">{order.fromToken}</div>
@@ -41,7 +43,9 @@ const AdminOrderDetails = ({ order, onBack, onShowDetails, onUpdateStatus }) => 
                </div>
 
                <div className="flex items-center gap-5 w-full sm:w-auto sm:text-right">
-                 <div className="w-14 h-14 bg-orange-500 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-orange-50 group-hover:scale-110 transition-transform order-last sm:order-first">₿</div>
+                 <div className="w-14 h-14 bg-orange-500 rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-orange-50 group-hover:scale-110 transition-transform order-last sm:order-first overflow-hidden">
+                    {order.toIcon?.length > 2 ? <img src={order.toIcon} alt="" className="w-full h-full object-cover"/> : order.toIcon}
+                  </div>
                  <div className="order-first sm:order-last flex-1 sm:flex-none">
                     <div className="font-black text-gray-900 text-xl leading-tight">{order.toAmount}</div>
                     <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mt-1">{order.toToken}</div>
@@ -64,6 +68,43 @@ const AdminOrderDetails = ({ order, onBack, onShowDetails, onUpdateStatus }) => 
              ))}
           </div>
 
+          {order.screenshotUrl && (
+            <div className="space-y-4">
+               <h3 className="text-gray-900 font-black uppercase text-xs tracking-widest ml-2 mb-4">Payment Verification</h3>
+               <div className="bg-white border-2 border-blue-50 rounded-[2.5rem] p-4 overflow-hidden shadow-sm hover:shadow-xl transition-all group">
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 px-4 pt-2">Transaction Screenshot</p>
+                  <div className="aspect-video sm:aspect-auto sm:h-[300px] w-full rounded-2xl overflow-hidden border border-gray-100 bg-gray-50">
+                     <img 
+                       src={order.screenshotUrl} 
+                       alt="Payment Proof" 
+                       className="w-full h-full object-contain cursor-zoom-in"
+                       onClick={() => window.open(order.screenshotUrl, '_blank')}
+                     />
+                  </div>
+               </div>
+            </div>
+          )}
+
+          {(order.frontImageUrl || order.backImageUrl) && (
+            <div className="space-y-4">
+               <h3 className="text-gray-900 font-black uppercase text-xs tracking-widest ml-2 mb-4">Gift Card Assets</h3>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {order.frontImageUrl && (
+                    <div className="bg-white border-2 border-gray-50 rounded-[2rem] p-4 shadow-sm">
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 px-2">Front Side</p>
+                       <img src={order.frontImageUrl} alt="GC Front" className="w-full h-48 object-contain rounded-xl bg-gray-50 cursor-zoom-in" onClick={() => window.open(order.frontImageUrl, '_blank')} />
+                    </div>
+                  )}
+                  {order.backImageUrl && (
+                    <div className="bg-white border-2 border-gray-50 rounded-[2rem] p-4 shadow-sm">
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 px-2">Back Side / Code</p>
+                       <img src={order.backImageUrl} alt="GC Back" className="w-full h-48 object-contain rounded-xl bg-gray-50 cursor-zoom-in" onClick={() => window.open(order.backImageUrl, '_blank')} />
+                    </div>
+                  )}
+               </div>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-4">
               <h3 className="text-gray-900 font-black uppercase text-xs tracking-widest ml-2 mb-4">Personal Vault</h3>
@@ -85,23 +126,47 @@ const AdminOrderDetails = ({ order, onBack, onShowDetails, onUpdateStatus }) => 
             </div>
 
             <div className="space-y-4">
-               <h3 className="text-gray-900 font-black uppercase text-xs tracking-widest ml-2 mb-4">Operational Data</h3>
-               <div className="bg-gray-50 rounded-2xl p-5 border border-transparent hover:border-blue-100 transition-all h-full">
-                  <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 leading-none">Settlement Address (USDT)</span>
-                  <div className="bg-white p-6 rounded-2xl shadow-inner border border-gray-100 break-all font-mono text-xs font-bold text-gray-900 leading-relaxed mb-6">
-                    {order.address}
-                  </div>
-                  <button
-                    onClick={() => copyToClipboard(order.address)}
-                    className="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-[10px] tracking-[0.2em] shadow-lg shadow-blue-50 active:scale-95 transition-all"
-                  >
-                    Copy Global Address
-                  </button>
+               <h3 className="text-gray-900 font-black uppercase text-xs tracking-widest ml-2 mb-4">Payout Information</h3>
+               <div className="bg-gray-50 rounded-[2.5rem] p-8 border border-transparent hover:border-blue-100 transition-all h-full">
+                  {order.bankName ? (
+                    <div className="space-y-6">
+                       <div>
+                          <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Beneficiary Bank</span>
+                          <p className="font-black text-gray-900">{order.bankName}</p>
+                       </div>
+                       <div>
+                          <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Account Number</span>
+                          <div className="flex items-center justify-between bg-white p-4 rounded-xl shadow-inner group/copy">
+                             <p className="font-mono text-lg font-black text-blue-600">{order.accountNumber}</p>
+                             <button onClick={() => copyToClipboard(order.accountNumber)} className="text-gray-300 hover:text-blue-600 transition-colors">
+                                <Copy size={16}/>
+                             </button>
+                          </div>
+                       </div>
+                       <div>
+                          <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Account Name</span>
+                          <p className="font-black text-gray-900 uppercase tracking-tight">{order.accountName}</p>
+                       </div>
+                    </div>
+                  ) : (
+                    <>
+                      <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-6 leading-none">Settlement Address</span>
+                      <div className="bg-white p-6 rounded-2xl shadow-inner border border-gray-100 break-all font-mono text-xs font-bold text-gray-900 leading-relaxed mb-6">
+                        {order.address}
+                      </div>
+                      <button
+                        onClick={() => copyToClipboard(order.address)}
+                        className="w-full bg-blue-600 text-white py-4 rounded-xl font-black uppercase text-[10px] tracking-[0.2em] shadow-lg shadow-blue-50 active:scale-95 transition-all"
+                      >
+                        Copy Address
+                      </button>
+                    </>
+                  )}
                </div>
             </div>
           </div>
 
-          {order.status === "Waiting" ? (
+          {order.status === "Waiting" || order.status === "Pending" ? (
             <div className="flex gap-4 mt-8">
               <button
                 onClick={() => onUpdateStatus(order.id, "Declined")}

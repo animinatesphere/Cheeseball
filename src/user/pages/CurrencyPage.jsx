@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { getCurrencies, getUserPortfolio, createTransaction, createGiftCardTrade } from "../../lib/api";
+import { supabase } from "../../lib/supabaseClient";
 import CurrencyRates from "../components/CurrencyRates";
 import CurrencyDetail from "../components/CurrencyDetail";
 import SwapCrypto from "../components/SwapCrypto";
@@ -19,6 +21,11 @@ import SupportPage from "../components/SupportPage";
 import HistoryPage from "../components/HistoryPage";
 import AlertRatesPage from "../components/AlertRatesPage";
 import BottomNav from "../components/BottomNav";
+import SellCryptocurrency from "../components/SellCryptocurrency";
+import SwapGiftCard from "../components/SwapGiftCard";
+import CardManagement from "../components/CardManagement";
+import GiftCardUpload from "../components/GiftCardUpload";
+import WithdrawalDetails from "../components/WithdrawalDetails";
 
 const CurrencyPage = () => {
   const [currentPage, setCurrentPage] = useState("rates");
@@ -26,6 +33,64 @@ const CurrencyPage = () => {
   const [showModal, setShowModal] = useState(null);
   const [transactionData, setTransactionData] = useState(null);
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleContinue = async (extraData = {}) => {
+    setLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("No active session");
+
+      const finalData = { ...transactionData, ...extraData, user_id: session.user.id };
+
+      // Harden the check - if it has a cardName, it's a gift card trade
+      const isGiftCard = finalData.type === 'giftcard' || !!finalData.cardName;
+
+      if (isGiftCard) {
+        const { error } = await createGiftCardTrade({
+          user_id: session.user.id,
+          card_type: finalData.cardName || 'Gift Card',
+          amount: parseFloat(finalData.fromAmount),
+          fiat_amount: parseFloat(finalData.toAmount),
+          front_image_url: finalData.frontImage, 
+          back_image_url: finalData.backImage,   
+          screenshot_url: finalData.screenshotUrl,
+          bank_name: finalData.bankName,
+          bank_account_number: finalData.accountNumber,
+          bank_account_name: finalData.accountName,
+          status: 'pending'
+        });
+        if (error) throw error;
+      } else {
+        const { error } = await createTransaction({
+          user_id: session.user.id,
+          exchange_id: `ID:${Math.random().toString(36).substr(2, 10).toUpperCase()}`,
+          type: finalData.type || 'sell',
+          status: 'waiting',
+          from_amount: parseFloat(finalData.fromAmount),
+          to_amount: parseFloat(finalData.toAmount),
+          from_currency_id: finalData.fromCurrencyId,
+          to_currency_id: finalData.toCurrencyId,
+          from_token_network: finalData.type === 'giftcard' ? finalData.cardName : finalData.fromCurrency,
+          to_token_network: finalData.toCurrency,
+          screenshot_url: finalData.screenshot_url,
+          payment_method: finalData.paymentMethod || 'manual',
+          wallet_address: finalData.wallet_address || '',
+          bank_name: finalData.bankName,
+          bank_account_number: finalData.accountNumber,
+          bank_account_name: finalData.accountName
+        });
+        if (error) throw error;
+      }
+
+      setShowModal("payment-success");
+    } catch (err) {
+      console.error("Failed to save transaction:", err);
+      alert("An error occurred while saving your transaction. Please contact support.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSelectCurrency = (currency) => {
     setSelectedCurrency(currency);
@@ -87,7 +152,18 @@ const CurrencyPage = () => {
         );
 
       case "awaiting":
-        return <AwaitingDeposit transactionData={transactionData} onBack={handleBack} />;
+        return (
+          <AwaitingDeposit 
+            transactionData={transactionData} 
+            onBack={handleBack} 
+            onContinue={(data) => {
+              const updatedData = { ...transactionData, ...data };
+              setTransactionData(updatedData);
+              if (updatedData.type === 'sell') setCurrentPage("withdrawal-details");
+              else handleContinue(data);
+            }}
+          />
+        );
 
       case "buy":
         return (
@@ -95,9 +171,56 @@ const CurrencyPage = () => {
             onBack={handleBack}
             onExchange={(data) => {
               setTransactionData(data);
-              setShowModal("crypto-exchange");
+              setCurrentPage("buy-address");
+            }}
+          />
+        );
+
+      case "sell":
+        return (
+          <SellCryptocurrency
+            onBack={handleBack}
+            onExchange={(data) => {
+              setTransactionData(data);
+              setCurrentPage("awaiting");
             }}
             onNavigate={handleNavigation}
+          />
+        );
+
+      case "giftcard-swap":
+        return (
+          <SwapGiftCard 
+            onBack={handleBack} 
+            onSwap={(data) => {
+              setTransactionData(data);
+              setCurrentPage("giftcard-upload");
+            }}
+            onNavigate={handleNavigation} 
+          />
+        );
+
+      case "giftcard-upload":
+        return (
+          <GiftCardUpload
+            transactionData={transactionData}
+            onBack={() => setCurrentPage("giftcard-swap")}
+            onContinue={(data) => {
+              setTransactionData(prev => ({ ...prev, ...data }));
+              setCurrentPage("withdrawal-details");
+            }}
+          />
+        );
+
+      case "withdrawal-details":
+        return (
+          <WithdrawalDetails
+            transactionData={transactionData}
+            onBack={() => {
+              if (transactionData?.type === 'sell') setCurrentPage("awaiting");
+              else setCurrentPage("giftcard-upload");
+            }}
+            onContinue={(data) => handleContinue(data)}
           />
         );
 
@@ -155,7 +278,7 @@ const CurrencyPage = () => {
           <BankTransferDetails
             transactionData={transactionData}
             onBack={() => setCurrentPage("complete-order")}
-            onContinue={() => setShowModal("payment-success")}
+            onContinue={(data) => handleContinue(data)}
           />
         );
 

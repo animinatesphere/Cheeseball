@@ -12,7 +12,7 @@ const PaymentSuccessModal = ({ onClose }) => {
         </button>
 
         <h2 className="text-2xl font-bold text-gray-800 mb-8 mt-4">
-          Your payment was successful
+          Payment on the way 
         </h2>
 
         <div className="flex justify-center mb-8">
@@ -34,7 +34,7 @@ const PaymentSuccessModal = ({ onClose }) => {
         </div>
 
         <p className="text-gray-600 mb-8">
-          Your wallet will be credited shortly
+          Your wallet will be credited once your payment is confirmed
         </p>
 
         <button

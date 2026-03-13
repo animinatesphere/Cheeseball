@@ -3,9 +3,11 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import { usePaystackPayment } from "react-paystack";
 import { PAYSTACK_PUBLIC_KEY } from "../../lib/paystack";
 import { supabase } from "../../lib/supabaseClient";
+import ScreenshotUpload from "./ScreenshotUpload";
 
 const BankTransferDetails = ({ onBack, onContinue, transactionData }) => {
   const [loading, setLoading] = useState(false);
+  const [screenshotUrl, setScreenshotUrl] = useState(null);
   const [copied, setCopied] = useState({
     account: false,
     name: false,
@@ -101,9 +103,9 @@ const BankTransferDetails = ({ onBack, onContinue, transactionData }) => {
             
             <div className="space-y-4 sm:space-y-6 flex-1">
               {[
-                { label: "Account Number", value: "0543210987" },
-                { label: "Account Name", value: "CHEESE BALLS 05" },
-                { label: "Bank Name", value: "LOOPAY" }
+                { label: "Account Number", value: "1219929496" },
+                { label: "Account Name", value: "CHEESEBALL" },
+                { label: "Bank Name", value: "Zenith Bank" }
               ].map((item, i) => (
                 <div key={i}>
                   <p className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest mb-2 sm:mb-3 px-2">{item.label}</p>
@@ -118,11 +120,19 @@ const BankTransferDetails = ({ onBack, onContinue, transactionData }) => {
                   </div>
                 </div>
               ))}
+
+              <div className="pt-6 border-t border-gray-100">
+                 <ScreenshotUpload 
+                   onUploadComplete={(url) => setScreenshotUrl(url)} 
+                   label="Upload Transfer Receipt"
+                 />
+              </div>
             </div>
 
             <button
-              onClick={onContinue}
-              className="w-full mt-8 sm:mt-12 bg-[#0063BF] hover:bg-blue-700 text-white py-5 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] font-black text-lg sm:text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group"
+              onClick={() => onContinue({ screenshotUrl })}
+              disabled={!screenshotUrl}
+              className="w-full mt-8 sm:mt-12 bg-[#0063BF] hover:bg-blue-700 text-white py-5 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] font-black text-lg sm:text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group disabled:opacity-50"
             >
               <span>I've Made The Transfer</span>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-2 transition-transform">

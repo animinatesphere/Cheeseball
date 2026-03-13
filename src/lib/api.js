@@ -52,9 +52,20 @@ export const getTransactions = async () => {
     .from('transactions')
     .select(`
       *,
-      profiles:user_id (full_name, email),
+      profiles:user_id (full_name, email, phone),
       from_currency:currencies!from_currency_id (symbol, icon_url),
       to_currency:currencies!to_currency_id (symbol, icon_url)
+    `)
+    .order('created_at', { ascending: false });
+  return { data, error };
+};
+
+export const getGiftCardTrades = async () => {
+  const { data, error } = await supabase
+    .from('gift_card_trades')
+    .select(`
+      *,
+      profiles:user_id (full_name, email, phone)
     `)
     .order('created_at', { ascending: false });
   return { data, error };
@@ -91,10 +102,36 @@ export const updateTransactionStatus = async (id, status) => {
   return { data, error };
 };
 
+export const updateGiftCardTradeStatus = async (id, status) => {
+  const { data, error } = await supabase
+    .from('gift_card_trades')
+    .update({ status })
+    .eq('id', id)
+    .select();
+  return { data, error };
+};
+
 export const createTransaction = async (transactionData) => {
   const { data, error } = await supabase
     .from('transactions')
     .insert([transactionData])
+    .select();
+  return { data, error };
+};
+
+export const getUserGiftCardTrades = async (userId) => {
+  const { data, error } = await supabase
+    .from('gift_card_trades')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+  return { data, error };
+};
+
+export const createGiftCardTrade = async (tradeData) => {
+  const { data, error } = await supabase
+    .from('gift_card_trades')
+    .insert([tradeData])
     .select();
   return { data, error };
 };
@@ -110,8 +147,6 @@ export const getUserPortfolio = async (userId) => {
 
   transactions.forEach(t => {
     // Only count approved transactions for balance
-    // Note: status casing varies, let's normalize or assume 'approved' or 'Approved' based on other files
-    // AdminOrders.jsx maps statuses to capitalized. Database default is lower case 'waiting', 'approved'.
     if (t.status?.toLowerCase() !== 'approved') return;
 
     // Add incoming (To)
@@ -177,8 +212,12 @@ export const getSystemStatus = async () => {
 // --- Admin Stats (Aggregated) ---
 export const getAdminStats = async () => {
   // Ideally, use Supabase RPC for complex aggregations, but doing simple fetches here for now
-  const { count: orderCount } = await supabase
+  const { count: txCount } = await supabase
     .from('transactions')
+    .select('*', { count: 'exact', head: true });
+
+  const { count: gcCount } = await supabase
+    .from('gift_card_trades')
     .select('*', { count: 'exact', head: true });
 
   const { count: currencyCount } = await supabase
@@ -186,12 +225,9 @@ export const getAdminStats = async () => {
     .select('*', { count: 'exact', head: true })
     .eq('is_active', true);
 
-  // Calculate volume (mock logic - in real app, sum transaction amounts)
-  const volume = "5,824k"; 
-
   return {
-    orderCount: orderCount || 0,
+    orderCount: (txCount || 0) + (gcCount || 0),
     currencyCount: currencyCount || 0,
-    volume
+    volume: "5,824k" // volume logic is currently mock
   };
 };

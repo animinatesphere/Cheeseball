@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import AdminBottomNav from "../component/AdminBottomNav";
 import AdminDashboardHome from "../component/AdminDashboardHome";
@@ -12,10 +13,15 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const isAdmin = sessionStorage.getItem("cheeseball_admin");
-    if (!isAdmin) {
-      navigate("/admin-login", { replace: true });
-    }
+    const checkAuth = async () => {
+      const isAdmin = sessionStorage.getItem("cheeseball_admin");
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!isAdmin || !session) {
+        navigate("/admin-login", { replace: true });
+      }
+    };
+    checkAuth();
   }, [navigate]);
   const [currentScreen, setCurrentScreen] = useState("dashboard");
   const [showAddModal, setShowAddModal] = useState(false);
