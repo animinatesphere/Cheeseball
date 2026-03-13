@@ -26,6 +26,7 @@ import SwapGiftCard from "../components/SwapGiftCard";
 import CardManagement from "../components/CardManagement";
 import GiftCardUpload from "../components/GiftCardUpload";
 import WithdrawalDetails from "../components/WithdrawalDetails";
+import AccountPage from "../components/AccountPage";
 
 const CurrencyPage = () => {
   const [currentPage, setCurrentPage] = useState("rates");
@@ -58,6 +59,8 @@ const CurrencyPage = () => {
           bank_name: finalData.bankName,
           bank_account_number: finalData.accountNumber,
           bank_account_name: finalData.accountName,
+          promo_code: finalData.promoCode,
+          promo_benefit: finalData.promoBenefit || 0,
           status: 'pending'
         });
         if (error) throw error;
@@ -78,7 +81,9 @@ const CurrencyPage = () => {
           wallet_address: finalData.wallet_address || '',
           bank_name: finalData.bankName,
           bank_account_number: finalData.accountNumber,
-          bank_account_name: finalData.accountName
+          bank_account_name: finalData.accountName,
+          promo_code: finalData.promoCode,
+          promo_benefit: finalData.promoBenefit || 0
         });
         if (error) throw error;
       }
@@ -86,7 +91,11 @@ const CurrencyPage = () => {
       setShowModal("payment-success");
     } catch (err) {
       console.error("Failed to save transaction:", err);
-      alert("An error occurred while saving your transaction. Please contact support.");
+      if (err.code === 'PGRST204' || err.message?.includes('schema cache') || err.message?.includes('column')) {
+        alert("CRITICAL: Your database schema is out of sync. Please run the provided SQL update script in your Supabase SQL Editor to add the required transaction columns (promo_code, etc.).");
+      } else {
+        alert("An error occurred while saving your transaction: " + (err.message || "Please contact support."));
+      }
     } finally {
       setLoading(false);
     }
@@ -285,11 +294,14 @@ const CurrencyPage = () => {
       case "address-book":
         return <AddressBook onBack={() => setCurrentPage("support")} />;
 
-      case "support":
-        return <SupportPage onNavigate={handleNavigation} />;
-
       case "history":
         return <HistoryPage onNavigate={handleNavigation} />;
+
+      case "account":
+        return <AccountPage onNavigate={handleNavigation} />;
+
+      case "support":
+        return <SupportPage onNavigate={handleNavigation} />;
 
       default:
         return (
@@ -341,25 +353,8 @@ const CurrencyPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <style>{`
-        @keyframes fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes bounce-in {
-          0% { transform: scale(0); }
-          50% { transform: scale(1.1); }
-          100% { transform: scale(1); }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.3s ease-out;
-        }
-        .animate-bounce-in {
-          animation: bounce-in 0.5s ease-out;
-        }
-      `}</style>
-      <div className="pb-32">
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+      <div className="pb-24">
         {renderPage()}
       </div>
       {renderModal()}

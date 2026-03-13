@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { ArrowLeft, Loader2, TrendingUp } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient";
-import { getCurrencies, getUserPortfolio } from "../../lib/api";
+import { getCurrencies, getUserPortfolio, validatePromoCode } from "../../lib/api";
+import { CheckCircle2, Ticket, XCircle } from "lucide-react";
 
 const SellCryptocurrency = ({ onBack, onExchange, onNavigate }) => {
   const [sendAmount, setSendAmount] = useState("");
@@ -11,6 +12,11 @@ const SellCryptocurrency = ({ onBack, onExchange, onNavigate }) => {
   const [fromCurrency, setFromCurrency] = useState("BTC");
   const [toCurrency, setToCurrency] = useState("NGN");
   const [loading, setLoading] = useState(true);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoBenefit, setPromoBenefit] = useState(0); // percentage boost
+  const [promoError, setPromoError] = useState("");
+  const [promoSuccess, setPromoSuccess] = useState(false);
+  const [promoLoading, setPromoLoading] = useState(false);
 
   const fiatCurrencies = [
     { symbol: "NGN", name: "Nigerian Naira", icon: "₦" },
@@ -57,10 +63,30 @@ const SellCryptocurrency = ({ onBack, onExchange, onNavigate }) => {
     setSendAmount(val);
     const rate = SELL_RATES[fromCurrency] || 0;
     if (val && rate) {
-       setReceiveAmount((parseFloat(val) * rate).toFixed(2));
+       const baseAmount = parseFloat(val) * rate;
+       const bonus = baseAmount * (promoBenefit / 100);
+       setReceiveAmount((baseAmount + bonus).toFixed(2));
     } else {
        setReceiveAmount("");
     }
+  };
+
+  const handleApplyPromo = async () => {
+    if (!promoCode) return;
+    setPromoLoading(true);
+    setPromoError("");
+    setPromoSuccess(false);
+    
+    const { data, error } = await validatePromoCode(promoCode);
+    
+    if (error || !data) {
+      setPromoError(error?.message || "Invalid promo code");
+      setPromoBenefit(0);
+    } else {
+      setPromoBenefit(data.benefit_percentage);
+      setPromoSuccess(true);
+    }
+    setPromoLoading(false);
   };
 
   // Update receiveAmount when fromCurrency changes
@@ -69,28 +95,31 @@ const SellCryptocurrency = ({ onBack, onExchange, onNavigate }) => {
   }, [fromCurrency, sendAmount]);
 
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-10 h-10 animate-spin text-red-600" /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}><Loader2 className="w-10 h-10 animate-spin text-blue-500" /></div>;
 
   return (
-    <div className="min-h-screen bg-white animate-fade-in pb-24">
+    <div className="min-h-screen animate-fade-in pb-24" style={{ background: 'var(--bg-primary)' }}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-          <div className="flex flex-col gap-8">
-            <button onClick={onBack} className="w-fit p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10 uppercase text-[10px] sm:text-xs font-black tracking-widest leading-none">
+      <div style={{ background: 'var(--bg-secondary)' }} className="relative overflow-hidden">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 relative z-10">
+          <div className="flex flex-col gap-6">
+            <button onClick={onBack} className="w-fit p-3 rounded-2xl transition-all" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', color: 'var(--text-secondary)' }}>
                 <ArrowLeft className="w-6 h-6" />
             </button>
             <div>
-              <h1 className="text-3xl sm:text-5xl font-black mb-2 tracking-tight">Sell Crypto</h1>
-              <p className="text-blue-200 text-sm sm:text-lg font-medium">Instantly convert your assets to local currency</p>
+              <h1 className="text-3xl sm:text-5xl font-black mb-2 tracking-tight" style={{ color: 'var(--text-primary)' }}>Sell Crypto</h1>
+              <p className="text-blue-400 text-sm sm:text-lg font-medium">Instantly convert your assets to local currency</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8">
-        <div className="max-w-3xl mx-auto bg-gray-50 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 lg:p-14 border border-gray-100 shadow-2xl relative overflow-hidden group">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-4">
+        <div className="max-w-3xl mx-auto card rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 lg:p-14 relative overflow-hidden group">
           <div className="space-y-10 relative z-10">
             {/* Sell Card */}
             <div>
@@ -125,10 +154,41 @@ const SellCryptocurrency = ({ onBack, onExchange, onNavigate }) => {
               </div>
             </div>
 
+             {/* Promo Code Card */}
+            <div>
+              <div className="flex justify-between items-center mb-4 px-2">
+                <label className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest">Promo Code</label>
+              </div>
+              <div className="bg-white p-4 sm:p-6 rounded-[2rem] border-2 border-transparent focus-within:border-blue-100 transition-all shadow-sm">
+                <div className="flex items-center gap-4">
+                   <div className="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400">
+                      <Ticket size={20} />
+                   </div>
+                   <input
+                     type="text"
+                     value={promoCode}
+                     onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                     placeholder="ENTER CODE"
+                     className="flex-1 bg-transparent text-lg font-black text-gray-900 placeholder-gray-200 outline-none uppercase tracking-widest"
+                   />
+                   <button 
+                     onClick={handleApplyPromo}
+                     disabled={promoLoading || !promoCode}
+                     className="px-6 py-3 bg-gray-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all disabled:opacity-50"
+                   >
+                     {promoLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply"}
+                   </button>
+                </div>
+                {promoError && <p className="mt-3 text-red-500 text-[10px] font-black uppercase tracking-widest flex items-center gap-2"><XCircle size={14} /> {promoError}</p>}
+                {promoSuccess && <p className="mt-3 text-green-600 text-[10px] font-black uppercase tracking-widest flex items-center gap-2"><CheckCircle2 size={14} /> Success! {promoBenefit}% boost applied</p>}
+              </div>
+            </div>
+
             {/* Receive Card */}
             <div>
               <div className="flex justify-between items-center mb-4 px-2">
                 <label className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest">You Get</label>
+                {promoSuccess && <span className="text-[10px] font-black text-green-600 uppercase bg-green-50 px-2 py-0.5 rounded-md">Includes {promoBenefit}% Boost</span>}
               </div>
               <div className="bg-white p-6 sm:p-8 rounded-[2rem] border-2 border-transparent focus-within:border-blue-100 transition-all shadow-sm">
                 <div className="flex items-center gap-6">
@@ -157,9 +217,11 @@ const SellCryptocurrency = ({ onBack, onExchange, onNavigate }) => {
                 fromAmount: sendAmount,
                 fromCurrency: fromCurrency,
                 fromCurrencyId: fromCurrObj?.id,
-                toAmount: receiveAmount,
+                 toAmount: receiveAmount,
                 toCurrency: toCurrency,
-                rate: SELL_RATES[fromCurrency]
+                rate: SELL_RATES[fromCurrency],
+                promoCode: promoSuccess ? promoCode : null,
+                promoBenefit: promoSuccess ? promoBenefit : 0
               });
             }}
             disabled={!sendAmount}

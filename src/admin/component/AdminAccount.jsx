@@ -120,7 +120,7 @@ const AdminAccount = () => {
     }
   };
 
-  return <div className="flex h-full w-full bg-white">{renderPage()}</div>;
+  return <div className="flex h-full w-full" style={{ background: 'var(--bg-primary)' }}>{renderPage()}</div>;
 };
 
 export default AdminAccount;

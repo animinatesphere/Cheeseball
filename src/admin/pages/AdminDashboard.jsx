@@ -7,6 +7,7 @@ import AdminCurrencies from "../component/AdminCurrencies";
 import AdminOrders from "../component/AdminOrders";
 import AdminHistory from "../component/AdminHistory";
 import AdminAccount from "../component/AdminAccount";
+import AdminPromoCodes from "../component/AdminPromoCodes";
 import AdminAddCurrencyModal from "../component/AdminAddCurrencyModal";
 
 export default function AdminDashboard() {
@@ -48,13 +49,15 @@ export default function AdminDashboard() {
         return <AdminHistory onBack={() => setCurrentScreen("dashboard")} />;
       case "account":
         return <AdminAccount />;
+      case "promos":
+        return <AdminPromoCodes />;
       default:
         return <AdminDashboardHome onNavigate={setCurrentScreen} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-700">
+    <div className="min-h-screen flex flex-col font-sans selection:bg-blue-900 selection:text-blue-100" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <main className="flex-1 flex flex-col relative overflow-hidden">
         {renderScreen()}
       </main>

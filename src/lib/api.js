@@ -231,3 +231,62 @@ export const getAdminStats = async () => {
     volume: "5,824k" // volume logic is currently mock
   };
 };
+// --- Promo Codes ---
+export const validatePromoCode = async (code) => {
+  try {
+    const { data, error } = await supabase
+      .from('promo_codes')
+      .select('*')
+      .eq('code', code.toUpperCase())
+      .eq('is_active', true)
+      .single();
+    
+    if (error) {
+      if (error.code === 'PGRST116' || error.message?.includes('not found')) {
+        return { data: null, error: new Error("Promo codes system is currently being updated. Please try again later.") };
+      }
+      return { data: null, error };
+    }
+    
+    // Check expiration
+    if (data.expires_at && new Date(data.expires_at) < new Date()) {
+      return { data: null, error: new Error("Promo code has expired") };
+    }
+    
+    return { data, error: null };
+  } catch (err) {
+    return { data: null, error: new Error("Promo system unavailable") };
+  }
+};
+
+export const getPromoCodes = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('promo_codes')
+      .select('*')
+      .order('created_at', { ascending: false });
+    return { data, error };
+  } catch (err) {
+    return { data: [], error: new Error("Promo table missing") };
+  }
+};
+
+export const createPromoCode = async (promoData) => {
+  try {
+    const { data, error } = await supabase
+      .from('promo_codes')
+      .insert([promoData])
+      .select();
+    return { data, error };
+  } catch (err) {
+    return { data: null, error: new Error("Promo table missing") };
+  }
+};
+
+export const deletePromoCode = async (id) => {
+  const { error } = await supabase
+    .from('promo_codes')
+    .delete()
+    .eq('id', id);
+  return { error };
+};

@@ -29,7 +29,6 @@ const Signup = () => {
     setLoading(true);
     setError(null);
 
-    // Validation
     if (password !== confirmPassword) {
       const msg = "Those passwords don't match. Please make sure both fields are the same.";
       setError(msg);
@@ -76,7 +75,7 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-white to-blue-50 page-container slide-in justify-center items-center py-12">
+    <div className="min-h-screen flex flex-col mesh-gradient slide-in justify-center items-center py-8 px-4">
       {toast && (
         <Toast
           message={toast.message}
@@ -85,113 +84,109 @@ const Signup = () => {
         />
       )}
 
-      <div className="max-w-md w-full bg-white p-8 sm:p-12 rounded-[2.5rem] shadow-2xl shadow-blue-100 border border-blue-50 relative overflow-hidden">
+      <div className="max-w-md w-full card p-8 sm:p-10 relative overflow-hidden">
+        {/* Glow accent */}
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl"></div>
+
         {/* Back Button */}
         <button
           onClick={() => navigate("/")}
-          className="absolute top-8 left-8 p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all group"
+          className="absolute top-6 left-6 p-2 rounded-xl transition-all group hover:bg-white/5"
+          style={{ color: 'var(--text-muted)' }}
         >
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
         </button>
-
-        {/* Abstract background element */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/5 rounded-full blur-3xl"></div>
 
         <div className="relative z-10">
           <img
             src={logo}
             alt="Cheeseball Logo"
-            className="w-full max-w-[220px] mx-auto mb-10"
+            className="w-full max-w-[180px] mx-auto mb-8"
           />
 
-          <div className="text-center mb-10">
-            <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-2">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-black tracking-tight mb-2" style={{ color: 'var(--text-primary)' }}>
               Create Account
             </h2>
-            <p className="text-gray-500 text-sm font-medium">
-              Sign up with your email and password
+            <p className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
+              Join Cheeseball and start trading
             </p>
           </div>
 
-          <form onSubmit={handleSignup} className="space-y-6">
+          <form onSubmit={handleSignup} className="space-y-5">
             {/* Email Input */}
             <div className="relative group">
-              <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 px-1">
+              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 px-1" style={{ color: 'var(--text-muted)' }}>
                 Email Address
               </label>
-              <div className="relative">
-                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+              <div className="relative glow-ring rounded-xl">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full bg-gray-50 hover:bg-gray-100 focus:bg-white border-2 border-gray-100 focus:border-blue-500 rounded-xl py-4 px-5 pl-14 font-medium text-gray-900 placeholder-gray-400 transition-all outline-none focus:shadow-lg focus:shadow-blue-200/50"
+                  className="input-field pl-12"
                 />
               </div>
             </div>
 
             {/* Password Input */}
             <div className="relative group">
-              <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 px-1">
+              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 px-1" style={{ color: 'var(--text-muted)' }}>
                 Password
               </label>
-              <div className="relative">
-                <KeyRound className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+              <div className="relative glow-ring rounded-xl">
+                <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
                 <input
                   type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="At least 6 characters"
-                  className="w-full bg-gray-50 hover:bg-gray-100 focus:bg-white border-2 border-gray-100 focus:border-blue-500 rounded-xl py-4 px-5 pl-14 pr-14 font-medium text-gray-900 placeholder-gray-400 transition-all outline-none focus:shadow-lg focus:shadow-blue-200/50"
+                  className="input-field pl-12 pr-12"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 hover:text-blue-400 transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
                 >
-                  {showPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
 
             {/* Confirm Password Input */}
             <div className="relative group">
-              <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 px-1">
+              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 px-1" style={{ color: 'var(--text-muted)' }}>
                 Confirm Password
               </label>
-              <div className="relative">
-                <KeyRound className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+              <div className="relative glow-ring rounded-xl">
+                <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter password"
-                  className="w-full bg-gray-50 hover:bg-gray-100 focus:bg-white border-2 border-gray-100 focus:border-blue-500 rounded-xl py-4 px-5 pl-14 pr-14 font-medium text-gray-900 placeholder-gray-400 transition-all outline-none focus:shadow-lg focus:shadow-blue-200/50"
+                  className="input-field pl-12 pr-12"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 hover:text-blue-400 transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
                 >
-                  {showConfirmPassword ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
 
             {error && (
-              <div className="bg-red-50 text-red-600 p-4 rounded-xl text-xs font-bold border border-red-100 flex items-center gap-3">
+              <div className="badge-danger p-3 rounded-xl text-xs font-bold flex items-center gap-2">
                 <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0"></div>
                 {error}
               </div>
@@ -200,7 +195,7 @@ const Signup = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-200 transition-all transform active:scale-95 flex items-center justify-center gap-3 group"
+              className="btn-primary w-full py-4 text-base flex items-center justify-center gap-3 group"
             >
               {loading ? (
                 <Loader2 className="w-6 h-6 animate-spin" />
@@ -213,20 +208,20 @@ const Signup = () => {
             </button>
           </form>
 
-          <div className="mt-8 pt-8 border-t border-gray-100 text-center">
-            <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">
+          <div className="mt-8 pt-6 text-center" style={{ borderTop: '1px solid var(--border-primary)' }}>
+            <p className="text-[10px] font-black uppercase tracking-widest mb-3" style={{ color: 'var(--text-muted)' }}>
               Already have an account?
             </p>
             <button
               onClick={() => navigate("/login")}
-              className="w-full text-blue-600 hover:text-blue-700 font-bold text-sm transition-colors"
+              className="text-blue-400 hover:text-blue-300 font-bold text-sm transition-colors"
             >
               Sign In Instead
             </button>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-gray-100 text-center">
-            <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em]">
+          <div className="mt-6 pt-6 text-center" style={{ borderTop: '1px solid var(--border-primary)' }}>
+            <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
               Secured by Supabase Infrastructure
             </p>
           </div>

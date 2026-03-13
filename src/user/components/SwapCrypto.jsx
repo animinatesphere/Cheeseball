@@ -129,35 +129,38 @@ const SwapCrypto = ({ onBack, onSwap, onNavigate }) => {
 
   if (loading) {
      return (
-       <div className="min-h-screen bg-white flex items-center justify-center">
-         <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
+         <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
        </div>
      );
   }
 
   return (
-    <div className="min-h-screen bg-white animate-fade-in pb-24">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-6 py-12">
-          <button onClick={onBack} className="mb-8 p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10">
+    <div className="min-h-screen animate-fade-in pb-24" style={{ background: 'var(--bg-primary)' }}>
+      <div style={{ background: 'var(--bg-secondary)' }} className="relative overflow-hidden">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 relative z-10">
+          <button onClick={onBack} className="mb-6 p-3 rounded-2xl transition-all" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', color: 'var(--text-secondary)' }}>
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <h1 className="text-4xl font-black mb-2 tracking-tight">Swap Assets</h1>
-          <p className="text-blue-200 font-medium">Instant conversion with zero slippage</p>
+          <h1 className="text-3xl sm:text-4xl font-black mb-2 tracking-tight" style={{ color: 'var(--text-primary)' }}>Swap Assets</h1>
+          <p className="text-blue-400 font-medium text-sm">Instant conversion with zero slippage</p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8">
-        <div className="bg-white rounded-[1.5rem] sm:rounded-[2rem] shadow-xl p-1.5 flex border border-gray-100 mb-8 sm:mb-12 max-w-md mx-auto">
-          <button className="flex-1 py-3 sm:py-4 rounded-[1.2rem] sm:rounded-[1.5rem] bg-blue-600 text-white font-black shadow-lg shadow-blue-100 text-sm sm:text-base">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-4">
+        <div className="card rounded-2xl p-1.5 flex mb-6 sm:mb-8 max-w-md mx-auto">
+          <button className="flex-1 py-3 sm:py-4 rounded-xl bg-blue-500 text-white font-black shadow-lg shadow-blue-500/20 text-sm sm:text-base">
             Crypto Swap
           </button>
-          <button onClick={() => onNavigate("giftcard-swap")} className="flex-1 py-3 sm:py-4 rounded-[1.2rem] sm:rounded-[1.5rem] text-gray-500 font-bold hover:bg-gray-50 transition-all text-sm sm:text-base">
+          <button onClick={() => onNavigate("giftcard-swap")} className="flex-1 py-3 sm:py-4 rounded-xl font-bold hover:bg-white/5 transition-all text-sm sm:text-base" style={{ color: 'var(--text-muted)' }}>
             Gift Card
           </button>
         </div>
 
-        <div className="max-w-3xl mx-auto bg-gray-50 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 lg:p-12 border border-gray-100 shadow-sm">
+        <div className="max-w-3xl mx-auto card rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 lg:p-12">
           <div className="mb-8 sm:mb-10">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-4 px-2 text-sm sm:text-base">
               <label className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest">Swap From</label>

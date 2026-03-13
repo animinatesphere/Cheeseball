@@ -79,42 +79,45 @@ const HistoryPage = ({ onNavigate }) => {
 
   const getStatusStyle = (status) => {
     switch (status) {
-      case "Waiting": return "text-orange-600 bg-orange-50 border-orange-100";
-      case "Approved": return "text-green-600 bg-green-50 border-green-100";
-      case "Cancel": return "text-red-600 bg-red-50 border-red-100";
-      default: return "text-gray-500 bg-gray-50 border-gray-100";
+      case "Waiting": return "text-orange-400 bg-orange-400/10 border-orange-400/20";
+      case "Approved": return "text-emerald-400 bg-emerald-400/10 border-emerald-400/20";
+      case "Cancel": return "text-red-400 bg-red-400/10 border-red-400/20";
+      default: return "text-gray-400 bg-gray-400/10 border-gray-400/20";
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
+        <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white pb-32">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <div className="min-h-screen pb-32" style={{ background: 'var(--bg-primary)' }}>
+      <div style={{ background: 'var(--bg-secondary)' }} className="relative overflow-hidden">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 relative z-10">
           <div className="flex justify-between items-center mb-6 sm:mb-8">
-            <button onClick={() => onNavigate("rates")} className="p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 rounded-xl sm:rounded-2xl transition-all border border-white/10">
+            <button onClick={() => onNavigate("rates")} className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl transition-all" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', color: 'var(--text-secondary)' }}>
               <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
             <button
               onClick={() => setShowFilterModal(true)}
-              className="p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 rounded-xl sm:rounded-2xl transition-all border border-white/10"
+              className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl transition-all" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', color: 'var(--text-secondary)' }}
             >
               <SlidersHorizontal className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black tracking-tight">Swap History</h1>
-          <p className="text-blue-200 text-sm sm:text-base font-medium">Tracking your global transactions</p>
+          <h1 className="text-2xl sm:text-4xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>Swap History</h1>
+          <p className="text-blue-400 text-sm sm:text-base font-medium">Tracking your global transactions</p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-8 sm:mt-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-6 sm:mt-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {transactions.map((transaction, index) => (
             <div key={transaction.id} className="group">
@@ -124,7 +127,7 @@ const HistoryPage = ({ onNavigate }) => {
                   <div className="h-px bg-gray-100 flex-1"></div>
                 </div>
               )}
-              <div className="bg-white rounded-[1.5rem] sm:rounded-[2.5rem] p-5 sm:p-8 border border-gray-100 shadow-sm hover:shadow-2xl hover:border-blue-100 transition-all cursor-pointer">
+              <div className="card p-5 sm:p-8 cursor-pointer">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8 mb-6 sm:mb-8">
                   <div className="flex items-center gap-4 w-full sm:w-auto">
                     <div className="w-12 h-12 sm:w-14 sm:h-14 bg-green-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-green-600 font-black text-lg sm:text-xl border border-green-100 shrink-0 overflow-hidden">

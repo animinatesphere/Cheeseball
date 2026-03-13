@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
 import Routee from "./Routee";
 import { supabase } from "./lib/supabaseClient";
+import { ThemeProvider } from "./context/ThemeProvider";
 
 const App = () => {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
 
-    // Listen for auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -21,7 +20,11 @@ const App = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  return <Routee />;
+  return (
+    <ThemeProvider>
+      <Routee />
+    </ThemeProvider>
+  );
 };
 
 export default App;
