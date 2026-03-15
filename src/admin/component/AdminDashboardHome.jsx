@@ -50,19 +50,19 @@ const AdminDashboardHome = ({ onNavigate }) => {
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6">
         
         {/* Header Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 py-10 sm:py-16">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 py-8 sm:py-16">
           <div className="reveal active">
-            <h1 className="text-4xl sm:text-6xl font-black tracking-tighter" style={{ color: 'var(--text-primary)' }}>
+            <h1 className="text-3xl sm:text-6xl font-black tracking-tighter" style={{ color: 'var(--text-primary)' }}>
               Overview
             </h1>
-            <div className="flex items-center gap-2 mt-3">
+            <div className="flex items-center gap-2 mt-2 sm:mt-3">
               <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(59,130,246,0.5)]"></span>
-              <p className="text-blue-500 font-bold uppercase text-[10px] tracking-widest">Master Control Panel • Online</p>
+              <p className="text-blue-500 font-bold uppercase text-[8px] sm:text-[10px] tracking-widest">Master Control Panel • Online</p>
             </div>
           </div>
-          <button className="btn-ghost flex items-center gap-3 px-6 py-4 rounded-2xl group active:scale-95">
-            <Calendar className="w-5 h-5 text-blue-500" />
-            <span className="font-extrabold text-sm uppercase tracking-widest" style={{ color: 'var(--text-primary)' }}>Today</span>
+          <button className="btn-ghost flex items-center gap-3 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl group active:scale-95">
+            <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
+            <span className="font-extrabold text-xs sm:text-sm uppercase tracking-widest" style={{ color: 'var(--text-primary)' }}>Today</span>
             <ChevronDown className="w-4 h-4 text-gray-400 group-hover:rotate-180 transition-transform" />
           </button>
         </div>
@@ -70,32 +70,32 @@ const AdminDashboardHome = ({ onNavigate }) => {
         {/* Top Grid: Main Stats */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-12">
           {/* Velocity Chart / Main Stat Card */}
-          <div className="lg:col-span-2 card p-8 sm:p-12 relative overflow-hidden group">
+          <div className="lg:col-span-2 card p-6 sm:p-12 relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/5 rounded-full blur-3xl -mr-40 -mt-40 group-hover:bg-blue-500/10 transition-all duration-700"></div>
             
-            <div className="flex justify-between items-center mb-12 relative z-10">
+            <div className="flex justify-between items-center mb-10 sm:mb-12 relative z-10">
               <div>
-                <h2 className="font-black text-2xl tracking-tight" style={{ color: 'var(--text-primary)' }}>Trade Velocity</h2>
-                <p className="text-xs font-bold uppercase tracking-widest mt-1" style={{ color: 'var(--text-muted)' }}>Real-time volume analysis</p>
+                <h2 className="font-black text-xl sm:text-2xl tracking-tight" style={{ color: 'var(--text-primary)' }}>Trade Velocity</h2>
+                <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest mt-1" style={{ color: 'var(--text-muted)' }}>Real-time volume analysis</p>
               </div>
-              <div className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-500">
-                <Activity className="w-6 h-6 animate-pulse" />
+              <div className="p-3 sm:p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-500">
+                <Activity className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row items-center gap-12 sm:gap-20 relative z-10">
-              <div className="relative w-56 h-56 sm:w-64 sm:h-64">
+            <div className="flex flex-col md:flex-row items-center gap-10 sm:gap-20 relative z-10">
+              <div className="relative w-48 h-48 sm:w-64 sm:h-64">
                 <svg className="w-full h-full transform -rotate-90">
-                  <circle cx="50%" cy="50%" r="90" fill="none" stroke="var(--border-primary)" strokeWidth="24" strokeLinecap="round" />
+                  <circle cx="50%" cy="50%" r="80" sm:r="90" fill="none" stroke="var(--border-primary)" strokeWidth="20" sm:strokeWidth="24" strokeLinecap="round" />
                   <circle
                     cx="50%"
                     cy="50%"
-                    r="90"
+                    r="80" sm:r="90"
                     fill="none"
                     stroke="var(--accent)"
-                    strokeWidth="24"
-                    strokeDasharray="565"
-                    strokeDashoffset="141"
+                    strokeWidth="20" sm:strokeWidth="24"
+                    strokeDasharray="502" sm:strokeDasharray="565"
+                    strokeDashoffset="125" sm:strokeDashoffset="141"
                     strokeLinecap="round"
                     className="transition-all duration-1000 shadow-[0_0_20px_var(--accent-glow)]"
                     style={{ stroke: 'url(#gradient-blue)' }}
@@ -108,36 +108,36 @@ const AdminDashboardHome = ({ onNavigate }) => {
                   </defs>
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <div className="text-3xl sm:text-4xl font-black tabular-nums" style={{ color: 'var(--text-primary)' }}>{stats.volume}</div>
-                  <div className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>Units Traded</div>
+                  <div className="text-2xl sm:text-4xl font-black tabular-nums" style={{ color: 'var(--text-primary)' }}>{stats.volume}</div>
+                  <div className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: 'var(--text-muted)' }}>Units Traded</div>
                 </div>
               </div>
 
-              <div className="space-y-5 flex-1 w-full">
-                <div className="p-6 rounded-3xl border border-transparent transition-all hover:border-blue-500/30 group/item" style={{ background: 'var(--bg-elevated)' }}>
-                  <div className="flex items-center justify-between mb-3">
+              <div className="space-y-4 sm:space-y-5 flex-1 w-full">
+                <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-transparent transition-all hover:border-blue-500/30 group/item" style={{ background: 'var(--bg-elevated)' }}>
+                  <div className="flex items-center justify-between mb-2 sm:mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
-                        <Zap className="w-5 h-5" />
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
+                        <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
-                      <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Total Orders</span>
+                      <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Total Orders</span>
                     </div>
-                    <span className="text-xs font-bold text-blue-500">+18% this hour</span>
+                    <span className="text-[10px] sm:text-xs font-bold text-blue-500">+18%</span>
                   </div>
-                  <div className="text-3xl font-black" style={{ color: 'var(--text-primary)' }}>{stats.orderCount} <span className="text-sm font-medium text-gray-500">Transactions</span></div>
+                  <div className="text-2xl sm:text-3xl font-black" style={{ color: 'var(--text-primary)' }}>{stats.orderCount} <span className="text-xs sm:text-sm font-medium text-gray-500">Transactions</span></div>
                 </div>
 
-                <div className="p-6 rounded-3xl border border-transparent transition-all hover:border-emerald-500/30 group/item" style={{ background: 'var(--bg-elevated)' }}>
-                  <div className="flex items-center justify-between mb-3">
+                <div className="p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-transparent transition-all hover:border-emerald-500/30 group/item" style={{ background: 'var(--bg-elevated)' }}>
+                  <div className="flex items-center justify-between mb-2 sm:mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
-                        <TrendingUp className="w-5 h-5" />
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                        <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />
                       </div>
-                      <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Success Rate</span>
+                      <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Success Rate</span>
                     </div>
-                    <span className="text-xs font-bold text-emerald-500">Peak Performance</span>
+                    <span className="text-[10px] sm:text-xs font-bold text-emerald-500">Peak</span>
                   </div>
-                  <div className="text-3xl font-black" style={{ color: 'var(--text-primary)' }}>99.8% <span className="text-sm font-medium text-gray-500">Efficiency</span></div>
+                  <div className="text-2xl sm:text-3xl font-black" style={{ color: 'var(--text-primary)' }}>99.8% <span className="text-xs sm:text-sm font-medium text-gray-500">Efficiency</span></div>
                 </div>
               </div>
             </div>

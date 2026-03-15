@@ -4,19 +4,21 @@
 -- It fixes the "column profiles.email does not exist" error and the missing profile error.
 -- ==============================================================================
 
--- 0. Add email column if it doesn't exist
+-- 0. Add email and referral_code columns if they don't exist
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS email text;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS referral_code text;
 
--- 1. Create/Update function to handle new user signup (including email)
+-- 1. Create/Update function to handle new user signup (including email and referral_code)
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, full_name, avatar_url, email)
+  insert into public.profiles (id, full_name, avatar_url, email, referral_code)
   values (
     new.id, 
     new.raw_user_meta_data->>'full_name', 
     new.raw_user_meta_data->>'avatar_url', 
-    new.email
+    new.email,
+    new.raw_user_meta_data->>'referral_code'
   );
   return new;
 end;

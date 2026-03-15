@@ -90,31 +90,31 @@ const AdminCurrencies = ({ onAddCurrency, onBack }) => {
       <div className="sticky top-0 z-20 border-b" style={{ background: 'var(--bg-primary)', borderColor: 'var(--border-primary)', backdropFilter: 'blur(20px)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between py-8 sm:py-10 gap-6">
-            <div className="flex items-center gap-6">
-              <button onClick={onBack} className="p-4 btn-ghost rounded-2xl group active:scale-95">
-                <ArrowLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
+            <div className="flex items-center gap-4 sm:gap-6">
+              <button onClick={onBack} className="p-3 sm:p-4 btn-ghost rounded-xl sm:rounded-2xl group active:scale-95">
+                <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-x-1 transition-transform" />
               </button>
               <div>
-                <h1 className="text-4xl font-black tracking-tighter" style={{ color: 'var(--text-primary)' }}>Market</h1>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mt-1">Live Asset Management</p>
+                <h1 className="text-3xl sm:text-4xl font-black tracking-tighter" style={{ color: 'var(--text-primary)' }}>Market</h1>
+                <p className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.3em] text-blue-500 mt-1">Live Asset Management</p>
               </div>
             </div>
             
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 sm:gap-4">
                  <button
                   onClick={handleSyncData}
                   disabled={syncing}
-                  className="btn-ghost flex items-center gap-3 px-6 py-4 rounded-2xl disabled:opacity-50 group active:scale-95"
+                  className="btn-ghost flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl disabled:opacity-50 group active:scale-95"
                 >
-                  {syncing ? <Loader2 className="w-5 h-5 animate-spin" /> : <RefreshCcw className="w-5 h-5 group-hover:rotate-180 transition-transform" />}
-                  <span className="font-extrabold text-sm uppercase tracking-widest" style={{ color: 'var(--text-primary)' }}>Sync Market</span>
+                  {syncing ? <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" /> : <RefreshCcw className="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-180 transition-transform" />}
+                  <span className="font-extrabold text-[10px] sm:text-sm uppercase tracking-widest" style={{ color: 'var(--text-primary)' }}>Sync Market</span>
                 </button>
                 
                 <button
                   onClick={onAddCurrency}
-                  className="btn-primary flex items-center gap-3 px-8 py-4 rounded-2xl group active:scale-95"
+                  className="btn-primary flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl group active:scale-95"
                 >
-                  <Plus className="w-6 h-6" />
+                  <Plus className="w-5 h-5 sm:w-6 sm:h-6" />
                   <span className="hidden sm:inline">Add Asset</span>
                 </button>
             </div>

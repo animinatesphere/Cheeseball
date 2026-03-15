@@ -10,6 +10,7 @@ import {
   ArrowLeft,
   Eye,
   EyeOff,
+  Ticket,
 } from "lucide-react";
 import Toast from "../components/Toast";
 
@@ -19,6 +20,7 @@ const Signup = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [referralCode, setReferralCode] = useState("");
   const [toast, setToast] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -50,6 +52,9 @@ const Signup = () => {
       password,
       options: {
         emailRedirectTo: window.location.origin + "/currency-change",
+        data: {
+          referral_code: referralCode,
+        },
       },
     });
 
@@ -182,6 +187,23 @@ const Signup = () => {
                 >
                   {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
+              </div>
+            </div>
+
+            {/* Referral Code Input */}
+            <div className="relative group">
+              <label className="block text-[10px] font-black uppercase tracking-widest mb-2 px-1" style={{ color: 'var(--text-muted)' }}>
+                Referral Code (Optional)
+              </label>
+              <div className="relative glow-ring rounded-xl">
+                <Ticket className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+                <input
+                  type="text"
+                  value={referralCode}
+                  onChange={(e) => setReferralCode(e.target.value)}
+                  placeholder="Enter referral code"
+                  className="input-field pl-12"
+                />
               </div>
             </div>
 

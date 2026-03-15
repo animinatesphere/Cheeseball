@@ -268,48 +268,47 @@ const AdminOrders = () => {
                       <div className="absolute top-0 left-0 w-1.5 h-full transition-all group-hover:w-2" style={{ background: order.status === 'Completed' || order.status === 'Approved' ? 'var(--success)' : (order.status === 'Pending' || order.status === 'Waiting' ? 'var(--warning)' : 'var(--danger)') }}></div>
                       
                       <div className="flex-1 flex items-center gap-8">
-                         <div className="flex items-center -space-x-4">
-                            <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-xl border-4 border-white dark:border-gray-800 relative z-10 overflow-hidden transform group-hover:-rotate-6 transition-transform">
+                         <div className="flex items-center -space-x-4 flex-shrink-0">
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center text-white font-black text-xs sm:text-xl shadow-xl border-2 sm:border-4 border-white dark:border-gray-800 relative z-10 overflow-hidden transform group-hover:-rotate-6 transition-transform">
                               {order.fromIcon?.length > 2 ? <img src={order.fromIcon} alt="" className="w-full h-full object-cover"/> : order.fromIcon}
                             </div>
-                            <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-xl border-4 border-white dark:border-gray-800 relative z-0 transform group-hover:translate-x-4 group-hover:rotate-6 transition-all overflow-hidden">
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl flex items-center justify-center text-white font-black text-xs sm:text-xl shadow-xl border-2 sm:border-4 border-white dark:border-gray-800 relative z-0 transform group-hover:translate-x-4 group-hover:rotate-6 transition-all overflow-hidden">
                               {order.toIcon?.length > 2 ? <img src={order.toIcon} alt="" className="w-full h-full object-cover"/> : order.toIcon}
                             </div>
                          </div>
                          
                          <div className="flex-1 min-w-0">
-                            <div className="flex items-baseline gap-2 flex-wrap">
-                               <p className="font-black text-2xl truncate group-hover:text-blue-500 transition-colors" style={{ color: 'var(--text-primary)' }}>{order.fromAmount}</p>
-                               <span className="text-blue-500 font-bold">→</span>
-                               <p className="font-black text-xl truncate" style={{ color: 'var(--text-secondary)' }}>{order.toAmount}</p>
-                            </div>
-                            <div className="flex items-center gap-3 mt-2">
-                               <span className="text-[10px] font-black uppercase tracking-widest opacity-40">#{order.exchangeId?.slice(-8)}</span>
-                               <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                               <span className="text-[10px] font-extrabold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{order.fullName}</span>
-                            </div>
+                             <div className="flex items-baseline gap-2 flex-wrap">
+                                <p className="font-black text-lg sm:text-2xl truncate group-hover:text-blue-500 transition-colors" style={{ color: 'var(--text-primary)' }}>{order.fromAmount}</p>
+                                <span className="text-blue-500 font-bold">→</span>
+                                <p className="font-black text-base sm:text-xl truncate" style={{ color: 'var(--text-secondary)' }}>{order.toAmount}</p>
+                             </div>
+                             <div className="flex items-center gap-2 sm:gap-3 mt-1 sm:mt-2 flex-wrap">
+                                <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest opacity-40">#{order.exchangeId?.slice(-8)}</span>
+                                <span className="w-1 h-1 bg-gray-300 rounded-full hidden sm:block"></span>
+                                <span className="text-[8px] sm:text-[10px] font-extrabold uppercase tracking-wider truncate" style={{ color: 'var(--text-muted)' }}>{order.fullName}</span>
+                             </div>
                          </div>
                       </div>
 
-                      <div className="flex items-center justify-between sm:justify-end gap-10 sm:pl-10 sm:border-l border-gray-100 dark:border-gray-800">
-                         <div className="text-right hidden md:block">
-                            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Network</p>
-                            <p className="text-sm font-bold mt-1" style={{ color: 'var(--text-primary)' }}>{order.toToken || 'NGN'}</p>
-                         </div>
-                         
-                         <span className={`px-5 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-sm ${
-                            order.status === "Waiting" || order.status === "Pending" 
-                            ? "bg-amber-500/10 text-amber-500 border border-amber-500/20" 
-                            : (order.status === "Completed" || order.status === "Approved" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-red-500/10 text-red-500 border border-red-500/20")
-                         }`}>
+                       <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-10 sm:pl-10 sm:border-l border-gray-100 dark:border-gray-800 w-full sm:w-auto mt-4 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-t-0">
+                          <div className="text-left hidden lg:block">
+                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Network</p>
+                             <p className="text-sm font-bold mt-1" style={{ color: 'var(--text-primary)' }}>{order.toToken || 'NGN'}</p>
+                          </div>
+                          
+                          <span className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-[8px] sm:text-[10px] font-black uppercase tracking-widest shadow-sm ${
+                             order.status === "Waiting" || order.status === "Pending" 
+                             ? "bg-amber-500/10 text-amber-500 border border-amber-500/20" 
+                             : (order.status === "Completed" || order.status === "Approved" ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" : "bg-red-500/10 text-red-500 border border-red-500/20")
+                          }`}>
                             {order.status}
                          </span>
-                         
-                         <div className="p-3 rounded-2xl bg-blue-500/5 text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all shadow-lg group-hover:shadow-blue-500/20 group-hover:-translate-x-1">
-                            <ChevronRight className="w-6 h-6" />
-                         </div>
-                      </div>
-                   </div>
+                                                  <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-blue-500/5 text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all shadow-lg group-hover:shadow-blue-500/20 group-hover:-translate-x-1">
+                             <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                          </div>
+                       </div>
+                    </div>
                  </div>
                );
             })
