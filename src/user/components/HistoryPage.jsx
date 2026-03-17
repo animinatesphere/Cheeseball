@@ -95,25 +95,25 @@ const HistoryPage = ({ onNavigate }) => {
   }
 
   return (
-    <div className="min-h-screen pb-32" style={{ background: 'var(--bg-primary)' }}>
-      <div style={{ background: 'var(--bg-secondary)' }} className="relative overflow-hidden">
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+    <div className="min-h-screen pb-32 bg-[#0B0E11] text-[#EAECEF] uppercase tracking-tighter">
+      <div className="bg-[#181A20] relative overflow-hidden border-b border-white/5">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-64 h-64 bg-[#FFB11A]/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 relative z-10">
           <div className="flex justify-between items-center mb-6 sm:mb-8">
-            <button onClick={() => onNavigate("rates")} className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl transition-all" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', color: 'var(--text-secondary)' }}>
+            <button onClick={() => onNavigate("rates")} className="p-2.5 sm:p-3 rounded-xl hover:bg-white/5 transition-all border border-white/5 text-gray-400">
               <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
             <button
               onClick={() => setShowFilterModal(true)}
-              className="p-2.5 sm:p-3 rounded-xl sm:rounded-2xl transition-all" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-primary)', color: 'var(--text-secondary)' }}
+              className="p-2.5 sm:p-3 rounded-xl hover:bg-white/5 transition-all border border-white/5 text-gray-400"
             >
               <SlidersHorizontal className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>Swap History</h1>
-          <p className="text-blue-400 text-sm sm:text-base font-medium">Tracking your global transactions</p>
+          <h1 className="text-2xl sm:text-4xl font-black text-white italic">Trade History</h1>
+          <p className="text-[#FFB11A] text-[10px] sm:text-xs font-black uppercase tracking-[0.2em]">Institutional Grade Tracking</p>
         </div>
       </div>
 
@@ -123,47 +123,47 @@ const HistoryPage = ({ onNavigate }) => {
             <div key={transaction.id} className="group">
               {(index === 0 || transactions[index - 1].date !== transaction.date) && (
                 <div className="flex items-center gap-4 mb-4 sm:mb-6 px-2 sm:px-4">
-                  <span className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-[0.2em]">{transaction.date}</span>
-                  <div className="h-px bg-gray-100 flex-1"></div>
+                  <span className="text-gray-600 font-black text-[10px] sm:text-xs tracking-[0.3em]">{transaction.date}</span>
+                  <div className="h-px bg-white/5 flex-1"></div>
                 </div>
               )}
-              <div className="card p-5 sm:p-8 cursor-pointer">
+              <div className="bg-[#181A20] rounded-[2rem] p-5 sm:p-8 border border-white/5 hover:border-[#FFB11A]/20 transition-all cursor-pointer shadow-xl">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8 mb-6 sm:mb-8">
                   <div className="flex items-center gap-4 w-full sm:w-auto">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-green-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-green-600 font-black text-lg sm:text-xl border border-green-100 shrink-0 overflow-hidden">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#1E2329] rounded-xl sm:rounded-2xl flex items-center justify-center text-[#FFB11A] font-black text-lg sm:text-xl border border-white/5 shrink-0 overflow-hidden">
                       {transaction.from.icon}
                     </div>
                     <div>
-                      <p className="font-black text-lg sm:text-xl text-gray-900 leading-none mb-1">
-                        {transaction.from.amount} <span className="text-gray-400 text-xs sm:text-sm">{transaction.from.currency}</span>
+                      <p className="font-black text-lg sm:text-xl text-white leading-none mb-1">
+                        {transaction.from.amount} <span className="text-gray-500 text-[10px] uppercase tracking-widest">{transaction.from.currency}</span>
                       </p>
-                      <p className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider">{transaction.from.symbol}</p>
+                      <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">{transaction.from.symbol}</p>
                     </div>
                   </div>
 
-                  <div className="hidden sm:block p-3 rounded-full bg-blue-50 text-blue-600">
+                  <div className="hidden sm:block p-3 rounded-full bg-white/5 text-gray-600">
                     <ArrowRight size={20} className="stroke-[3px]" />
                   </div>
-                  <div className="sm:hidden w-full h-px bg-gray-50"></div>
+                  <div className="sm:hidden w-full h-px bg-white/5"></div>
 
                   <div className="flex items-center gap-4 w-full sm:w-auto sm:text-right">
                     <div className="sm:order-1 order-2 flex-1 sm:flex-none">
-                       <p className="font-black text-lg sm:text-xl text-gray-900 leading-none mb-1">
-                        {transaction.to.amount} <span className="text-gray-400 text-xs sm:text-sm">{transaction.to.currency}</span>
+                       <p className="font-black text-lg sm:text-xl text-white leading-none mb-1">
+                        {transaction.to.amount} <span className="text-gray-500 text-[10px] uppercase tracking-widest">{transaction.to.currency}</span>
                       </p>
-                      <p className="text-[10px] sm:text-xs text-gray-400 font-bold uppercase tracking-wider">{transaction.to.currency}</p>
+                      <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">{transaction.to.currency}</p>
                     </div>
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-orange-50 rounded-xl sm:rounded-2xl flex items-center justify-center text-orange-600 font-black text-xl sm:text-2xl border border-orange-100 sm:order-2 order-1 shrink-0 overflow-hidden">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#1E2329] rounded-xl sm:rounded-2xl flex items-center justify-center text-green-400 font-black text-xl sm:text-2xl border border-white/5 sm:order-2 order-1 shrink-0 overflow-hidden">
                       {transaction.to.icon}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 sm:pt-6 border-t border-gray-50">
-                  <span className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-wider border ${getStatusStyle(transaction.status)}`}>
+                <div className="flex items-center justify-between pt-4 sm:pt-6 border-t border-white/5">
+                  <span className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border ${getStatusStyle(transaction.status)}`}>
                     {transaction.status}
                   </span>
-                  <p className="text-[10px] sm:text-xs font-black text-blue-600/40 group-hover:text-blue-600 transition-colors uppercase tracking-widest leading-none">
+                  <p className="text-[10px] font-black text-gray-600 group-hover:text-[#FFB11A] transition-colors tracking-widest leading-none">
                     ID: {transaction.exchangeId.split(':')[1]?.slice(-8) || transaction.exchangeId.slice(-8)}
                   </p>
                 </div>
@@ -171,8 +171,8 @@ const HistoryPage = ({ onNavigate }) => {
             </div>
           ))}
           {transactions.length === 0 && (
-             <div className="col-span-full text-center py-12 text-gray-400 font-bold">
-                No history available.
+             <div className="col-span-full text-center py-20 text-gray-600 font-black uppercase tracking-widest italic scale-125 opacity-40">
+                No record found.
              </div>
           )}
         </div>

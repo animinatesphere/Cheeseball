@@ -89,22 +89,22 @@ const LandingPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white font-sans overflow-x-hidden selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-screen bg-[#0B0E11] font-sans overflow-x-hidden selection:bg-[#FFB11A]/30 selection:text-white">
       {/* ═══ FLOATING NAV ═══ */}
-      <nav className="fixed w-full z-50 bg-white/70 backdrop-blur-2xl border-b border-gray-100/80 transition-all">
+      <nav className="fixed w-full z-50 bg-[#0B0E11]/80 backdrop-blur-2xl border-b border-white/5 transition-all">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
           <img src={logo} alt="Cheeseball" className="h-12 sm:h-16 w-auto rounded-full" />
           <div className="hidden md:flex items-center gap-8">
-            <a href="#how" className="text-gray-500 hover:text-blue-600 font-bold text-sm transition-colors">How it Works</a>
-            <a href="#features" className="text-gray-500 hover:text-blue-600 font-bold text-sm transition-colors">Features</a>
-            <a href="#assets" className="text-gray-500 hover:text-blue-600 font-bold text-sm transition-colors">Assets</a>
-            <a href="#faq" className="text-gray-500 hover:text-blue-600 font-bold text-sm transition-colors">FAQ</a>
+            <a href="#how" className="text-gray-400 hover:text-[#FFB11A] font-bold text-sm transition-colors uppercase tracking-widest">How it Works</a>
+            <a href="#features" className="text-gray-400 hover:text-[#FFB11A] font-bold text-sm transition-colors uppercase tracking-widest">Features</a>
+            <a href="#assets" className="text-gray-400 hover:text-[#FFB11A] font-bold text-sm transition-colors uppercase tracking-widest">Assets</a>
+            <a href="#faq" className="text-gray-400 hover:text-[#FFB11A] font-bold text-sm transition-colors uppercase tracking-widest">FAQ</a>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate("/auth")} className="text-gray-700 font-bold text-sm hover:text-blue-600 transition-colors hidden sm:block">
+            <button onClick={() => navigate("/auth")} className="text-gray-300 font-bold text-sm hover:text-[#FFB11A] transition-colors hidden sm:block uppercase tracking-widest">
               Sign In
             </button>
-            <button onClick={() => navigate("/signup")} className="bg-blue-600 hover:bg-blue-700 text-white px-5 sm:px-6 py-2.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-blue-200 active:scale-95">
+            <button onClick={() => navigate("/signup")} className="bg-[#FFB11A] hover:bg-[#FFB11A]/90 text-black px-5 sm:px-6 py-2.5 rounded-xl font-black text-sm transition-all hover:shadow-lg hover:shadow-[#FFB11A]/20 active:scale-95 uppercase tracking-tighter">
               Get Started
             </button>
           </div>
@@ -112,14 +112,14 @@ const LandingPage = () => {
       </nav>
 
       {/* ═══ LIVE TICKER ═══ */}
-      <div className="fixed top-16 sm:top-20 w-full z-40 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 overflow-hidden py-2.5">
+      <div className="fixed top-16 sm:top-20 w-full z-40 bg-[#1E2329] border-b border-white/5 overflow-hidden py-2.5">
         <div className="flex animate-marquee whitespace-nowrap gap-10 items-center">
           {[...marketData, ...marketData].map((item, i) => (
-            <div key={i} className="flex items-center gap-2 text-white">
-              <span className="font-bold text-xs opacity-70">{item.coin}</span>
+            <div key={i} className="flex items-center gap-2 text-[#EAECEF]">
+              <span className="font-bold text-xs opacity-50 uppercase">{item.coin}</span>
               <span className="font-black text-sm">{item.price}</span>
-              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${item.up ? 'bg-green-400/30 text-green-100' : 'bg-red-400/30 text-red-100'}`}>
-                {item.change}
+              <span className={`text-[10px] font-black px-1.5 py-0.5 rounded ${item.up ? 'text-green-400' : 'text-red-400'}`}>
+                {item.up ? '▲' : '▼'} {item.change}
               </span>
             </div>
           ))}
@@ -129,42 +129,42 @@ const LandingPage = () => {
       {/* ═══════════════ HERO ═══════════════ */}
       <section className="relative pt-36 sm:pt-44 pb-16 sm:pb-24 overflow-hidden">
         {/* Animated background blobs */}
-        <div className="absolute top-20 right-0 w-[600px] h-[600px] bg-blue-100/50 rounded-full blur-[120px] animate-blob"></div>
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-100/40 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
+        <div className="absolute top-20 right-0 w-[600px] h-[600px] bg-[#FFB11A]/5 rounded-full blur-[120px] animate-blob"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-blue-500/5 rounded-full blur-[100px] animate-blob animation-delay-2000"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div className="space-y-6 sm:space-y-8">
-              <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-100 text-blue-700 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest animate-fade-in-down">
-                <span className="w-2 h-2 bg-blue-600 rounded-full animate-ping"></span>
-                #1 Crypto Exchange in Nigeria
+              <div className="inline-flex items-center gap-2 bg-[#FFB11A]/10 border border-[#FFB11A]/20 text-[#FFB11A] px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.2em] animate-fade-in-down">
+                <span className="w-2 h-2 bg-[#FFB11A] rounded-full animate-ping"></span>
+                Top Crypto Hub in Nigeria
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-gray-900 tracking-tighter leading-[0.9] animate-fade-in-up">
+              <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white tracking-tighter leading-[0.9] animate-fade-in-up">
                 Buy, Sell &{" "}
-                <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-transparent bg-clip-text animate-gradient-shift">
+                <span className="text-[#FFB11A] italic">
                   Swap Crypto
                 </span>
                 <br />
-                In Seconds.
+                Instantly.
               </h1>
 
-              <p className="text-lg sm:text-xl text-gray-500 font-medium leading-relaxed max-w-lg animate-fade-in-up animation-delay-200">
-                The fastest, safest way to trade cryptocurrency and gift cards in Nigeria.
-                Get the best rates, instant payouts, and 24/7 support.
+              <p className="text-lg sm:text-xl text-gray-400 font-medium leading-relaxed max-w-lg animate-fade-in-up animation-delay-200">
+                The most reliable platform to trade BTC, USDT and Gift Cards in Nigeria.
+                Enjoy premium rates, automated payouts, and bank-grade security.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up animation-delay-400">
                 <button
                   onClick={() => navigate("/signup")}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-5 rounded-2xl font-black text-lg transition-all hover:shadow-xl hover:shadow-blue-200 active:scale-95 flex items-center justify-center gap-3 group"
+                  className="bg-[#FFB11A] hover:bg-[#FFB11A]/90 text-black px-8 py-5 rounded-2xl font-black text-lg transition-all hover:shadow-2xl hover:shadow-[#FFB11A]/20 active:scale-95 flex items-center justify-center gap-3 group uppercase tracking-tighter"
                 >
-                  Start Trading Free
+                  Start Trading
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <button className="bg-gray-50 hover:bg-gray-100 text-gray-900 border border-gray-200 px-8 py-5 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-3">
+                <button className="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-8 py-5 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-3 active:scale-95">
                   <Smartphone className="w-5 h-5 text-gray-400" />
-                  Download App
+                  Get the App
                 </button>
               </div>
 
@@ -172,7 +172,7 @@ const LandingPage = () => {
               <div className="flex items-center gap-6 pt-4 animate-fade-in-up animation-delay-600">
                 <div className="flex -space-x-2">
                   {[...Array(4)].map((_, i) => (
-                    <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 border-2 border-white flex items-center justify-center text-white text-xs font-bold">
+                    <div key={i} className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1E2329] to-[#0B0E11] border-2 border-[#FFB11A]/20 flex items-center justify-center text-[#FFB11A] text-xs font-black">
                       {String.fromCharCode(65 + i)}
                     </div>
                   ))}
@@ -180,10 +180,10 @@ const LandingPage = () => {
                 <div>
                   <div className="flex gap-0.5">
                     {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                      <Star key={i} className="w-4 h-4 text-[#FFB11A] fill-[#FFB11A]" />
                     ))}
                   </div>
-                  <p className="text-xs text-gray-500 font-bold">Trusted by 50,000+ users</p>
+                  <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Trusted by 50,000+ users</p>
                 </div>
               </div>
             </div>
@@ -192,7 +192,7 @@ const LandingPage = () => {
             <div className="relative hidden lg:flex items-center justify-center h-[550px]">
               <div className="absolute inset-0 flex items-center justify-center">
                 {/* Central glow */}
-                <div className="w-80 h-80 bg-gradient-to-br from-blue-200 to-indigo-200 rounded-full blur-[80px] opacity-50 animate-pulse-slow"></div>
+                <div className="w-80 h-80 bg-gradient-to-br from-[#FFB11A]/20 to-[#FFB11A]/5 rounded-full blur-[80px] opacity-50 animate-pulse-slow"></div>
               </div>
 
               {/* Floating crypto coins */}
@@ -203,22 +203,22 @@ const LandingPage = () => {
               <img src={appleGC} alt="Gift Card" className="absolute top-40 left-4 w-20 h-20 animate-float animation-delay-2000 drop-shadow-xl" />
 
               {/* Floating stat card */}
-              <div className="absolute bottom-32 left-1/2 -translate-x-1/2 bg-white rounded-3xl shadow-2xl shadow-gray-200/60 px-8 py-5 flex items-center gap-4 animate-float animation-delay-700 border border-gray-100">
-                <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center">
-                  <TrendingUp className="w-6 h-6 text-green-600" />
+              <div className="absolute bottom-32 left-1/2 -translate-x-1/2 bg-[#1E2329] rounded-3xl shadow-2xl shadow-black/60 px-8 py-5 flex items-center gap-4 animate-float animation-delay-700 border border-white/5">
+                <div className="w-12 h-12 bg-green-500/10 rounded-2xl flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-green-400" />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 font-bold">Trade Volume</p>
-                  <p className="text-lg font-black text-gray-900">$2.4M <span className="text-green-500 text-xs">+12%</span></p>
+                  <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">Trade Volume</p>
+                  <p className="text-lg font-black text-white">$2.4M <span className="text-green-400 text-xs">+12%</span></p>
                 </div>
               </div>
 
               {/* Success notification */}
-              <div className="absolute top-24 left-0 bg-white rounded-2xl shadow-xl shadow-gray-200/50 px-5 py-3 flex items-center gap-3 animate-slide-in-left animation-delay-1000 border border-gray-100">
-                <CheckCircle2 className="w-8 h-8 text-green-500" />
+              <div className="absolute top-24 left-0 bg-[#2B3139] rounded-2xl shadow-xl shadow-black/50 px-5 py-3 flex items-center gap-3 animate-slide-in-left animation-delay-1000 border border-white/5">
+                <CheckCircle2 className="w-8 h-8 text-green-400" />
                 <div>
-                  <p className="text-xs font-bold text-gray-900">Payment Received!</p>
-                  <p className="text-[10px] text-gray-400 font-bold">+₦250,000 • 3s ago</p>
+                  <p className="text-xs font-black text-white uppercase tracking-tighter">Payment Received!</p>
+                  <p className="text-[10px] text-gray-500 font-bold">₦250,000 • 3s ago</p>
                 </div>
               </div>
             </div>
@@ -227,62 +227,62 @@ const LandingPage = () => {
       </section>
 
       {/* ═══ ANIMATED STATS ═══ */}
-      <section id="stats-section" className="py-16 sm:py-20 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 reveal">
+      <section id="stats-section" className="py-16 sm:py-20 bg-[#181A20] reveal border-y border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-3 gap-6 sm:gap-12 text-center">
             <div className="group">
               <p className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-2 tabular-nums">
                 {counter.users.toLocaleString()}+
               </p>
-              <p className="text-gray-400 text-xs sm:text-sm font-bold uppercase tracking-widest">Active Traders</p>
+              <p className="text-[#FFB11A] text-[10px] sm:text-xs font-black uppercase tracking-[0.2em]">Active Traders</p>
             </div>
             <div className="group">
               <p className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-2 tabular-nums">
                 ${counter.volume}M+
               </p>
-              <p className="text-gray-400 text-xs sm:text-sm font-bold uppercase tracking-widest">Volume Traded</p>
+              <p className="text-[#FFB11A] text-[10px] sm:text-xs font-black uppercase tracking-[0.2em]">Volume Traded</p>
             </div>
             <div className="group">
               <p className="text-3xl sm:text-5xl lg:text-6xl font-black text-white mb-2 tabular-nums">
                 {counter.trades.toLocaleString()}+
               </p>
-              <p className="text-gray-400 text-xs sm:text-sm font-bold uppercase tracking-widest">Trades Completed</p>
+              <p className="text-[#FFB11A] text-[10px] sm:text-xs font-black uppercase tracking-[0.2em]">Trades Completed</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* ═══ HOW IT WORKS ═══ */}
-      <section id="how" className="py-20 sm:py-28 overflow-hidden">
+      <section id="how" className="py-20 sm:py-28 overflow-hidden bg-[#0B0E11]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-16 reveal">
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-4">
-              <Zap className="w-3 h-3" /> Simple Process
+            <div className="inline-flex items-center gap-2 bg-[#FFB11A]/10 text-[#FFB11A] px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
+              <Zap className="w-3 h-3" /> Quick Startup
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight mb-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight mb-4">
               Start Trading in{" "}
-              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 text-transparent bg-clip-text">3 Steps</span>
+              <span className="text-[#FFB11A] italic">3 Steps</span>
             </h2>
-            <p className="text-gray-500 font-medium text-base sm:text-lg">
+            <p className="text-gray-500 font-medium text-base sm:text-lg uppercase tracking-tight">
               No complicated setup. Just sign up and start trading in minutes.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 relative">
             {/* Connection line */}
-            <div className="hidden md:block absolute top-24 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-blue-200 to-transparent z-0"></div>
+            <div className="hidden md:block absolute top-24 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#FFB11A]/20 to-transparent z-0"></div>
 
             {[
-              { step: "01", title: "Create Account", desc: "Sign up in 30 seconds with your email. No paperwork, no KYC delays.", icon: <UserPlus className="w-7 h-7" />, color: "from-blue-500 to-blue-600" },
-              { step: "02", title: "Choose Your Trade", desc: "Pick from crypto, gift cards, or swaps. Set your amount and get instant quotes.", icon: <BarChart3 className="w-7 h-7" />, color: "from-indigo-500 to-indigo-600" },
-              { step: "03", title: "Get Paid Instantly", desc: "Receive your payout in seconds. We support all Nigerian banks for instant transfers.", icon: <Wallet className="w-7 h-7" />, color: "from-purple-500 to-purple-600" },
+              { step: "01", title: "Create Account", desc: "Sign up in 30 seconds with your email. No paperwork, no KYC delays.", icon: <UserPlus className="w-7 h-7" />, color: "from-[#1E2329] to-[#0B0E11]" },
+              { step: "02", title: "Choose Your Trade", desc: "Pick from crypto, gift cards, or swaps. Set your amount and get instant quotes.", icon: <BarChart3 className="w-7 h-7" />, color: "from-[#2B3139] to-[#1E2329]" },
+              { step: "03", title: "Get Paid Instantly", desc: "Receive your payout in seconds. We support all Nigerian banks for instant transfers.", icon: <Wallet className="w-7 h-7" />, color: "from-[#FFB11A] to-[#FF8A00]" },
             ].map((item, i) => (
               <div key={i} className={`relative z-10 text-center group reveal`} style={{ transitionDelay: `${i * 150}ms` }}>
-                <div className={`w-20 h-20 mx-auto bg-gradient-to-br ${item.color} text-white rounded-3xl flex items-center justify-center mb-6 shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
+                <div className={`w-20 h-20 mx-auto bg-gradient-to-br ${item.color} ${i === 2 ? 'text-black' : 'text-[#FFB11A]'} rounded-3xl flex items-center justify-center mb-6 shadow-xl border border-white/5 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500`}>
                   {item.icon}
                 </div>
-                <div className="text-5xl font-black text-gray-100 mb-2">{item.step}</div>
-                <h3 className="text-xl sm:text-2xl font-black text-gray-900 mb-3">{item.title}</h3>
+                <div className="text-5xl font-black text-white/5 mb-2">{item.step}</div>
+                <h3 className="text-xl sm:text-2xl font-black text-white mb-3 uppercase tracking-tighter">{item.title}</h3>
                 <p className="text-gray-500 font-medium leading-relaxed max-w-xs mx-auto">{item.desc}</p>
               </div>
             ))}
@@ -291,118 +291,117 @@ const LandingPage = () => {
       </section>
 
       {/* ═══ FEATURES BENTO GRID ═══ */}
-      <section id="features" className="py-20 sm:py-28 bg-gray-50">
+      <section id="features" className="py-20 sm:py-28 bg-[#181A20]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="text-center max-w-2xl mx-auto mb-16 reveal">
-            <div className="inline-flex items-center gap-2 bg-green-50 text-green-600 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-4">
+            <div className="inline-flex items-center gap-2 bg-blue-500/10 text-blue-400 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
               <Shield className="w-3 h-3" /> Why Cheeseball
             </div>
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight mb-4">
-              Built Different.
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight mb-4 uppercase">
+              The Premium Choice.
             </h2>
             <p className="text-gray-500 font-medium text-base sm:text-lg">
-              We're not just another exchange. Here's what makes us the top choice.
+              Engineered for speed, security, and the best rates in Nigeria.
             </p>
           </div>
 
           {/* Bento Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Big Feature Card */}
-            <div className="lg:col-span-2 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 rounded-[2rem] p-8 sm:p-12 text-white relative overflow-hidden group hover:shadow-2xl hover:shadow-blue-200 transition-all reveal">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-700"></div>
+            <div className="lg:col-span-2 bg-gradient-to-br from-[#1E2329] via-[#0B0E11] to-black rounded-[2rem] p-8 sm:p-12 text-white relative overflow-hidden group border border-white/5 hover:border-[#FFB11A]/30 transition-all reveal">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-[#FFB11A]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-700"></div>
               <div className="relative z-10 max-w-md">
-                <div className="w-14 h-14 bg-white/15 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-sm">
-                  <Zap className="w-7 h-7" />
+                <div className="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mb-6 border border-white/10">
+                  <Zap className="w-7 h-7 text-[#FFB11A]" />
                 </div>
-                <h3 className="text-2xl sm:text-3xl font-black mb-4 tracking-tight">Lightning-Fast Transactions</h3>
-                <p className="text-blue-100 font-medium leading-relaxed text-base sm:text-lg">
-                  Our automated system processes trades in seconds, not minutes.
-                  Get your money faster than anywhere else.
+                <h3 className="text-2xl sm:text-3xl font-black mb-4 tracking-tighter uppercase italic">Lightning Execution</h3>
+                <p className="text-gray-400 font-medium leading-relaxed text-base sm:text-lg">
+                  Every trade is powered by our high-frequency matching engine.
+                  Experience instant finality on every transaction.
                 </p>
               </div>
-              <img src={mobilePay} alt="" className="absolute bottom-0 right-4 w-48 sm:w-64 opacity-40 group-hover:opacity-60 transition-opacity" />
+              <img src={mobilePay} alt="" className="absolute bottom-0 right-4 w-48 sm:w-64 opacity-20 grayscale group-hover:grayscale-0 group-hover:opacity-40 transition-all duration-700" />
             </div>
 
-            <div className="bg-white rounded-[2rem] p-8 border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all group reveal">
-              <div className="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-green-100 transition-colors">
-                <Lock className="w-7 h-7 text-green-600" />
+            <div className="bg-[#1E2329] rounded-[2rem] p-8 border border-white/5 hover:border-[#FFB11A]/20 transition-all group reveal">
+              <div className="w-14 h-14 bg-green-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-green-400/20 transition-colors">
+                <Lock className="w-7 h-7 text-green-400" />
               </div>
-              <h3 className="text-xl font-black text-gray-900 mb-3">Bank-Grade Security</h3>
+              <h3 className="text-xl font-black text-white mb-3 uppercase tracking-tighter">Cold Storage</h3>
               <p className="text-gray-500 font-medium leading-relaxed">
-                AES-256 encryption, 2FA, and cold storage. Your assets are protected 24/7.
+                Your assets are stored offline in military-grade facilities.
               </p>
             </div>
 
-            <div className="bg-white rounded-[2rem] p-8 border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all group reveal">
-              <div className="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-orange-100 transition-colors">
-                <Globe className="w-7 h-7 text-orange-600" />
+            <div className="bg-[#1E2329] rounded-[2rem] p-8 border border-white/5 hover:border-[#FFB11A]/20 transition-all group reveal">
+              <div className="w-14 h-14 bg-blue-400/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-400/20 transition-colors">
+                <Globe className="w-7 h-7 text-blue-400" />
               </div>
-              <h3 className="text-xl font-black text-gray-900 mb-3">Best Market Rates</h3>
+              <h3 className="text-xl font-black text-white mb-3 uppercase tracking-tighter">Global Liquidity</h3>
               <p className="text-gray-500 font-medium leading-relaxed">
-                We scan multiple sources to guarantee you the most competitive rates in Nigeria.
+                Access deep liquidity pools for the best rates on every pair.
               </p>
             </div>
 
-            <div className="bg-white rounded-[2rem] p-8 border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all group reveal">
-              <div className="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-100 transition-colors">
-                <Clock className="w-7 h-7 text-purple-600" />
+            <div className="bg-[#1E2329] rounded-[2rem] p-8 border border-white/5 hover:border-[#FFB11A]/20 transition-all group reveal">
+              <div className="w-14 h-14 bg-[#FFB11A]/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-[#FFB11A]/20 transition-colors">
+                <Clock className="w-7 h-7 text-[#FFB11A]" />
               </div>
-              <h3 className="text-xl font-black text-gray-900 mb-3">24/7 Support</h3>
+              <h3 className="text-xl font-black text-white mb-3 uppercase tracking-tighter">VIP Service</h3>
               <p className="text-gray-500 font-medium leading-relaxed">
-                Our team is always online. Get help via live chat, email, or phone anytime.
+                Dedicated relationship managers for all high-volume traders.
               </p>
             </div>
 
             {/* Big card 2 */}
-            <div className="lg:col-span-2 bg-gray-900 rounded-[2rem] p-8 sm:p-12 text-white relative overflow-hidden group hover:shadow-2xl hover:shadow-gray-300 transition-all reveal">
-              <div className="absolute bottom-0 right-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl translate-y-1/2 translate-x-1/4 group-hover:bg-blue-500/20 transition-all duration-700"></div>
+            <div className="lg:col-span-2 bg-gradient-to-br from-[#FFB11A] to-[#FF8A00] rounded-[2rem] p-8 sm:p-12 text-black relative overflow-hidden group hover:shadow-2xl hover:shadow-[#FFB11A]/20 transition-all reveal">
+              <div className="absolute bottom-0 right-0 w-64 h-64 bg-white/20 rounded-full blur-3xl translate-y-1/2 translate-x-1/4 group-hover:scale-150 transition-all duration-700"></div>
               <div className="relative z-10 max-w-md">
-                <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-sm">
+                <div className="w-14 h-14 bg-black/10 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-sm">
                   <CreditCard className="w-7 h-7" />
                 </div>
-                <h3 className="text-2xl sm:text-3xl font-black mb-4 tracking-tight">Trade Gift Cards Too</h3>
-                <p className="text-gray-400 font-medium leading-relaxed text-base sm:text-lg">
-                  Got an unused gift card? Swap it for instant cash.
-                  We accept Apple, Amazon, Steam, Google Play, and 20+ brands.
+                <h3 className="text-2xl sm:text-3xl font-black mb-4 tracking-tighter uppercase italic">Gift Card Hub</h3>
+                <p className="text-black/70 font-bold leading-relaxed text-base sm:text-lg">
+                  Convert unused gift cards to Naira instantly.
+                  Premium rates for Apple, Steam, AMEX and 20+ more.
                 </p>
               </div>
-              <img src={transferMoney} alt="" className="absolute bottom-0 right-4 w-48 sm:w-64 opacity-30 group-hover:opacity-50 transition-opacity" />
+              <img src={transferMoney} alt="" className="absolute bottom-0 right-4 w-48 sm:w-64 opacity-40 mix-blend-multiply group-hover:scale-110 transition-transform duration-700" />
             </div>
           </div>
         </div>
       </section>
 
       {/* ═══ SUPPORTED ASSETS ═══ */}
-      <section id="assets" className="py-20 sm:py-28 bg-white overflow-hidden">
+      <section id="assets" className="py-20 sm:py-28 bg-[#0B0E11] overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
             <div className="reveal">
-              <div className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-600 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-4">
-                <Wallet className="w-3 h-3" /> Supported Assets
+              <div className="inline-flex items-center gap-2 bg-[#FFB11A]/10 text-[#FFB11A] px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
+                <Wallet className="w-3 h-3" /> Market Depth
               </div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-gray-900 tracking-tight mb-6">
-                All Your Favorite{" "}
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
-                  Coins & Cards
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight mb-6">
+                Premium{" "}
+                <span className="text-[#FFB11A] italic underline decoration-white/10 decoration-8 underline-offset-8">
+                  Assets List
                 </span>
               </h2>
-              <p className="text-gray-500 font-medium text-base sm:text-lg mb-8 max-w-lg">
-                Trade top cryptocurrencies and swap 20+ gift card brands at the best rates.
-                New assets added regularly.
+              <p className="text-gray-500 font-medium text-base sm:text-lg mb-8 max-w-lg uppercase tracking-tight">
+                Trade verified assets with zero slippage. Our order books are updated millisecond-by-millisecond.
               </p>
               <button
                 onClick={() => navigate("/signup")}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-bold text-base transition-all hover:shadow-lg hover:shadow-blue-200 active:scale-95 flex items-center gap-3 group"
+                className="bg-[#FFB11A] hover:bg-[#FFB11A]/90 text-black px-8 py-4 rounded-2xl font-black text-base transition-all hover:shadow-lg hover:shadow-[#FFB11A]/20 active:scale-95 flex items-center gap-3 group uppercase tracking-tighter"
               >
-                Start Trading Now
+                Start Trading
                 <ArrowUpRight className="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </button>
             </div>
 
             <div className="space-y-4 reveal">
               {/* Crypto Row */}
-              <div className="bg-gray-50 rounded-3xl p-6 sm:p-8 border border-gray-100">
-                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Cryptocurrencies</h3>
+              <div className="bg-[#181A20] rounded-3xl p-6 sm:p-8 border border-white/5">
+                <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em] mb-4">Hot Currencies</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {[
                     { name: "Bitcoin", symbol: "BTC", img: btcIcon, change: "+2.4%" },
@@ -412,13 +411,13 @@ const LandingPage = () => {
                     { name: "BNB", symbol: "BNB", img: null, change: "-0.5%" },
                     { name: "Cardano", symbol: "ADA", img: null, change: "+1.2%" },
                   ].map((coin, i) => (
-                    <div key={i} className="bg-white rounded-2xl p-4 flex items-center gap-3 border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all group cursor-default">
-                      <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center bg-gray-50 font-black text-xs group-hover:scale-110 transition-transform">
+                    <div key={i} className="bg-[#1E2329] rounded-2xl p-4 flex items-center gap-3 border border-white/5 hover:border-[#FFB11A]/30 hover:bg-[#2B3139] transition-all group cursor-default">
+                      <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center bg-[#0B0E11] font-black text-xs text-[#FFB11A] group-hover:scale-110 transition-transform border border-white/5">
                         {coin.img ? <img src={coin.img} alt="" className="w-full h-full object-cover" /> : coin.symbol}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-bold text-gray-900 truncate">{coin.name}</p>
-                        <p className={`text-xs font-bold ${coin.change.startsWith('+') ? 'text-green-500' : 'text-red-500'}`}>{coin.change}</p>
+                        <p className="text-[10px] font-black text-white truncate uppercase">{coin.name}</p>
+                        <p className={`text-[10px] font-black ${coin.change.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>{coin.change}</p>
                       </div>
                     </div>
                   ))}
@@ -426,22 +425,22 @@ const LandingPage = () => {
               </div>
 
               {/* Gift Card Row */}
-              <div className="bg-gray-50 rounded-3xl p-6 sm:p-8 border border-gray-100">
-                <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Gift Cards</h3>
+              <div className="bg-[#181A20] rounded-3xl p-6 sm:p-8 border border-white/5">
+                <h3 className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em] mb-4">Top Gift Cards</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {[
-                    { name: "Apple/iTunes", img: appleGC },
+                    { name: "Apple", img: appleGC },
                     { name: "Amazon", fallback: "AMZ" },
                     { name: "Steam", fallback: "STM" },
-                    { name: "Google Play", fallback: "GPL" },
+                    { name: "Google", fallback: "GPL" },
                     { name: "Sephora", fallback: "SEP" },
                     { name: "Nordstrom", fallback: "NOR" },
                   ].map((card, i) => (
-                    <div key={i} className="bg-white rounded-2xl p-4 flex items-center gap-3 border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all group cursor-default">
-                      <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center bg-gray-50 font-black text-[10px] group-hover:scale-110 transition-transform">
+                    <div key={i} className="bg-[#1E2329] rounded-2xl p-4 flex items-center gap-3 border border-white/5 hover:border-blue-400/30 hover:bg-[#2B3139] transition-all group cursor-default">
+                      <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center bg-[#0B0E11] font-black text-[10px] text-blue-400 group-hover:scale-110 transition-transform border border-white/5">
                         {card.img ? <img src={card.img} alt="" className="w-full h-full object-cover" /> : card.fallback}
                       </div>
-                      <p className="text-sm font-bold text-gray-900 truncate">{card.name}</p>
+                      <p className="text-[10px] font-black text-white truncate uppercase">{card.name}</p>
                     </div>
                   ))}
                 </div>
@@ -452,46 +451,45 @@ const LandingPage = () => {
       </section>
 
       {/* ═══ TESTIMONIAL / SOCIAL PROOF ═══ */}
-      <section className="py-20 sm:py-28 bg-blue-600 relative overflow-hidden reveal">
+      <section className="py-20 sm:py-28 bg-[#FFB11A] relative overflow-hidden reveal">
         <div className="absolute inset-0">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-black/5 rounded-full blur-3xl"></div>
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10 text-black">
           <div className="text-center max-w-3xl mx-auto">
             <div className="flex justify-center gap-1 mb-6">
-              {[...Array(5)].map((_, i) => <Star key={i} className="w-6 h-6 text-yellow-300 fill-yellow-300" />)}
+              {[...Array(5)].map((_, i) => <Star key={i} className="w-6 h-6 text-black fill-black" />)}
             </div>
-            <blockquote className="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight mb-8 leading-snug">
-              "Cheeseball is hands down the fastest exchange I've ever used.
-              I sold BTC and had the money in my bank in under 3 minutes."
+            <blockquote className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tighter mb-8 leading-snug uppercase italic">
+              "Cheeseball transformed my trading experience.
+              The Bybit-inspired interface is premium, and payouts hit my bank in less than 2 minutes."
             </blockquote>
             <div>
-              <p className="text-white font-bold text-lg">Adewale O.</p>
-              <p className="text-blue-200 text-sm font-medium">Lagos, Nigeria • Verified Trader</p>
+              <p className="font-black text-lg uppercase tracking-widest">Adewale O.</p>
+              <p className="text-black/50 text-xs font-black uppercase tracking-[0.2em]">Lagos, Nigeria • Verified High Volume Trader</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* ═══ FAQ ACCORDION ═══ */}
-      <section id="faq" className="py-20 sm:py-28 bg-white">
+      <section id="faq" className="py-20 sm:py-28 bg-[#0B0E11]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
             <div className="reveal">
-              <div className="inline-flex items-center gap-2 bg-yellow-50 text-yellow-700 px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-4">
-                <HelpCircle className="w-3 h-3" /> FAQ
+              <div className="inline-flex items-center gap-2 bg-[#FFB11A]/10 text-[#FFB11A] px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
+                <HelpCircle className="w-3 h-3" /> Support
               </div>
-              <h2 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight mb-4">
+              <h2 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-4 uppercase">
                 Got Questions?
               </h2>
-              <p className="text-gray-500 font-medium text-base sm:text-lg mb-8">
-                Everything you need to know about trading on Cheeseball.
-                Can't find what you're looking for? Chat with us.
+              <p className="text-gray-500 font-medium text-base sm:text-lg mb-8 uppercase tracking-tight">
+                Everything you need to know about the most premium exchange in Nigeria.
               </p>
               <button
                 onClick={() => navigate("/signup")}
-                className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-4 rounded-2xl font-bold text-base transition-all hover:shadow-lg active:scale-95 flex items-center gap-3"
+                className="bg-white/5 hover:bg-white/10 text-white border border-white/10 px-8 py-4 rounded-2xl font-black text-base transition-all active:scale-95 flex items-center gap-3 uppercase tracking-tighter"
               >
                 Contact Support
               </button>
@@ -502,22 +500,22 @@ const LandingPage = () => {
                 <div
                   key={i}
                   className={`border rounded-2xl transition-all overflow-hidden cursor-pointer ${
-                    activeAccordion === i ? 'border-blue-200 bg-blue-50/50 shadow-md' : 'border-gray-100 bg-white hover:border-gray-200'
+                    activeAccordion === i ? 'border-[#FFB11A]/30 bg-[#1E2329] shadow-2xl shadow-black/50' : 'border-white/5 bg-[#181A20] hover:border-white/10'
                   }`}
                   onClick={() => setActiveAccordion(activeAccordion === i ? null : i)}
                 >
                   <div className="flex justify-between items-center p-5 sm:p-6">
-                    <h4 className={`font-bold text-sm sm:text-base pr-4 ${activeAccordion === i ? 'text-blue-700' : 'text-gray-900'}`}>
+                    <h4 className={`font-black text-xs sm:text-sm pr-4 uppercase tracking-widest ${activeAccordion === i ? 'text-[#FFB11A]' : 'text-white'}`}>
                       {faq.q}
                     </h4>
                     <ChevronDown className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${
-                      activeAccordion === i ? 'rotate-180 text-blue-600' : 'text-gray-400'
+                      activeAccordion === i ? 'rotate-180 text-[#FFB11A]' : 'text-gray-600'
                     }`} />
                   </div>
                   <div className={`overflow-hidden transition-all duration-300 ${
                     activeAccordion === i ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
                   }`}>
-                    <p className="px-5 sm:px-6 pb-5 sm:pb-6 text-gray-500 font-medium text-sm leading-relaxed">
+                    <p className="px-5 sm:px-6 pb-5 sm:pb-6 text-gray-400 font-medium text-sm leading-relaxed">
                       {faq.a}
                     </p>
                   </div>
@@ -529,31 +527,32 @@ const LandingPage = () => {
       </section>
 
       {/* ═══ FINAL CTA ═══ */}
-      <section className="py-20 sm:py-28 bg-gray-50 reveal">
+      <section className="py-20 sm:py-28 bg-[#181A20] reveal border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-[2rem] sm:rounded-[3rem] p-10 sm:p-16 lg:p-24 text-center relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:bg-blue-500/20 transition-all duration-700"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 group-hover:bg-indigo-500/20 transition-all duration-700"></div>
+          <div className="bg-black rounded-[2rem] sm:rounded-[3rem] p-10 sm:p-16 lg:p-24 text-center relative overflow-hidden group border border-white/5">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-[#FFB11A]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-all duration-700"></div>
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 group-hover:scale-150 transition-all duration-700"></div>
 
             <div className="relative z-10 max-w-3xl mx-auto">
-              <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black text-white tracking-tighter mb-6 leading-tight">
-                Ready to Start{" "}
-                <span className="bg-gradient-to-r from-blue-400 to-cyan-400 text-transparent bg-clip-text">
-                  Trading?
+              <h2 className="text-3xl sm:text-4xl lg:text-6xl font-black text-white tracking-tighter mb-6 leading-tight uppercase italic">
+                The World of{" "}
+                <span className="text-[#FFB11A]">
+                  Top Rates
                 </span>
+                <br />Awaits You.
               </h2>
-              <p className="text-gray-400 text-base sm:text-xl font-medium mb-10 max-w-xl mx-auto">
-                Join 50,000+ Nigerians who already trust Cheeseball for fast, secure crypto and gift card trading.
+              <p className="text-gray-500 text-base sm:text-xl font-medium mb-10 max-w-xl mx-auto uppercase tracking-tighter">
+                Join 50,000+ traders experiencing the premium side of crypto.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6">
                 <button
                   onClick={() => navigate("/signup")}
-                  className="bg-blue-600 hover:bg-blue-500 text-white px-10 py-5 rounded-2xl font-black text-lg hover:shadow-2xl hover:shadow-blue-500/30 transition-all active:scale-95 flex items-center justify-center gap-3 group"
+                  className="bg-[#FFB11A] hover:bg-[#FFB11A]/90 text-black px-10 py-5 rounded-2xl font-black text-lg shadow-2xl shadow-[#FFB11A]/20 transition-all active:scale-95 flex items-center justify-center gap-3 group uppercase tracking-tighter"
                 >
-                  Create Free Account
+                  Create Account
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <button className="border-2 border-white/20 text-white px-10 py-5 rounded-2xl font-bold text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-3">
+                <button className="bg-white/5 border border-white/10 text-white px-10 py-5 rounded-2xl font-black text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-3 uppercase tracking-tighter border-white/10">
                   <Smartphone className="w-5 h-5" />
                   Download App
                 </button>
@@ -564,41 +563,39 @@ const LandingPage = () => {
       </section>
 
       {/* ═══ FOOTER ═══ */}
-      <footer className="bg-white pt-16 sm:pt-20 pb-8 sm:pb-12 border-t border-gray-100">
+      <footer className="bg-[#0B0E11] pt-16 sm:pt-20 pb-8 sm:pb-12 border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 mb-12">
             <div className="sm:col-span-2">
-              <img src={logo} alt="Cheeseball" className="h-16 w-auto rounded-full mb-6" />
-              <p className="text-gray-500 font-medium max-w-sm text-sm leading-relaxed">
-                Nigeria's most trusted cryptocurrency exchange. Buy, sell, and swap 
-                crypto and gift cards with the best rates and instant payouts.
+              <img src={logo} alt="Cheeseball" className="h-16 w-auto rounded-full mb-6 grayscale hover:grayscale-0 transition-all" />
+              <p className="text-gray-500 font-medium max-w-sm text-sm leading-relaxed uppercase tracking-tighter">
+                Nigeria's #1 Institutional Grade Exchange. Experience depth, speed, and security like never before.
               </p>
             </div>
             <div>
-              <h4 className="font-black uppercase text-xs tracking-widest text-gray-400 mb-4">Company</h4>
-              <ul className="space-y-3 text-gray-500 font-medium text-sm">
-                <li><button onClick={() => navigate("/about")} className="hover:text-blue-600 transition-colors">About Us</button></li>
-                <li><button onClick={() => navigate("/careers")} className="hover:text-blue-600 transition-colors">Careers</button></li>
-                <li><button onClick={() => navigate("/press")} className="hover:text-blue-600 transition-colors">Press</button></li>
+              <h4 className="font-black uppercase text-[10px] tracking-[0.3em] text-gray-600 mb-6">Trade</h4>
+              <ul className="space-y-4 text-gray-500 font-black text-xs uppercase tracking-widest">
+                <li><button onClick={() => navigate("/rates")} className="hover:text-[#FFB11A] transition-colors">Market</button></li>
+                <li><button onClick={() => navigate("/buy")} className="hover:text-[#FFB11A] transition-colors">Buy Crypto</button></li>
+                <li><button onClick={() => navigate("/swap")} className="hover:text-[#FFB11A] transition-colors">Convert</button></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-black uppercase text-xs tracking-widest text-gray-400 mb-4">Legal</h4>
-              <ul className="space-y-3 text-gray-500 font-medium text-sm">
-                <li><button onClick={() => navigate("/terms")} className="hover:text-blue-600 transition-colors text-left">Terms of Service</button></li>
-                <li><button onClick={() => navigate("/privacy")} className="hover:text-blue-600 transition-colors text-left">Privacy Policy</button></li>
-                <li><button onClick={() => navigate("/aml")} className="hover:text-blue-600 transition-colors text-left">AML Policy</button></li>
+              <h4 className="font-black uppercase text-[10px] tracking-[0.3em] text-gray-600 mb-6">Legal</h4>
+              <ul className="space-y-4 text-gray-500 font-black text-xs uppercase tracking-widest">
+                <li><button onClick={() => navigate("/terms")} className="hover:text-[#FFB11A] transition-colors text-left font-black">Terms</button></li>
+                <li><button onClick={() => navigate("/privacy")} className="hover:text-[#FFB11A] transition-colors text-left font-black">Privacy</button></li>
               </ul>
             </div>
           </div>
-          <div className="pt-8 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-gray-400 text-xs sm:text-sm font-bold">
-              © {new Date().getFullYear()} Cheeseball. All rights reserved.
+          <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <p className="text-gray-600 text-[10px] font-black uppercase tracking-[0.2em]">
+              © {new Date().getFullYear()} CHEESEBALL • INSTITUTIONAL GRADE TRADING
             </p>
-            <div className="flex gap-4">
-              <CreditCard className="w-5 h-5 text-gray-300" />
-              <Shield className="w-5 h-5 text-gray-300" />
-              <Lock className="w-5 h-5 text-gray-300" />
+            <div className="flex gap-6">
+              <ShieldCheck className="w-5 h-5 text-gray-800" />
+              <Lock className="w-5 h-5 text-gray-800" />
+              <Zap className="w-5 h-5 text-gray-800" />
             </div>
           </div>
         </div>

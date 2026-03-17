@@ -63,42 +63,42 @@ const AccountPage = ({ onNavigate }) => {
   }
 
   return (
-    <div className="min-h-screen pb-32 animate-fade-in overflow-x-hidden" style={{ background: 'var(--bg-primary)' }}>
+    <div className="min-h-screen pb-32 animate-fade-in bg-[#0B0E11] text-[#EAECEF] uppercase tracking-tighter">
       {/* Header gradient area */}
-      <div className="h-48 sm:h-64 relative overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
-        <div className="absolute inset-0 opacity-40">
-          <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-cyan-500/15 rounded-full blur-3xl translate-x-1/4 translate-y-1/4"></div>
+      <div className="h-48 sm:h-64 relative overflow-hidden bg-[#181A20] border-b border-white/5">
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-0 left-0 w-64 h-64 bg-[#FFB11A]/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl translate-x-1/4 translate-y-1/4"></div>
         </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 -mt-24 sm:-mt-32 relative z-10">
-        <div className="space-y-5">
+        <div className="space-y-6">
           {/* Profile Header Card */}
-          <div className="card p-6 sm:p-8 relative overflow-hidden">
+          <div className="bg-[#1E2329] rounded-[2.5rem] p-6 sm:p-10 relative overflow-hidden border border-white/5 shadow-2xl">
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <div className="relative">
-                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[2rem] flex items-center justify-center text-white shadow-lg overflow-hidden ring-4 rotate-3 hover:rotate-0 transition-all duration-500" style={{ background: 'linear-gradient(135deg, var(--accent), #1d4ed8)', ringColor: 'var(--border-primary)' }}>
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-[2rem] flex items-center justify-center text-black shadow-lg overflow-hidden ring-4 rotate-3 hover:rotate-0 transition-all duration-500 bg-gradient-to-br from-[#FFB11A] to-[#FF8A00] ring-white/10">
                   {profile?.avatar_url ? (
                     <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
                   ) : (
                     <User className="w-10 h-10 sm:w-12 sm:h-12" />
                   )}
                 </div>
-                <div className="absolute -bottom-1 -right-1 bg-emerald-500 w-7 h-7 rounded-xl border-4 flex items-center justify-center shadow-lg" style={{ borderColor: 'var(--bg-card)' }}>
+                <div className="absolute -bottom-1 -right-1 bg-green-500 w-7 h-7 rounded-xl border-4 border-[#1E2329] flex items-center justify-center shadow-lg">
                    <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                 </div>
               </div>
-              
+
               <div className="text-center sm:text-left flex-1">
-                <h1 className="text-2xl sm:text-3xl font-black tracking-tight mb-2" style={{ color: 'var(--text-primary)' }}>
-                  {profile?.full_name || "Welcome User"}
+                <h1 className="text-2xl sm:text-3xl font-black text-white italic tracking-tighter mb-2">
+                  {profile?.full_name || "Premium User"}
                 </h1>
                 <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                  <span className="px-3 py-1 bg-blue-500 text-white rounded-xl text-[10px] font-bold uppercase tracking-widest shadow-lg shadow-blue-500/20">
-                    {profile?.role || "Verified"}
+                  <span className="px-3 py-1 bg-[#FFB11A] text-black rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg shadow-[#FFB11A]/20">
+                    {profile?.role || "Verified VIP"}
                   </span>
-                  <span className="px-3 py-1 rounded-xl text-[10px] font-bold uppercase tracking-widest" style={{ background: 'var(--bg-elevated)', color: 'var(--text-muted)', border: '1px solid var(--border-primary)' }}>
+                  <span className="px-3 py-1 bg-[#2B3139] text-gray-400 rounded-lg text-[10px] font-black uppercase tracking-widest border border-white/5">
                     ID: {profile?.id?.slice(0, 8).toUpperCase()}
                   </span>
                 </div>
@@ -107,80 +107,78 @@ const AccountPage = ({ onNavigate }) => {
           </div>
 
           {/* Theme Toggle */}
-          <div className="card p-5 sm:p-6 flex items-center justify-between">
+          <div className="bg-[#1E2329] rounded-2xl p-5 sm:p-6 flex items-center justify-between border border-white/5">
             <div className="flex items-center gap-4">
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'var(--accent-subtle)' }}>
-                {theme === 'dark' ? <Moon className="w-5 h-5 text-blue-400" /> : <Sun className="w-5 h-5 text-yellow-500" />}
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-white/5">
+                {theme === 'dark' ? <Moon className="w-5 h-5 text-[#FFB11A]" /> : <Sun className="w-5 h-5 text-[#FFB11A]" />}
               </div>
               <div>
-                <p className="text-sm font-black" style={{ color: 'var(--text-primary)' }}>Appearance</p>
-                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
-                  {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+                <p className="text-xs font-black text-white italic">Appearance</p>
+                <p className="text-[9px] font-black text-gray-500 uppercase tracking-widest">
+                  Custom Interface Theme
                 </p>
               </div>
             </div>
             <button
               onClick={toggleTheme}
-              className="relative w-14 h-8 rounded-full transition-all duration-300 cursor-pointer"
-              style={{ background: theme === 'dark' ? 'var(--accent)' : 'var(--border-hover)' }}
+              className="relative w-14 h-8 bg-[#2B3139] border border-white/10 rounded-full transition-all duration-300 cursor-pointer"
             >
-              <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300 ${theme === 'dark' ? 'left-7' : 'left-1'}`}></div>
+              <div className={`absolute top-1 w-6 h-6 rounded-full shadow-md transition-all duration-300 ${theme === 'dark' ? 'left-7 bg-[#FFB11A]' : 'left-1 bg-gray-600'}`}></div>
             </button>
           </div>
 
           {/* Quick Stats Grid */}
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
-            <div className="card p-6 hover:border-blue-500/30 transition-all group">
-               <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" style={{ background: 'var(--accent-subtle)' }}>
-                  <TrendingUp className="w-5 h-5 text-blue-400" />
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-[#1E2329] rounded-[2rem] p-8 hover:border-[#FFB11A]/30 transition-all group border border-white/5">
+               <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform bg-[#FFB11A]/10">
+                  <TrendingUp className="w-5 h-5 text-[#FFB11A]" />
                </div>
-               <p className="text-2xl sm:text-3xl font-black mb-1" style={{ color: 'var(--text-primary)' }}>{stats.totalTrades}</p>
-               <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Total Trades</p>
+               <p className="text-3xl font-black text-white mb-1 leading-none">{stats.totalTrades}</p>
+               <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Trades</p>
             </div>
-            <div className="card p-6 hover:border-emerald-500/30 transition-all group">
-               <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform" style={{ background: 'rgba(16,185,129,0.1)' }}>
-                  <CreditCard className="w-5 h-5 text-emerald-400" />
+            <div className="bg-[#1E2329] rounded-[2rem] p-8 hover:border-green-500/30 transition-all group border border-white/5">
+               <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform bg-green-500/10">
+                  <CreditCard className="w-5 h-5 text-green-400" />
                </div>
-               <p className="text-2xl sm:text-3xl font-black mb-1" style={{ color: 'var(--text-primary)' }}>{stats.activeOrders}</p>
-               <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>Active Orders</p>
+               <p className="text-3xl font-black text-white mb-1 leading-none">{stats.activeOrders}</p>
+               <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em]">Active</p>
             </div>
           </div>
 
           {/* Settings List */}
-          <div className="card overflow-hidden">
+          <div className="bg-[#1E2329] rounded-[2rem] overflow-hidden border border-white/5 shadow-xl">
             {[
-              { icon: Mail, label: "Primary Email", value: profile?.email || "Not set", color: "text-blue-400" },
-              { icon: Phone, label: "Phone Number", value: profile?.phone || "No phone linked", color: "text-purple-400" },
-              { icon: Shield, label: "Account Security", value: "Verified Profile", color: "text-emerald-400" },
+              { icon: Mail, label: "Security Email", value: profile?.email || "NOT LINKED", color: "text-[#FFB11A]" },
+              { icon: Phone, label: "Phone Linked", value: profile?.phone || "NOT SET", color: "text-blue-400" },
+              { icon: Shield, label: "KYC Status", value: "Level 2 • Verified", color: "text-green-400" },
             ].map((item, i) => (
-              <div key={i} className="flex justify-between items-center p-5 transition-all group cursor-pointer hover:bg-white/5" style={{ borderBottom: i < 2 ? '1px solid var(--border-primary)' : 'none' }}>
+              <div key={i} className="flex justify-between items-center p-6 transition-all group cursor-pointer hover:bg-white/5" style={{ borderBottom: i < 2 ? '1px solid rgba(255,255,255,0.05)' : 'none' }}>
                 <div className="flex items-center gap-4">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${item.color} group-hover:scale-110 transition-transform`} style={{ background: 'var(--bg-elevated)' }}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${item.color} group-hover:scale-110 transition-transform bg-black/20 border border-white/5`}>
                     <item.icon className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="text-[9px] font-bold uppercase tracking-widest mb-0.5" style={{ color: 'var(--text-muted)' }}>{item.label}</p>
-                    <p className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>{item.value}</p>
+                    <p className="text-[9px] font-black text-gray-600 uppercase tracking-widest mb-0.5">{item.label}</p>
+                    <p className="text-sm font-black text-white">{item.value}</p>
                   </div>
                 </div>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" style={{ color: 'var(--text-muted)' }} />
+                <ArrowRight className="w-4 h-4 text-gray-600 group-hover:translate-x-1 group-hover:text-[#FFB11A] transition-all" />
               </div>
             ))}
           </div>
 
           {/* Action Footer */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <button className="btn-ghost py-4 flex items-center justify-center gap-3 group">
-               <Settings className="w-5 h-5 group-hover:rotate-90 transition-all duration-500" style={{ color: 'var(--text-muted)' }} />
-               <span className="uppercase text-xs tracking-widest font-bold">Edit Profile</span>
+          <div className="grid grid-cols-2 gap-4">
+            <button className="bg-[#1E2329] text-gray-400 p-5 rounded-2xl flex items-center justify-center gap-3 group border border-white/5 hover:text-white transition-all">
+               <Settings className="w-5 h-5 group-hover:rotate-90 transition-all duration-700" />
+               <span className="uppercase text-[10px] tracking-[0.2em] font-black">Preferences</span>
             </button>
-            <button 
+            <button
               onClick={handleLogout}
-              className="py-4 rounded-2xl font-bold transition-all flex items-center justify-center gap-3 group text-sm uppercase tracking-widest"
-              style={{ background: 'var(--danger)', color: 'white' }}
+              className="p-5 bg-red-500/10 text-red-500 border border-red-500/20 rounded-2xl font-black transition-all flex items-center justify-center gap-3 group text-[10px] uppercase tracking-[0.2em]"
             >
                <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-               <span>Sign Out</span>
+               <span>Logout</span>
             </button>
           </div>
         </div>
