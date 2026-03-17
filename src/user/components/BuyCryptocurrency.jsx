@@ -181,7 +181,7 @@ const BuyCryptocurrency = ({ onBack, onExchange, onNavigate }) => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-10">
         <div className="max-w-3xl mx-auto card rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 lg:p-12 text-sm sm:text-base">
           <div className="mb-8 sm:mb-10">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-0 mb-4 px-2">

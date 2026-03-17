@@ -150,7 +150,7 @@ const SwapCrypto = ({ onBack, onSwap, onNavigate }) => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-10">
         <div className="card rounded-2xl p-1.5 flex mb-6 sm:mb-8 max-w-md mx-auto">
           <button className="flex-1 py-3 sm:py-4 rounded-xl bg-blue-500 text-white font-black shadow-lg shadow-blue-500/20 text-sm sm:text-base">
             Crypto Swap

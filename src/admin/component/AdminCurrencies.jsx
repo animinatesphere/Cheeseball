@@ -40,7 +40,7 @@ const AdminCurrencies = ({ onAddCurrency, onBack }) => {
                 is_positive: coin.price_change_percentage_24h >= 0,
                 icon_url: coin.image,
                 is_active: true,
-                color_class: existing?.color_class || (coin.price_change_percentage_24h >= 0 ? 'bg-emerald-500' : 'bg-red-500') 
+                color_class: existing?.color_class || (coin.price_change_percentage_24h >= 0 ? 'bg-blue-600' : 'bg-indigo-600') 
             };
             if (existing) {
                 await updateCurrency(existing.id, currencyData);
@@ -165,9 +165,9 @@ const AdminCurrencies = ({ onAddCurrency, onBack }) => {
               
               <div className="relative">
                 <div className={`w-16 h-16 rounded-[1.25rem] flex items-center justify-center text-white font-black text-2xl shadow-xl transition-transform group-hover:scale-110 group-hover:rotate-6 overflow-hidden ${currency.color_class || 'bg-blue-600'}`}>
-                  {currency.icon_url ? <img src={currency.icon_url} alt="" className="w-full h-full object-cover" /> : (currency.symbol ? currency.symbol[0] : '$')}
+                  {currency.icon_url ? <img src={currency.icon_url} alt="" className="w-full h-full object-cover" /> : (currency.symbol ? currency.symbol[0] : '₦')}
                 </div>
-                <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-lg flex items-center justify-center border-2 border-white dark:border-gray-800 shadow-lg ${currency.is_active ? 'bg-emerald-500' : 'bg-gray-400'}`}>
+                <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-lg flex items-center justify-center border-2 border-white dark:border-gray-800 shadow-lg ${currency.is_active ? 'bg-blue-500' : 'bg-gray-400'}`}>
                    {currency.is_active ? <Zap className="w-3 h-3 text-white" /> : <Shield className="w-3 h-3 text-white" />}
                 </div>
               </div>
@@ -184,7 +184,7 @@ const AdminCurrencies = ({ onAddCurrency, onBack }) => {
               
               <div className="text-right relative z-10">
                 <div className="font-black text-lg tabular-nums" style={{ color: 'var(--text-primary)' }}>
-                  ${Number(currency.price).toLocaleString()}
+                  ₦{Number(currency.price).toLocaleString()}
                 </div>
                 <div className="flex flex-col items-end gap-1 mt-1">
                    <MiniChart positive={currency.is_positive} />

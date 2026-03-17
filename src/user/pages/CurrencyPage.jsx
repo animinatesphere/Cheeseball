@@ -29,7 +29,7 @@ import WithdrawalDetails from "../components/WithdrawalDetails";
 import AccountPage from "../components/AccountPage";
 
 const CurrencyPage = () => {
-  const [currentPage, setCurrentPage] = useState("rates");
+  const [currentPage, setCurrentPage] = useState("buy");
   const [selectedCurrency, setSelectedCurrency] = useState(null);
   const [showModal, setShowModal] = useState(null);
   const [transactionData, setTransactionData] = useState(null);

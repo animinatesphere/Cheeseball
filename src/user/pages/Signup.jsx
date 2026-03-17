@@ -126,14 +126,14 @@ const Signup = () => {
                 Email Address
               </label>
               <div className="relative glow-ring rounded-xl">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="input-field pl-12"
+                  className="input-field pl-14"
                 />
               </div>
             </div>
@@ -144,14 +144,14 @@ const Signup = () => {
                 Password
               </label>
               <div className="relative glow-ring rounded-xl">
-                <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+                <KeyRound className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
                 <input
                   type={showPassword ? "text" : "password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="At least 6 characters"
-                  className="input-field pl-12 pr-12"
+                  className="input-field pl-14 pr-12"
                 />
                 <button
                   type="button"
@@ -170,14 +170,14 @@ const Signup = () => {
                 Confirm Password
               </label>
               <div className="relative glow-ring rounded-xl">
-                <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+                <KeyRound className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
                 <input
                   type={showConfirmPassword ? "text" : "password"}
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter password"
-                  className="input-field pl-12 pr-12"
+                  className="input-field pl-14 pr-12"
                 />
                 <button
                   type="button"
@@ -196,13 +196,13 @@ const Signup = () => {
                 Referral Code (Optional)
               </label>
               <div className="relative glow-ring rounded-xl">
-                <Ticket className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+                <Ticket className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5" style={{ color: 'var(--text-muted)' }} />
                 <input
                   type="text"
                   value={referralCode}
                   onChange={(e) => setReferralCode(e.target.value)}
                   placeholder="Enter referral code"
-                  className="input-field pl-12"
+                  className="input-field pl-14"
                 />
               </div>
             </div>

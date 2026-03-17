@@ -56,11 +56,11 @@ const AddressBook = ({ onBack }) => {
             </div>
 
             <div className="relative flex-1 group">
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={24} />
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={24} />
               <input
                 type="text"
                 placeholder="Search by address or label..."
-                className="w-full pl-16 pr-8 py-5 bg-gray-50 border-2 border-transparent focus:border-blue-100 rounded-[1.5rem] font-bold text-gray-900 placeholder-gray-300 outline-none transition-all"
+                className="w-full pl-14 pr-8 py-5 bg-gray-50 border-2 border-transparent focus:border-blue-100 rounded-[1.5rem] font-bold text-gray-900 placeholder-gray-300 outline-none transition-all"
               />
             </div>
           </div>

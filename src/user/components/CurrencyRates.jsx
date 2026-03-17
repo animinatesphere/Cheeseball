@@ -5,6 +5,11 @@ import {
   TrendingDown,
   Search,
   Loader2,
+  Filter,
+  ArrowUpRight,
+  ChevronRight,
+  Globe,
+  Wallet
 } from "lucide-react";
 import { getCurrencies } from "../../lib/api";
 
@@ -21,13 +26,13 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
       if (data) {
         const mappedCurrencies = data.map(c => ({
           id: c.id,
-          name: c.symbol,
-          fullName: c.name,
-          price: `$${Number(c.price).toLocaleString()}`,
+          symbol: c.symbol,
+          name: c.name,
+          price: `₦${Number(c.price).toLocaleString()}`,
           change: c.change_24h,
           positive: c.is_positive,
-          icon: c.symbol ? c.symbol[0] : '$',
-          colorClass: c.color_class || 'bg-gray-100'
+          icon: c.icon_url || null,
+          colorClass: c.color_class || 'bg-blue-600'
         }));
         setCurrencies(mappedCurrencies);
       }
@@ -38,134 +43,169 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
   }, []);
 
   const filteredCurrencies = currencies.filter(c => 
-    c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    c.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+    c.symbol.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    c.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
-     return (
-       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
-         <Loader2 className="w-10 h-10 animate-spin text-blue-500" />
-       </div>
-     );
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#05070a]">
+        <div className="relative">
+          <div className="w-16 h-16 border-4 border-blue-500/20 border-t-blue-500 rounded-full animate-spin"></div>
+          <div className="absolute inset-0 flex items-center justify-center text-blue-500 font-bold text-[10px] uppercase tracking-widest">Live</div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen animate-fade-in" style={{ background: 'var(--bg-primary)' }}>
-      {/* Header */}
-      <div className="relative overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl translate-x-1/4 translate-y-1/4"></div>
-        </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 relative z-10">
-          <div className="flex justify-between items-center mb-8">
+    <div className="min-h-screen bg-[#05070a] text-white selection:bg-blue-500/30">
+      {/* Premium Mesh Gradient Header */}
+      <div className="relative overflow-hidden pt-12 pb-20 px-4 sm:px-8">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] -mr-48 -mt-48 animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-indigo-600/5 rounded-full blur-[100px] -ml-24 -mb-24"></div>
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex justify-between items-end mb-10">
             <div>
-              <h1 className="text-3xl sm:text-5xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>
+              <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest mb-4">
+                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-ping"></span>
+                Global Markets
+              </div>
+              <h1 className="text-4xl sm:text-6xl font-black tracking-tighter leading-none mb-2 bg-gradient-to-r from-white via-white to-white/40 bg-clip-text text-transparent">
                 Market
               </h1>
-              <p className="text-blue-400 font-bold text-sm mt-1">Live cryptocurrency rates</p>
+              <p className="text-gray-400 font-medium text-sm sm:text-base">Track and trade your favorite digital assets in real-time.</p>
             </div>
             <button
               onClick={() => onNavigate("alert-rates")}
-              className="p-3 sm:p-4 rounded-2xl transition-all border hover:border-blue-500/30"
-              style={{ background: 'var(--bg-card)', borderColor: 'var(--border-primary)' }}
+              className="group p-4 rounded-2xl bg-white/5 border border-white/10 hover:bg-blue-600/10 hover:border-blue-500/30 transition-all active:scale-95"
             >
-              <Bell className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: 'var(--text-secondary)' }} />
+              <Bell className="w-6 h-6 text-gray-400 group-hover:text-blue-400 transition-colors" />
             </button>
           </div>
-          <div className="relative max-w-2xl">
-            <Search className="absolute left-4 sm:left-5 top-1/2 transform -translate-y-1/2 w-5 h-5 sm:w-6 sm:h-6" style={{ color: 'var(--text-muted)' }} />
-            <input
-              type="text"
-              placeholder="Search currencies..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="input-field pl-12 sm:pl-14 text-base sm:text-lg rounded-2xl"
-            />
+
+          {/* Integrated Search & Filter */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1 group">
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500 group-focus-within:text-blue-400 transition-colors" />
+              <input
+                type="text"
+                placeholder="Search by asset name or symbol..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-14 pr-6 text-sm sm:text-base font-medium outline-none focus:border-blue-500/50 focus:bg-white/10 transition-all placeholder:text-gray-600"
+              />
+            </div>
+            <div className="flex bg-white/5 p-1 rounded-2xl border border-white/10">
+              <button
+                onClick={() => setActiveTab("all")}
+                className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                  activeTab === "all" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-gray-500 hover:text-gray-300"
+                }`}
+              >
+                All Assets
+              </button>
+              <button
+                onClick={() => setActiveTab("favorites")}
+                className={`px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+                  activeTab === "favorites" ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-gray-500 hover:text-gray-300"
+                }`}
+              >
+                Favorites
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-4">
-        {/* Tab switcher */}
-        <div className="card rounded-2xl p-1.5 flex mb-6 sm:mb-8 max-w-sm">
-          <button
-            onClick={() => setActiveTab("all")}
-            className={`flex-1 py-3 rounded-xl font-bold transition-all text-sm ${
-              activeTab === "all"
-                ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
-                : "hover:bg-white/5"
-            }`}
-            style={activeTab !== "all" ? { color: 'var(--text-muted)' } : {}}
-          >
-            All Market
-          </button>
-          <button
-            onClick={() => setActiveTab("favorites")}
-            className={`flex-1 py-3 rounded-xl font-bold transition-all text-sm ${
-              activeTab === "favorites"
-                ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20"
-                : "hover:bg-white/5"
-            }`}
-            style={activeTab !== "favorites" ? { color: 'var(--text-muted)' } : {}}
-          >
-            Favorites
-          </button>
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 -mt-8 pb-32">
+        {/* Market Stats Bar (Optional, for flavor) */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+           {[
+             { label: "Market Cap", value: "₦1.2T", icon: Globe, color: "text-blue-400" },
+             { label: "24h Volume", value: "₦45.8B", icon: TrendingUp, color: "text-emerald-400" },
+             { label: "Top Gainer", value: "SOL +8.4%", icon: ArrowUpRight, color: "text-cyan-400" },
+             { label: "Assets", value: currencies.length.toString(), icon: Wallet, color: "text-indigo-400" }
+           ].map((stat, i) => (
+             <div key={i} className="bg-white/5 border border-white/10 rounded-3xl p-5 hover:bg-white/[0.07] transition-all">
+                <p className="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2">{stat.label}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xl font-black">{stat.value}</span>
+                  <stat.icon className={`w-5 h-5 ${stat.color} opacity-40`} />
+                </div>
+             </div>
+           ))}
         </div>
 
-        {/* Currency Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 pb-24">
+        {/* Assets Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {filteredCurrencies.map((currency) => (
             <div
               key={currency.id}
               onClick={() => onSelectCurrency(currency)}
-              className="card p-5 sm:p-6 cursor-pointer group"
+              className="group relative bg-[#0d1117] border border-white/5 rounded-[2rem] p-6 cursor-pointer hover:border-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-500 overflow-hidden"
             >
-              <div className="flex flex-col h-full">
-                <div className="flex items-center justify-between mb-5 sm:mb-6">
-                  <div className={`w-11 h-11 sm:w-12 sm:h-12 ${currency.colorClass} rounded-xl flex items-center justify-center text-white text-xl sm:text-2xl font-black shadow-lg group-hover:scale-110 transition-transform`}>
-                    {currency.icon}
+              {/* Card Glow Effect */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              
+              <div className="relative z-10 flex flex-col h-full">
+                <div className="flex items-center justify-between mb-8">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xl transition-transform group-hover:scale-110 group-hover:rotate-6 overflow-hidden ${currency.colorClass || 'bg-blue-600'}`}>
+                    {currency.icon ? (
+                      <img src={currency.icon} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-2xl font-black text-white">{currency.symbol[0]}</span>
+                    )}
                   </div>
-                  <div className={`px-3 py-1 rounded-full text-[10px] sm:text-xs font-bold ${
-                    currency.positive ? "badge-success" : "badge-danger"
+                  <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-black tracking-widest ${
+                    currency.positive ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"
                   }`}>
+                    {currency.positive ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
                     {currency.change}
                   </div>
                 </div>
-                
-                <div className="mb-5 sm:mb-6">
-                  <h3 className="font-black text-lg sm:text-xl group-hover:text-blue-400 transition-colors" style={{ color: 'var(--text-primary)' }}>
-                    {currency.name}
+
+                <div className="mb-8">
+                  <h3 className="text-2xl font-black group-hover:text-blue-400 transition-colors">
+                    {currency.symbol}
                   </h3>
-                  <p className="font-bold text-xs tracking-wide" style={{ color: 'var(--text-muted)' }}>{currency.fullName}</p>
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{currency.name}</p>
                 </div>
 
                 <div className="mt-auto flex items-end justify-between">
                   <div>
-                    <p className="text-[10px] font-black uppercase mb-1" style={{ color: 'var(--text-muted)' }}>Price</p>
-                    <p className="font-black text-base sm:text-lg leading-none" style={{ color: 'var(--text-primary)' }}>
+                    <span className="text-[10px] font-black text-gray-600 uppercase tracking-widest block mb-1">Buy Price</span>
+                    <span className="text-2xl font-light tracking-tight tabular-nums">
                       {currency.price}
-                    </p>
+                    </span>
                   </div>
-                  <div className="w-14 h-7 sm:w-16 sm:h-8 opacity-40 group-hover:opacity-100 transition-opacity">
-                    {currency.positive ? (
-                      <TrendingUp className="w-full h-full text-emerald-400" />
-                    ) : (
-                      <TrendingDown className="w-full h-full text-red-400" />
-                    )}
+                  <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-blue-600 group-hover:border-blue-600 transition-all duration-300">
+                    <ChevronRight className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
                   </div>
                 </div>
               </div>
             </div>
           ))}
-          {filteredCurrencies.length === 0 && (
-             <div className="col-span-full text-center py-12 font-bold" style={{ color: 'var(--text-muted)' }}>
-                No active currencies found.
-             </div>
-          )}
         </div>
+
+        {filteredCurrencies.length === 0 && (
+          <div className="py-20 text-center bg-white/5 border border-white/10 border-dashed rounded-[3rem]">
+            <Search className="w-12 h-12 text-gray-700 mx-auto mb-4" />
+            <h3 className="text-xl font-black mb-2">No results found</h3>
+            <p className="text-gray-500 font-medium">Try searching for a different asset or symbol.</p>
+          </div>
+        )}
       </div>
+
+      {/* Modern Gradient Styles */}
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 0.1; transform: scale(1); }
+          50% { opacity: 0.2; transform: scale(1.1); }
+        }
+        .animate-pulse { animation: pulse 8s ease-in-out infinite; }
+      `}</style>
     </div>
   );
 };
