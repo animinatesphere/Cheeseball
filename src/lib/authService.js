@@ -2,7 +2,7 @@ const API_BASE = "https://cheeseball-v2.vercel.app";
 
 const authService = {
   /**
-   * Register a new user
+   * Register a new userjsjjsj
    */
   register: async ({ email, password, confirm_password, referral_code = "" }) => {
     const response = await fetch(`${API_BASE}/api/auth/register`, {
