@@ -60,7 +60,7 @@ const CompleteOrderEmail = ({ onBack, onContinue }) => {
           onClose={() => setToast(null)}
         />
       )}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-slate-900 shadow-xl">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex justify-between items-center mb-8">
             <button onClick={onBack} className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10">
@@ -101,7 +101,7 @@ const CompleteOrderEmail = ({ onBack, onContinue }) => {
                     className="appearance-none w-full h-full bg-white border-2 border-gray-200 rounded-lg checked:bg-blue-600 checked:border-blue-600 transition-all cursor-pointer"
                   />
                   {receiveUpdates && (
-                    <svg className="absolute w-4 h-4 text-white pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                    <svg className="absolute w-4 h-4 text-slate-900 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                   )}
@@ -113,7 +113,7 @@ const CompleteOrderEmail = ({ onBack, onContinue }) => {
             </div>
 
             <div className="p-8 bg-blue-50 rounded-[2.5rem] border border-blue-100 flex items-center gap-6">
-               <div className="w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg">
+               <div className="w-14 h-14 bg-blue-600 text-slate-900 rounded-2xl flex items-center justify-center shadow-lg">
                   <Clock className="w-8 h-8" />
                </div>
                <div>
@@ -128,18 +128,18 @@ const CompleteOrderEmail = ({ onBack, onContinue }) => {
             
             <div className="space-y-6 flex-1">
                <div className="bg-gray-50 p-8 rounded-[2.5rem] text-center mb-8 border border-gray-100">
-                  <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-4">You will receive</p>
-                  <p className="text-4xl font-black text-gray-900 mb-2 tabular-nums">0.00217609 <span className="text-xl text-gray-400">BTC</span></p>
+                  <p className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] mb-4">You will receive</p>
+                  <p className="text-4xl font-black text-gray-900 mb-2 tabular-nums">0.00217609 <span className="text-xl text-slate-500">BTC</span></p>
                   <p className="text-blue-600 font-black text-lg">₦4,980,000.00</p>
                </div>
 
                <div className="space-y-4 px-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400 font-bold">Exchange Rate</span>
+                    <span className="text-slate-500 font-bold">Exchange Rate</span>
                     <span className="font-black text-gray-900 tabular-nums text-sm md:text-base">1 BTC = ₦8,962,026.00</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400 font-bold">Network Fee</span>
+                    <span className="text-slate-500 font-bold">Network Fee</span>
                     <span className="font-black text-green-600 tabular-nums">₦20,000.00</span>
                   </div>
                   <div className="pt-6 border-t border-gray-100 flex justify-between items-center">
@@ -152,7 +152,7 @@ const CompleteOrderEmail = ({ onBack, onContinue }) => {
             <button
               onClick={handleSendOtp}
               disabled={loading || countdown > 0}
-              className="w-full mt-12 bg-[#0063BF] hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex flex-col items-center justify-center gap-1 group"
+              className="w-full mt-12 bg-[#0063BF] hover:bg-blue-700 disabled:bg-gray-200 disabled:text-slate-500 text-slate-900 py-6 rounded-[2rem] font-black text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex flex-col items-center justify-center gap-1 group"
             >
                <div className="flex items-center gap-4">
                 {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : (
@@ -168,7 +168,7 @@ const CompleteOrderEmail = ({ onBack, onContinue }) => {
               </div>
             </button>
             
-            <p className="mt-8 text-center text-gray-400 text-xs font-bold leading-relaxed px-4">
+            <p className="mt-8 text-center text-slate-500 text-xs font-bold leading-relaxed px-4">
               By continuing you agree to our <span className="text-blue-600">Terms</span>, <span className="text-blue-600">Privacy</span> and <span className="text-blue-600">Cookies Policy</span>
             </p>
           </div>

@@ -14,7 +14,7 @@ const AdminRestriction = ({ admin, onBack, onUpdatePassword }) => {
               <h2 className="text-2xl font-black text-gray-900 tracking-tight">{admin?.name || "Creative Omotayo"}</h2>
               <p className="text-blue-600 font-bold mt-1">creativeomotayo@gmail.com</p>
             </div>
-            <span className="bg-blue-600 text-white text-[10px] font-black uppercase tracking-[0.2em] px-5 py-2.5 rounded-full shadow-lg shadow-blue-100">
+            <span className="bg-blue-600 text-slate-900 text-[10px] font-black uppercase tracking-[0.2em] px-5 py-2.5 rounded-full shadow-lg shadow-blue-100">
               {admin?.role || "System Admin"}
             </span>
           </div>
@@ -39,7 +39,7 @@ const AdminRestriction = ({ admin, onBack, onUpdatePassword }) => {
 
         <button
           onClick={onUpdatePassword}
-          className="w-full bg-blue-600 text-white py-6 rounded-3xl font-black text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all active:scale-[0.98]"
+          className="w-full bg-blue-600 text-slate-900 py-6 rounded-3xl font-black text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all active:scale-[0.98]"
         >
           Secure Credentials Upgrade
         </button>

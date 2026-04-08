@@ -46,7 +46,7 @@ const BuyCrypto = () => {
                 </div>
                 <button 
                   onClick={handleClick}
-                  className="bg-[#0063BF] hover:bg-blue-700 text-white w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg shadow-blue-200 transition-all hover:translate-x-1"
+                  className="bg-[#0063BF] hover:bg-blue-700 text-slate-900 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg shadow-blue-200 transition-all hover:translate-x-1"
                 >
                   <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
                 </button>

@@ -14,7 +14,7 @@ const AlertRatesPage = ({ onNavigate, onBack }) => {
 
   return (
     <div className="min-h-screen bg-white pb-32">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-slate-900 shadow-xl">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="flex justify-between items-center mb-8">
             <button onClick={onBack} className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10">
@@ -37,7 +37,7 @@ const AlertRatesPage = ({ onNavigate, onBack }) => {
               <button
                 onClick={() => setActiveTab("all")}
                 className={`flex-1 py-3 rounded-[1.2rem] font-black tracking-tight transition-all ${
-                  activeTab === "all" ? "bg-white text-blue-600 shadow-lg shadow-blue-50" : "text-gray-400 hover:text-gray-600"
+                  activeTab === "all" ? "bg-white text-blue-600 shadow-lg shadow-blue-50" : "text-slate-500 hover:text-gray-600"
                 }`}
               >
                 All Currencies
@@ -45,7 +45,7 @@ const AlertRatesPage = ({ onNavigate, onBack }) => {
               <button
                 onClick={() => setActiveTab("favorites")}
                 className={`flex-1 py-3 rounded-[1.2rem] font-black tracking-tight transition-all ${
-                  activeTab === "favorites" ? "bg-white text-blue-600 shadow-lg shadow-blue-50" : "text-gray-400 hover:text-gray-600"
+                  activeTab === "favorites" ? "bg-white text-blue-600 shadow-lg shadow-blue-50" : "text-slate-500 hover:text-gray-600"
                 }`}
               >
                 Favorites
@@ -53,7 +53,7 @@ const AlertRatesPage = ({ onNavigate, onBack }) => {
             </div>
 
             <div className="relative flex-1 group">
-              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={24} />
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-600 transition-colors" size={24} />
               <input
                 type="text"
                 placeholder="Search alerts..."
@@ -71,12 +71,12 @@ const AlertRatesPage = ({ onNavigate, onBack }) => {
                 className="group bg-white rounded-[2rem] p-8 border border-gray-100 hover:border-blue-200 hover:shadow-2xl transition-all flex items-center justify-between gap-6"
               >
                 <div className="flex items-center gap-6">
-                  <div className={`w-14 h-14 ${alert.from.color} rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg`}>
+                  <div className={`w-14 h-14 ${alert.from.color} rounded-2xl flex items-center justify-center text-slate-900 font-black text-2xl shadow-lg`}>
                     {alert.from.icon}
                   </div>
                   <div>
-                    <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1">Alert threshold</p>
-                    <p className="text-xl font-black text-gray-900">{alert.from.amount} <span className="text-gray-400">{alert.from.currency}</span></p>
+                    <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">Alert threshold</p>
+                    <p className="text-xl font-black text-gray-900">{alert.from.amount} <span className="text-slate-500">{alert.from.currency}</span></p>
                   </div>
                 </div>
 
@@ -88,10 +88,10 @@ const AlertRatesPage = ({ onNavigate, onBack }) => {
 
                 <div className="flex items-center gap-6 text-right">
                   <div>
-                    <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1">Target Price</p>
-                    <p className="text-xl font-black text-gray-900">{alert.to.amount} <span className="text-gray-400">{alert.to.currency}</span></p>
+                    <p className="text-[10px] font-black uppercase text-slate-500 tracking-widest mb-1">Target Price</p>
+                    <p className="text-xl font-black text-gray-900">{alert.to.amount} <span className="text-slate-500">{alert.to.currency}</span></p>
                   </div>
-                  <div className={`w-14 h-14 ${alert.to.color} rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg`}>
+                  <div className={`w-14 h-14 ${alert.to.color} rounded-2xl flex items-center justify-center text-slate-900 font-black text-2xl shadow-lg`}>
                     {alert.to.icon}
                   </div>
                 </div>

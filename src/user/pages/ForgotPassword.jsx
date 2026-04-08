@@ -185,7 +185,7 @@ const OTPStep = ({ email, onNext, onBack, loading, setLoading, setToast }) => {
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
             className={`w-11 h-14 text-center text-2xl font-black rounded-xl border-2 outline-none transition-all
-              ${digit ? "border-blue-500 bg-blue-500/10 text-blue-400" : "border-white/10 bg-white/5 text-white"}
+              ${digit ? "border-blue-500 bg-blue-500/10 text-blue-400" : "border-white/10 bg-white/5 text-slate-900"}
               focus:border-blue-500 focus:bg-white/10 focus:shadow-lg focus:shadow-blue-500/20`}
           />
         ))}

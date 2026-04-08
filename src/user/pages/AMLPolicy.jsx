@@ -4,7 +4,7 @@ import SharedFooterLayout from "../components/SharedFooterLayout";
 const AMLPolicy = () => {
   return (
     <SharedFooterLayout title="AML Policy">
-      <p className="mb-8 text-sm text-gray-400 uppercase font-black tracking-widest">Anti-Money Laundering Framework</p>
+      <p className="mb-8 text-sm text-slate-500 uppercase font-black tracking-widest">Anti-Money Laundering Framework</p>
 
       <h2 className="text-2xl font-black text-gray-900 mb-4 uppercase tracking-tight">1. Overview</h2>
       <p className="mb-8">

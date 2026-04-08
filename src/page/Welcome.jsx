@@ -15,7 +15,7 @@ const Welcome = () => {
 
           <div className="w-full space-y-4">
             <Link to="/auth" className="block w-full">
-              <button className="w-full bg-[#0063BF] hover:bg-blue-700 text-white py-5 rounded-2xl font-bold text-lg shadow-lg shadow-blue-200 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer op">
+              <button className="w-full bg-[#0063BF] hover:bg-blue-700 text-slate-900 py-5 rounded-2xl font-bold text-lg shadow-lg shadow-blue-200 transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer op">
                 User
               </button>
             </Link>
@@ -27,7 +27,7 @@ const Welcome = () => {
             </Link>
           </div>
 
-          <p className="mt-12 text-gray-400 text-sm font-medium">
+          <p className="mt-12 text-slate-500 text-sm font-medium">
             Secure • Fast • Reliable
           </p>
         </div>

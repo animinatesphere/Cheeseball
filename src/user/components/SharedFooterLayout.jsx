@@ -43,7 +43,7 @@ const SharedFooterLayout = ({ title, children }) => {
       {/* Basic Footer for these pages */}
       <footer className="bg-gray-50 border-t border-gray-100 py-12">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-gray-400 font-bold text-sm uppercase tracking-widest">
+          <p className="text-slate-500 font-bold text-sm uppercase tracking-widest">
             © 2024 CHEESEBALL • ALL RIGHTS RESERVED
           </p>
         </div>

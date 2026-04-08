@@ -44,16 +44,16 @@ const BottomNav = ({ currentPage, onNavigate }) => {
               onClick={() => onNavigate(item.id)}
               className={`flex flex-col items-center gap-1 sm:gap-1.5 transition-all duration-300 group relative ${
                 active
-                  ? "text-[#FFB11A]"
-                  : isDark ? "text-gray-500 hover:text-gray-300" : "text-gray-400 hover:text-gray-600"
+                  ? "text-[#2563eb]"
+                  : isDark ? "text-gray-500 hover:text-slate-600" : "text-slate-500 hover:text-gray-600"
               }`}
             >
               {active && (
-                <div className="absolute -top-1 w-1.5 h-1.5 rounded-full bg-[#FFB11A] shadow-[0_0_12px_rgba(255,177,26,0.8)]" />
+                <div className="absolute -top-1 w-1.5 h-1.5 rounded-full bg-[#2563eb] shadow-[0_0_12px_rgba(255,177,26,0.8)]" />
               )}
               <div className={`p-1.5 sm:p-2.5 rounded-xl sm:rounded-2xl transition-all ${
                 active
-                  ? 'bg-[#FFB11A]/10'
+                  ? 'bg-[#2563eb]/10'
                   : isDark ? 'group-hover:bg-white/5' : 'group-hover:bg-gray-100'
               }`}>
                 <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${active ? 'stroke-[2.5px]' : 'stroke-[1.5px]'}`} />

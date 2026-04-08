@@ -98,7 +98,7 @@
 //   return (
 //     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
 //       {/* Header */}
-//       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 shadow-lg">
+//       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 p-6 shadow-lg">
 //         <div className="max-w-4xl mx-auto">
 //           <div className="flex justify-between items-center mb-6">
 //             <h1 className="text-3xl font-bold">Currency rates</h1>
@@ -109,7 +109,7 @@
 
 //           {/* Search Bar */}
 //           <div className="relative">
-//             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+//             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-500 w-5 h-5" />
 //             <input
 //               type="text"
 //               placeholder="Search for currency"
@@ -128,7 +128,7 @@
 //             onClick={() => setActiveTab("all")}
 //             className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
 //               activeTab === "all"
-//                 ? "bg-blue-600 text-white shadow-md"
+//                 ? "bg-blue-600 text-slate-900 shadow-md"
 //                 : "text-gray-600 hover:bg-gray-100"
 //             }`}
 //           >
@@ -138,7 +138,7 @@
 //             onClick={() => setActiveTab("favorites")}
 //             className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
 //               activeTab === "favorites"
-//                 ? "bg-blue-600 text-white shadow-md"
+//                 ? "bg-blue-600 text-slate-900 shadow-md"
 //                 : "text-gray-600 hover:bg-gray-100"
 //             }`}
 //           >
@@ -218,11 +218,11 @@
 //               <ShoppingCart className="w-6 h-6" />
 //               <span className="text-xs font-semibold">Buy</span>
 //             </button>
-//             <button className="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition-colors">
+//             <button className="flex flex-col items-center space-y-1 text-slate-500 hover:text-blue-600 transition-colors">
 //               <Clock className="w-6 h-6" />
 //               <span className="text-xs font-semibold">History</span>
 //             </button>
-//             <button className="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition-colors">
+//             <button className="flex flex-col items-center space-y-1 text-slate-500 hover:text-blue-600 transition-colors">
 //               <User className="w-6 h-6" />
 //               <span className="text-xs font-semibold">Account</span>
 //             </button>
@@ -277,7 +277,7 @@
 //         <div className="px-6 pb-6">
 //           <button
 //             onClick={onExchange}
-//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all flex items-center justify-center space-x-2"
+//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all flex items-center justify-center space-x-2"
 //           >
 //             <span>Exchange</span>
 //             <svg
@@ -309,7 +309,7 @@
 //     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 animate-fade-in">
 //       <div className="max-w-4xl mx-auto">
 //         {/* Header */}
-//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 shadow-lg">
+//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 p-6 shadow-lg">
 //           <Link to="/currency-rate">
 //             <button className="mb-4">
 //               <ArrowLeft className="w-6 h-6" />
@@ -327,7 +327,7 @@
 //             <button className="flex-1 py-3 rounded-lg text-gray-600 font-semibold hover:bg-gray-100 transition-all">
 //               Buy/Sell/Crypto
 //             </button>
-//             <button className="flex-1 py-3 rounded-lg bg-blue-600 text-white font-semibold shadow-md">
+//             <button className="flex-1 py-3 rounded-lg bg-blue-600 text-slate-900 font-semibold shadow-md">
 //               Swap Crypto
 //             </button>
 //           </div>
@@ -343,7 +343,7 @@
 //                 <label className="text-gray-600 font-semibold">Network</label>
 //               </div>
 //               <div className="flex items-center space-x-3 bg-gray-50 rounded-xl p-4">
-//                 <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+//                 <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-slate-900 font-bold">
 //                   T
 //                 </div>
 //                 <select className="bg-transparent font-bold text-lg outline-none">
@@ -355,7 +355,7 @@
 //                   onChange={(e) => setFromAmount(e.target.value)}
 //                   className="flex-1 bg-transparent text-right text-xl font-bold outline-none"
 //                 />
-//                 <span className="text-gray-400 text-sm">TRC-20</span>
+//                 <span className="text-slate-500 text-sm">TRC-20</span>
 //               </div>
 //             </div>
 
@@ -384,7 +384,7 @@
 //                 To
 //               </label>
 //               <div className="flex items-center space-x-3 bg-gray-50 rounded-xl p-4">
-//                 <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white text-xl">
+//                 <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-slate-900 text-xl">
 //                   ₿
 //                 </div>
 //                 <select className="bg-transparent font-bold text-lg outline-none">
@@ -396,7 +396,7 @@
 //                   onChange={(e) => setToAmount(e.target.value)}
 //                   className="flex-1 bg-transparent text-right text-xl font-bold outline-none"
 //                 />
-//                 <span className="text-gray-400 text-sm">BTC</span>
+//                 <span className="text-slate-500 text-sm">BTC</span>
 //               </div>
 //             </div>
 
@@ -409,7 +409,7 @@
 //             {/* Swap Action Button */}
 //             <button
 //               onClick={onSwap}
-//               className="w-full mt-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+//               className="w-full mt-6 bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
 //             >
 //               Swap
 //             </button>
@@ -445,7 +445,7 @@
 //           <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
 //             <div className="flex items-center justify-between">
 //               <div className="flex items-center space-x-3">
-//                 <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+//                 <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-slate-900 font-bold">
 //                   T
 //                 </div>
 //                 <div>
@@ -453,9 +453,9 @@
 //                   <p className="text-gray-500 text-sm">TRC-20</p>
 //                 </div>
 //               </div>
-//               <ArrowLeft className="w-6 h-6 text-gray-400 rotate-180" />
+//               <ArrowLeft className="w-6 h-6 text-slate-500 rotate-180" />
 //               <div className="flex items-center space-x-3">
-//                 <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white text-xl">
+//                 <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-slate-900 text-xl">
 //                   ₿
 //                 </div>
 //                 <div>
@@ -489,7 +489,7 @@
 //           {/* Confirm Button */}
 //           <button
 //             onClick={onConfirm}
-//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
 //           >
 //             Swap
 //           </button>
@@ -549,7 +549,7 @@
 //               </p>
 //             </div>
 //             <div className="flex justify-center mb-4">
-//               <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+//               <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-slate-900 text-2xl font-bold">
 //                 T
 //               </div>
 //             </div>
@@ -599,7 +599,7 @@
 //           <div className="bg-white rounded-2xl p-6 shadow-lg mb-6">
 //             <p className="text-center text-gray-600 mb-3">You get</p>
 //             <div className="flex items-center justify-center space-x-3">
-//               <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white text-xl">
+//               <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-slate-900 text-xl">
 //                 ₿
 //               </div>
 //               <div>
@@ -610,7 +610,7 @@
 //           </div>
 
 //           {/* Done Button */}
-//           <button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all">
+//           <button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all">
 //             Done
 //           </button>
 //         </div>
@@ -628,7 +628,7 @@
 //     <div className="min-h-screen bg-white animate-fade-in">
 //       <div className="max-w-4xl mx-auto">
 //         {/* Header */}
-//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 shadow-lg">
+//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 p-6 shadow-lg">
 //           <button onClick={() => window.history.back()} className="mb-4">
 //             <ArrowLeft className="w-6 h-6" />
 //           </button>
@@ -657,7 +657,7 @@
 //               <label className="text-gray-600 font-semibold">Network</label>
 //             </div>
 //             <div className="flex items-center space-x-3 bg-gray-50 rounded-xl p-4">
-//               <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+//               <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-slate-900 font-bold">
 //                 T
 //               </div>
 //               <select className="bg-transparent font-bold text-lg outline-none">
@@ -669,7 +669,7 @@
 //                 onChange={(e) => setSendAmount(e.target.value)}
 //                 className="flex-1 bg-transparent text-right text-xl font-bold outline-none"
 //               />
-//               <span className="text-gray-400 text-sm">NGN</span>
+//               <span className="text-slate-500 text-sm">NGN</span>
 //             </div>
 //           </div>
 
@@ -699,7 +699,7 @@
 //               <label className="text-gray-600 font-semibold">Network</label>
 //             </div>
 //             <div className="flex items-center space-x-3 bg-gray-50 rounded-xl p-4">
-//               <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-white text-xl">
+//               <div className="w-10 h-10 bg-orange-500 rounded-full flex items-center justify-center text-slate-900 text-xl">
 //                 ₿
 //               </div>
 //               <select className="bg-transparent font-bold text-lg outline-none">
@@ -711,14 +711,14 @@
 //                 onChange={(e) => setReceiveAmount(e.target.value)}
 //                 className="flex-1 bg-transparent text-right text-xl font-bold outline-none"
 //               />
-//               <span className="text-gray-400 text-sm">BTC</span>
+//               <span className="text-slate-500 text-sm">BTC</span>
 //             </div>
 //           </div>
 
 //           {/* Exchange Button */}
 //           <button
 //             onClick={onExchange}
-//             className="w-full mt-8 bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+//             className="w-full mt-8 bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
 //           >
 //             Exchange
 //           </button>
@@ -729,7 +729,7 @@
 //       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
 //         <div className="max-w-4xl mx-auto px-6 py-3">
 //           <div className="flex justify-around">
-//             <button className="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition-colors">
+//             <button className="flex flex-col items-center space-y-1 text-slate-500 hover:text-blue-600 transition-colors">
 //               <TrendingUp className="w-6 h-6" />
 //               <span className="text-xs font-semibold">Rate</span>
 //             </button>
@@ -737,11 +737,11 @@
 //               <ShoppingCart className="w-6 h-6" />
 //               <span className="text-xs font-semibold">Buy</span>
 //             </button>
-//             <button className="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition-colors">
+//             <button className="flex flex-col items-center space-y-1 text-slate-500 hover:text-blue-600 transition-colors">
 //               <Clock className="w-6 h-6" />
 //               <span className="text-xs font-semibold">History</span>
 //             </button>
-//             <button className="flex flex-col items-center space-y-1 text-gray-400 hover:text-blue-600 transition-colors">
+//             <button className="flex flex-col items-center space-y-1 text-slate-500 hover:text-blue-600 transition-colors">
 //               <User className="w-6 h-6" />
 //               <span className="text-xs font-semibold">Account</span>
 //             </button>
@@ -763,7 +763,7 @@
 //         <div className="flex justify-between items-start mb-6">
 //           <button
 //             onClick={() => window.history.back()}
-//             className="text-gray-400 hover:text-gray-600"
+//             className="text-slate-500 hover:text-gray-600"
 //           >
 //             ✕
 //           </button>
@@ -817,7 +817,7 @@
 //         <button
 //           onClick={onAccept}
 //           disabled={!agreed || !termsAgreed}
-//           className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+//           className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
 //         >
 //           Ok, I got it
 //         </button>
@@ -834,7 +834,7 @@
 //     <div className="min-h-screen bg-white animate-fade-in">
 //       <div className="max-w-4xl mx-auto">
 //         {/* Header */}
-//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 shadow-lg">
+//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 p-6 shadow-lg">
 //           <div className="flex items-center space-x-4 mb-2">
 //             <button onClick={() => window.history.back()}>
 //               <ArrowLeft className="w-6 h-6" />
@@ -848,7 +848,7 @@
 //           {/* Exchange Summary */}
 //           <div className="flex items-center justify-center space-x-4 mb-8">
 //             <div className="flex items-center space-x-2">
-//               <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+//               <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-slate-900 font-bold">
 //                 T
 //               </div>
 //               <div>
@@ -856,9 +856,9 @@
 //                 <p className="text-gray-500 text-sm">TRC-20</p>
 //               </div>
 //             </div>
-//             <ArrowLeft className="w-6 h-6 text-gray-400 rotate-180" />
+//             <ArrowLeft className="w-6 h-6 text-slate-500 rotate-180" />
 //             <div className="flex items-center space-x-2">
-//               <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-white text-xl">
+//               <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-slate-900 text-xl">
 //                 ₿
 //               </div>
 //               <div>
@@ -891,7 +891,7 @@
 //           {/* Create Exchange Button */}
 //           <button
 //             onClick={onCreateExchange}
-//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all mb-32"
+//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all mb-32"
 //           >
 //             Create Exchange
 //           </button>
@@ -915,7 +915,7 @@
 //         <div className="flex justify-between items-start mb-6">
 //           <button
 //             onClick={() => window.history.back()}
-//             className="text-gray-400 hover:text-gray-600"
+//             className="text-slate-500 hover:text-gray-600"
 //           >
 //             ✕
 //           </button>
@@ -935,7 +935,7 @@
 
 //         <button
 //           onClick={onAccept}
-//           className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+//           className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
 //         >
 //           Ok, I got it
 //         </button>
@@ -950,10 +950,10 @@
 //     <div className="min-h-screen bg-white animate-fade-in">
 //       <div className="max-w-4xl mx-auto">
 //         {/* Header */}
-//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 shadow-lg flex justify-between items-center">
+//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 p-6 shadow-lg flex justify-between items-center">
 //           <button
 //             onClick={() => window.history.back()}
-//             className="text-blue-100 hover:text-white font-semibold"
+//             className="text-blue-100 hover:text-slate-900 font-semibold"
 //           >
 //             Close
 //           </button>
@@ -1050,7 +1050,7 @@
 //           {/* Buy Button */}
 //           <button
 //             onClick={onBuyWithBankTransfer}
-//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
 //           >
 //             Buy with Bank Transfer
 //           </button>
@@ -1069,7 +1069,7 @@
 //     <div className="min-h-screen bg-white animate-fade-in">
 //       <div className="max-w-4xl mx-auto">
 //         {/* Header */}
-//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 shadow-lg flex justify-between items-center">
+//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 p-6 shadow-lg flex justify-between items-center">
 //           <button onClick={() => window.history.back()}>
 //             <ArrowLeft className="w-6 h-6" />
 //           </button>
@@ -1148,7 +1148,7 @@
 //           {/* Continue Button */}
 //           <button
 //             onClick={onContinue}
-//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all mb-6"
+//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all mb-6"
 //           >
 //             Continue
 //           </button>
@@ -1164,7 +1164,7 @@
 
 //         {/* Footer */}
 //         <div className="px-6 pb-6 text-center">
-//           <p className="text-gray-400 text-sm">Cryptopowered by Paystack</p>
+//           <p className="text-slate-500 text-sm">Cryptopowered by Paystack</p>
 //         </div>
 //       </div>
 //     </div>
@@ -1193,7 +1193,7 @@
 //     <div className="min-h-screen bg-white animate-fade-in">
 //       <div className="max-w-4xl mx-auto">
 //         {/* Header */}
-//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 shadow-lg flex justify-between items-center">
+//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 p-6 shadow-lg flex justify-between items-center">
 //           <button onClick={() => window.history.back()}>
 //             <ArrowLeft className="w-6 h-6" />
 //           </button>
@@ -1236,7 +1236,7 @@
 //           {/* Continue Button */}
 //           <button
 //             onClick={onContinue}
-//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
 //           >
 //             Continue
 //           </button>
@@ -1244,7 +1244,7 @@
 
 //         {/* Footer */}
 //         <div className="px-6 pb-6 text-center">
-//           <p className="text-gray-400 text-sm">Cryptopowered by Paystack</p>
+//           <p className="text-slate-500 text-sm">Cryptopowered by Paystack</p>
 //         </div>
 //       </div>
 //     </div>
@@ -1260,7 +1260,7 @@
 //     <div className="min-h-screen bg-white animate-fade-in">
 //       <div className="max-w-4xl mx-auto">
 //         {/* Header */}
-//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 shadow-lg flex justify-between items-center">
+//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 p-6 shadow-lg flex justify-between items-center">
 //           <button onClick={() => window.history.back()}>
 //             <ArrowLeft className="w-6 h-6" />
 //           </button>
@@ -1310,7 +1310,7 @@
 //           {/* Continue Button */}
 //           <button
 //             onClick={onContinue}
-//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
 //           >
 //             Continue
 //           </button>
@@ -1318,7 +1318,7 @@
 
 //         {/* Footer */}
 //         <div className="px-6 pb-6 text-center">
-//           <p className="text-gray-400 text-sm">Cryptopowered by Paystack</p>
+//           <p className="text-slate-500 text-sm">Cryptopowered by Paystack</p>
 //         </div>
 //       </div>
 //     </div>
@@ -1343,7 +1343,7 @@
 //     <div className="min-h-screen bg-white animate-fade-in">
 //       <div className="max-w-4xl mx-auto">
 //         {/* Header */}
-//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 shadow-lg flex justify-between items-center">
+//         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 p-6 shadow-lg flex justify-between items-center">
 //           <button onClick={() => window.history.back()}>
 //             <ArrowLeft className="w-6 h-6" />
 //           </button>
@@ -1413,7 +1413,7 @@
 //                 <span className="font-bold text-gray-800">Cheese Balls 05</span>
 //                 <button
 //                   onClick={() => handleCopy("account", "Cheese Balls 05")}
-//                   className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all"
+//                   className="bg-blue-600 text-slate-900 px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all"
 //                 >
 //                   {copied.account ? "Copied!" : "Copy"}
 //                 </button>
@@ -1428,7 +1428,7 @@
 //                 <span className="font-bold text-gray-800">Cheese Balls 05</span>
 //                 <button
 //                   onClick={() => handleCopy("name", "Cheese Balls 05")}
-//                   className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all"
+//                   className="bg-blue-600 text-slate-900 px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all"
 //                 >
 //                   {copied.name ? "Copied!" : "Copy"}
 //                 </button>
@@ -1443,7 +1443,7 @@
 //                 <span className="font-bold text-gray-800">Loopay</span>
 //                 <button
 //                   onClick={() => handleCopy("bank", "Loopay")}
-//                   className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all"
+//                   className="bg-blue-600 text-slate-900 px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-all"
 //                 >
 //                   {copied.bank ? "Copied!" : "Copy"}
 //                 </button>
@@ -1454,7 +1454,7 @@
 //           {/* Confirm Button */}
 //           <button
 //             onClick={onContinue}
-//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+//             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
 //           >
 //             I've sent the money
 //           </button>
@@ -1462,7 +1462,7 @@
 
 //         {/* Footer */}
 //         <div className="px-6 pb-6 text-center">
-//           <p className="text-gray-400 text-sm">Cryptopowered by Paystack</p>
+//           <p className="text-slate-500 text-sm">Cryptopowered by Paystack</p>
 //         </div>
 //       </div>
 //     </div>
@@ -1476,7 +1476,7 @@
 //       <div className="bg-white rounded-2xl max-w-md w-full p-8 animate-bounce-in text-center">
 //         <button
 //           onClick={onClose}
-//           className="absolute top-6 left-6 text-gray-400 hover:text-gray-600"
+//           className="absolute top-6 left-6 text-slate-500 hover:text-gray-600"
 //         >
 //           ✕
 //         </button>
@@ -1489,7 +1489,7 @@
 //         <div className="flex justify-center mb-8">
 //           <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center animate-bounce-in">
 //             <svg
-//               className="w-16 h-16 text-white"
+//               className="w-16 h-16 text-slate-900"
 //               fill="none"
 //               viewBox="0 0 24 24"
 //               stroke="currentColor"
@@ -1510,7 +1510,7 @@
 
 //         <button
 //           onClick={onClose}
-//           className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+//           className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
 //         >
 //           Ok, I got it
 //         </button>

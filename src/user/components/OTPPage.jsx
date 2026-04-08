@@ -95,7 +95,7 @@ const OTPPage = ({ onBack, onContinue, email }) => {
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
                   placeholder="000000"
-                  className="w-full py-6 bg-white/5 border-2 border-white/10 rounded-[2rem] font-black text-white placeholder-white/20 outline-none transition-all text-center text-4xl tracking-[0.5em] focus:border-blue-500 focus:bg-white/10 focus:shadow-lg focus:shadow-blue-500/20"
+                  className="w-full py-6 bg-white/5 border-2 border-white/10 rounded-[2rem] font-black text-slate-900 placeholder-white/20 outline-none transition-all text-center text-4xl tracking-[0.5em] focus:border-blue-500 focus:bg-white/10 focus:shadow-lg focus:shadow-blue-500/20"
                   maxLength="6"
                 />
               </div>

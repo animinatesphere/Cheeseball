@@ -7,7 +7,7 @@ export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("cheeseball_theme") || "dark";
+    return localStorage.getItem("cheeseball_theme") || "light";
   });
 
   // Apply theme class to <html>

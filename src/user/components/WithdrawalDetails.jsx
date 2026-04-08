@@ -8,7 +8,7 @@ const WithdrawalDetails = ({ onBack, onContinue, transactionData }) => {
 
   return (
     <div className="min-h-screen bg-white animate-fade-in pb-24">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-slate-900 shadow-xl">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <button onClick={onBack} className="mb-8 p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10">
             <ArrowLeft className="w-6 h-6" />
@@ -22,7 +22,7 @@ const WithdrawalDetails = ({ onBack, onContinue, transactionData }) => {
         <div className="max-w-3xl mx-auto bg-gray-50 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 lg:p-12 border border-gray-100 shadow-sm">
           <div className="space-y-8 mb-10">
              <div>
-                <label className="text-gray-400 font-black uppercase text-xs tracking-widest mb-4 block px-2">Select Bank</label>
+                <label className="text-slate-500 font-black uppercase text-xs tracking-widest mb-4 block px-2">Select Bank</label>
                 <div className="relative">
                    <select 
                      value={bankName}
@@ -36,14 +36,14 @@ const WithdrawalDetails = ({ onBack, onContinue, transactionData }) => {
                      <option value="kuda">Kuda Microfinance Bank</option>
                      <option value="opay">OPay</option>
                    </select>
-                   <div className="absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                   <div className="absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
                       <Landmark size={20}/>
                    </div>
                 </div>
              </div>
 
              <div>
-                <label className="text-gray-400 font-black uppercase text-xs tracking-widest mb-4 block px-2">Account Number</label>
+                <label className="text-slate-500 font-black uppercase text-xs tracking-widest mb-4 block px-2">Account Number</label>
                 <input
                   type="text"
                   placeholder="0000000000"
@@ -54,7 +54,7 @@ const WithdrawalDetails = ({ onBack, onContinue, transactionData }) => {
              </div>
 
              <div>
-                <label className="text-gray-400 font-black uppercase text-xs tracking-widest mb-4 block px-2">Account Name</label>
+                <label className="text-slate-500 font-black uppercase text-xs tracking-widest mb-4 block px-2">Account Name</label>
                 <input
                   type="text"
                   placeholder="EX: JOHN DOE"
@@ -66,7 +66,7 @@ const WithdrawalDetails = ({ onBack, onContinue, transactionData }) => {
           </div>
 
           <div className="bg-green-50 p-6 rounded-2xl border border-green-100 flex items-center gap-4 mb-10">
-             <div className="p-2 bg-green-500 text-white rounded-full"><CheckCircle2 size={16}/></div>
+             <div className="p-2 bg-green-500 text-slate-900 rounded-full"><CheckCircle2 size={16}/></div>
              <p className="text-sm text-green-800 font-bold">Payments are processed within 15-30 minutes of verification.</p>
           </div>
 
@@ -77,7 +77,7 @@ const WithdrawalDetails = ({ onBack, onContinue, transactionData }) => {
               accountName
             })}
             disabled={!bankName || !accountNumber || !accountName}
-            className="w-full bg-[#0063BF] hover:bg-blue-700 text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl transition-all flex items-center justify-center gap-4 group disabled:opacity-50"
+            className="w-full bg-[#0063BF] hover:bg-blue-700 text-slate-900 py-6 rounded-[2rem] font-black text-xl shadow-2xl transition-all flex items-center justify-center gap-4 group disabled:opacity-50"
           >
             <span>Confirm Payout Details</span>
             <ArrowLeft className="w-6 h-6 rotate-180 group-hover:translate-x-2 transition-transform" />

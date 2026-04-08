@@ -122,7 +122,7 @@ const AdminCurrencies = ({ onAddCurrency, onBack }) => {
 
           <div className="pb-8 flex flex-col sm:flex-row gap-6">
             <div className="relative flex-1 group">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-500 group-focus-within:text-blue-500 transition-colors" />
               <input
                 type="text"
                 placeholder="Search global markets..."
@@ -136,7 +136,7 @@ const AdminCurrencies = ({ onAddCurrency, onBack }) => {
               <button
                 onClick={() => setActiveView("active")}
                 className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                  activeView === "active" ? "bg-white dark:bg-gray-700 text-blue-600 shadow-lg" : "text-gray-400 hover:text-gray-600"
+                  activeView === "active" ? "bg-white dark:bg-gray-700 text-blue-600 shadow-lg" : "text-slate-500 hover:text-gray-600"
                 }`}
               >
                 Enabled
@@ -144,7 +144,7 @@ const AdminCurrencies = ({ onAddCurrency, onBack }) => {
               <button
                 onClick={() => setActiveView("all")}
                 className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                  activeView === "all" ? "bg-white dark:bg-gray-700 text-blue-600 shadow-lg" : "text-gray-400 hover:text-gray-600"
+                  activeView === "all" ? "bg-white dark:bg-gray-700 text-blue-600 shadow-lg" : "text-slate-500 hover:text-gray-600"
                 }`}
               >
                 Archived
@@ -164,11 +164,11 @@ const AdminCurrencies = ({ onAddCurrency, onBack }) => {
               <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-2xl -mr-12 -mt-12 group-hover:bg-blue-500/10 transition-all"></div>
               
               <div className="relative">
-                <div className={`w-16 h-16 rounded-[1.25rem] flex items-center justify-center text-white font-black text-2xl shadow-xl transition-transform group-hover:scale-110 group-hover:rotate-6 overflow-hidden ${currency.color_class || 'bg-blue-600'}`}>
+                <div className={`w-16 h-16 rounded-[1.25rem] flex items-center justify-center text-slate-900 font-black text-2xl shadow-xl transition-transform group-hover:scale-110 group-hover:rotate-6 overflow-hidden ${currency.color_class || 'bg-blue-600'}`}>
                   {currency.icon_url ? <img src={currency.icon_url} alt="" className="w-full h-full object-cover" /> : (currency.symbol ? currency.symbol[0] : '₦')}
                 </div>
                 <div className={`absolute -bottom-1 -right-1 w-6 h-6 rounded-lg flex items-center justify-center border-2 border-white dark:border-gray-800 shadow-lg ${currency.is_active ? 'bg-blue-500' : 'bg-gray-400'}`}>
-                   {currency.is_active ? <Zap className="w-3 h-3 text-white" /> : <Shield className="w-3 h-3 text-white" />}
+                   {currency.is_active ? <Zap className="w-3 h-3 text-slate-900" /> : <Shield className="w-3 h-3 text-slate-900" />}
                 </div>
               </div>
 

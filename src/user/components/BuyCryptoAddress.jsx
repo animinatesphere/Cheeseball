@@ -15,7 +15,7 @@ const BuyCryptoAddress = ({ onBack, onCreateExchange, transactionData }) => {
 
   return (
     <div className="min-h-screen bg-white animate-fade-in pb-24">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-slate-900 shadow-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="flex flex-col gap-6 sm:gap-8">
             <button onClick={onBack} className="w-fit p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 rounded-xl sm:rounded-2xl transition-all border border-white/10 font-black uppercase text-[10px] sm:text-xs tracking-widest leading-none">
@@ -32,7 +32,7 @@ const BuyCryptoAddress = ({ onBack, onCreateExchange, transactionData }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 -mt-6 sm:-mt-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
           <div className="space-y-6 sm:space-y-8">
-             <div className="bg-blue-600 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 text-white shadow-2xl relative overflow-hidden group">
+             <div className="bg-blue-600 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 text-slate-900 shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 right-0 w-48 h-48 sm:w-64 sm:h-64 bg-white/5 rounded-full -mr-24 -mt-24 sm:-mr-32 sm:-mt-32 transform group-hover:scale-110 transition-transform duration-700"></div>
                 <div className="relative z-10 flex flex-col gap-8 sm:gap-10">
                    <div className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-0">
@@ -71,7 +71,7 @@ const BuyCryptoAddress = ({ onBack, onCreateExchange, transactionData }) => {
              </div>
              
              <div className="p-6 sm:p-8 bg-blue-50 rounded-[2rem] sm:rounded-[2.5rem] border border-blue-100 flex items-center gap-4 sm:gap-6">
-                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-600 text-white rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shrink-0">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-600 text-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shrink-0">
                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="sm:w-8 sm:h-8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                 </div>
                 <div>
@@ -86,7 +86,7 @@ const BuyCryptoAddress = ({ onBack, onCreateExchange, transactionData }) => {
             
             <div className="space-y-6 sm:space-y-8 flex-1">
                <div className="relative group">
-                  <label className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest mb-3 sm:mb-4 block px-2">{transactionData?.toCurrency || 'Bitcoin'} Address</label>
+                  <label className="text-slate-500 font-black uppercase text-[10px] sm:text-xs tracking-widest mb-3 sm:mb-4 block px-2">{transactionData?.toCurrency || 'Bitcoin'} Address</label>
                   <div className="relative flex flex-col gap-4 sm:block">
                      <input
                        type="text"
@@ -97,7 +97,7 @@ const BuyCryptoAddress = ({ onBack, onCreateExchange, transactionData }) => {
                      />
                      <button 
                        onClick={handlePaste}
-                       className="sm:absolute sm:right-4 sm:top-1/2 sm:-translate-y-1/2 bg-[#0063BF] text-white px-6 sm:px-8 py-4 rounded-xl sm:rounded-[1.5rem] font-black text-sm hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2 group/btn"
+                       className="sm:absolute sm:right-4 sm:top-1/2 sm:-translate-y-1/2 bg-[#0063BF] text-slate-900 px-6 sm:px-8 py-4 rounded-xl sm:rounded-[1.5rem] font-black text-sm hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 flex items-center justify-center gap-2 group/btn"
                      >
                         <span>Paste</span>
                         <Copy size={16} />
@@ -117,7 +117,7 @@ const BuyCryptoAddress = ({ onBack, onCreateExchange, transactionData }) => {
             <button
               onClick={() => onCreateExchange(address)}
               disabled={!address}
-              className="w-full mt-8 sm:mt-12 bg-[#0063BF] hover:bg-blue-700 text-white py-5 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] font-black text-lg sm:text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group disabled:opacity-50"
+              className="w-full mt-8 sm:mt-12 bg-[#0063BF] hover:bg-blue-700 text-slate-900 py-5 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] font-black text-lg sm:text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group disabled:opacity-50"
             >
               <span>Create Order</span>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-2 transition-transform">

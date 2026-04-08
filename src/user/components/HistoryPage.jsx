@@ -82,7 +82,7 @@ const HistoryPage = ({ onNavigate }) => {
       case "Waiting": return "text-orange-400 bg-orange-400/10 border-orange-400/20";
       case "Approved": return "text-emerald-400 bg-emerald-400/10 border-emerald-400/20";
       case "Cancel": return "text-red-400 bg-red-400/10 border-red-400/20";
-      default: return "text-gray-400 bg-gray-400/10 border-gray-400/20";
+      default: return "text-slate-500 bg-gray-400/10 border-gray-400/20";
     }
   };
 
@@ -95,25 +95,25 @@ const HistoryPage = ({ onNavigate }) => {
   }
 
   return (
-    <div className="min-h-screen pb-32 bg-[#0B0E11] text-[#EAECEF] uppercase tracking-tighter">
-      <div className="bg-[#181A20] relative overflow-hidden border-b border-white/5">
+    <div className="min-h-screen pb-32 bg-[#ffffff] text-slate-800 uppercase tracking-tighter">
+      <div className="bg-[#f8f9fa] relative overflow-hidden border-b border-white/5">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-64 h-64 bg-[#FFB11A]/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute top-0 left-0 w-64 h-64 bg-[#2563eb]/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
         </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 relative z-10">
           <div className="flex justify-between items-center mb-6 sm:mb-8">
-            <button onClick={() => onNavigate("rates")} className="p-2.5 sm:p-3 rounded-xl hover:bg-white/5 transition-all border border-white/5 text-gray-400">
+            <button onClick={() => onNavigate("rates")} className="p-2.5 sm:p-3 rounded-xl hover:bg-white/5 transition-all border border-white/5 text-slate-500">
               <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
             <button
               onClick={() => setShowFilterModal(true)}
-              className="p-2.5 sm:p-3 rounded-xl hover:bg-white/5 transition-all border border-white/5 text-gray-400"
+              className="p-2.5 sm:p-3 rounded-xl hover:bg-white/5 transition-all border border-white/5 text-slate-500"
             >
               <SlidersHorizontal className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black text-white italic">Trade History</h1>
-          <p className="text-[#FFB11A] text-[10px] sm:text-xs font-black uppercase tracking-[0.2em]">Institutional Grade Tracking</p>
+          <h1 className="text-2xl sm:text-4xl font-black text-slate-900 italic">Trade History</h1>
+          <p className="text-[#2563eb] text-[10px] sm:text-xs font-black uppercase tracking-[0.2em]">Institutional Grade Tracking</p>
         </div>
       </div>
 
@@ -127,14 +127,14 @@ const HistoryPage = ({ onNavigate }) => {
                   <div className="h-px bg-white/5 flex-1"></div>
                 </div>
               )}
-              <div className="bg-[#181A20] rounded-[2rem] p-5 sm:p-8 border border-white/5 hover:border-[#FFB11A]/20 transition-all cursor-pointer shadow-xl">
+              <div className="bg-[#f8f9fa] rounded-[2rem] p-5 sm:p-8 border border-white/5 hover:border-[#2563eb]/20 transition-all cursor-pointer shadow-xl">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8 mb-6 sm:mb-8">
                   <div className="flex items-center gap-4 w-full sm:w-auto">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#1E2329] rounded-xl sm:rounded-2xl flex items-center justify-center text-[#FFB11A] font-black text-lg sm:text-xl border border-white/5 shrink-0 overflow-hidden">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#f1f3f5] rounded-xl sm:rounded-2xl flex items-center justify-center text-[#2563eb] font-black text-lg sm:text-xl border border-white/5 shrink-0 overflow-hidden">
                       {transaction.from.icon}
                     </div>
                     <div>
-                      <p className="font-black text-lg sm:text-xl text-white leading-none mb-1">
+                      <p className="font-black text-lg sm:text-xl text-slate-900 leading-none mb-1">
                         {transaction.from.amount} <span className="text-gray-500 text-[10px] uppercase tracking-widest">{transaction.from.currency}</span>
                       </p>
                       <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">{transaction.from.symbol}</p>
@@ -148,12 +148,12 @@ const HistoryPage = ({ onNavigate }) => {
 
                   <div className="flex items-center gap-4 w-full sm:w-auto sm:text-right">
                     <div className="sm:order-1 order-2 flex-1 sm:flex-none">
-                       <p className="font-black text-lg sm:text-xl text-white leading-none mb-1">
+                       <p className="font-black text-lg sm:text-xl text-slate-900 leading-none mb-1">
                         {transaction.to.amount} <span className="text-gray-500 text-[10px] uppercase tracking-widest">{transaction.to.currency}</span>
                       </p>
                       <p className="text-[10px] text-gray-500 font-black uppercase tracking-widest">{transaction.to.currency}</p>
                     </div>
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#1E2329] rounded-xl sm:rounded-2xl flex items-center justify-center text-green-400 font-black text-xl sm:text-2xl border border-white/5 sm:order-2 order-1 shrink-0 overflow-hidden">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#f1f3f5] rounded-xl sm:rounded-2xl flex items-center justify-center text-green-400 font-black text-xl sm:text-2xl border border-white/5 sm:order-2 order-1 shrink-0 overflow-hidden">
                       {transaction.to.icon}
                     </div>
                   </div>
@@ -163,7 +163,7 @@ const HistoryPage = ({ onNavigate }) => {
                   <span className={`px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest border ${getStatusStyle(transaction.status)}`}>
                     {transaction.status}
                   </span>
-                  <p className="text-[10px] font-black text-gray-600 group-hover:text-[#FFB11A] transition-colors tracking-widest leading-none">
+                  <p className="text-[10px] font-black text-gray-600 group-hover:text-[#2563eb] transition-colors tracking-widest leading-none">
                     ID: {transaction.exchangeId.split(':')[1]?.slice(-8) || transaction.exchangeId.slice(-8)}
                   </p>
                 </div>
@@ -191,14 +191,14 @@ const HistoryPage = ({ onNavigate }) => {
 
             <div className="space-y-8">
               <div>
-                <label className="text-gray-400 font-black uppercase text-xs tracking-widest mb-4 block">Time Range</label>
+                <label className="text-slate-500 font-black uppercase text-xs tracking-widest mb-4 block">Time Range</label>
                 <div className="grid grid-cols-2 gap-3">
                   {["Today", "Week", "Month", "All"].map((filter) => (
                     <button
                       key={filter}
                       onClick={() => setSelectedFilter(filter)}
                       className={`py-4 rounded-2xl font-black transition-all border-2 ${
-                        selectedFilter === filter ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-100" : "border-gray-100 text-gray-500 hover:border-blue-200"
+                        selectedFilter === filter ? "bg-blue-600 border-blue-600 text-slate-900 shadow-lg shadow-blue-100" : "border-gray-100 text-gray-500 hover:border-blue-200"
                       }`}
                     >
                       {filter}
@@ -208,17 +208,17 @@ const HistoryPage = ({ onNavigate }) => {
               </div>
 
               <div>
-                <label className="text-gray-400 font-black uppercase text-xs tracking-widest mb-4 block">Custom Range</label>
+                <label className="text-slate-500 font-black uppercase text-xs tracking-widest mb-4 block">Custom Range</label>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                    <p className="text-[10px] font-black uppercase text-gray-400 mb-1">Start Date</p>
+                    <p className="text-[10px] font-black uppercase text-slate-500 mb-1">Start Date</p>
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-gray-900">20/07/25</span>
                       <Calendar size={18} className="text-blue-600" />
                     </div>
                   </div>
                   <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                    <p className="text-[10px] font-black uppercase text-gray-400 mb-1">End Date</p>
+                    <p className="text-[10px] font-black uppercase text-slate-500 mb-1">End Date</p>
                     <div className="flex justify-between items-center">
                       <span className="font-bold text-gray-900">Today</span>
                       <Calendar size={18} className="text-blue-600" />
@@ -230,7 +230,7 @@ const HistoryPage = ({ onNavigate }) => {
 
             <button
               onClick={() => setShowFilterModal(false)}
-              className="w-full mt-10 bg-[#0063BF] text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl shadow-blue-200 hover:bg-blue-700 transition-all"
+              className="w-full mt-10 bg-[#0063BF] text-slate-900 py-6 rounded-[2rem] font-black text-xl shadow-2xl shadow-blue-200 hover:bg-blue-700 transition-all"
             >
               Apply Filter
             </button>
@@ -266,7 +266,7 @@ const HistoryPage = ({ onNavigate }) => {
             </p>
             <button
               onClick={() => setShowCancelModal(false)}
-              className="w-full bg-blue-600 text-white py-4 rounded-xl font-semibold mb-3"
+              className="w-full bg-blue-600 text-slate-900 py-4 rounded-xl font-semibold mb-3"
             >
               Ok, I got it
             </button>

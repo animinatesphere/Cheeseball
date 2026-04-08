@@ -144,7 +144,7 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData, onN
 
   return (
     <div className="min-h-screen bg-white animate-fade-in pb-24">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-slate-900 shadow-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <div className="flex justify-between items-center mb-6 sm:mb-8">
             <button onClick={onBack} className="p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 rounded-xl sm:rounded-2xl transition-all border border-white/10 font-black uppercase text-[10px] sm:text-xs tracking-widest leading-none">
@@ -166,7 +166,7 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData, onN
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
           <div className="space-y-6 sm:space-y-8">
             <div className="bg-gray-50 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 border border-gray-100">
-               <label className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest mb-4 sm:mb-6 block px-1">Payment Method</label>
+               <label className="text-slate-500 font-black uppercase text-[10px] sm:text-xs tracking-widest mb-4 sm:mb-6 block px-1">Payment Method</label>
                <div className="grid grid-cols-1 gap-4">
                   <label 
                     onClick={() => setPaymentMethod("bank")}
@@ -176,7 +176,7 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData, onN
                       <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-4 flex items-center justify-center ${paymentMethod === 'bank' ? 'border-blue-600' : 'border-gray-300'}`}>
                         {paymentMethod === 'bank' && <div className="w-2 h-2 bg-blue-600 rounded-full"></div>}
                       </div>
-                      <span className={`font-black text-lg sm:text-xl ${paymentMethod === 'bank' ? 'text-blue-600' : 'text-gray-400'}`}>Bank Transfer</span>
+                      <span className={`font-black text-lg sm:text-xl ${paymentMethod === 'bank' ? 'text-blue-600' : 'text-slate-500'}`}>Bank Transfer</span>
                     </div>
                     <div className="text-2xl sm:text-3xl">🏦</div>
                   </label>
@@ -189,7 +189,7 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData, onN
                       <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full border-4 flex items-center justify-center ${paymentMethod === 'card' ? 'border-blue-600' : 'border-gray-300'}`}>
                         {paymentMethod === 'card' && <div className="w-2 h-2 bg-blue-600 rounded-full"></div>}
                       </div>
-                      <span className={`font-black text-lg sm:text-xl ${paymentMethod === 'card' ? 'text-blue-600' : 'text-gray-400'}`}>Debit Card (Paystack)</span>
+                      <span className={`font-black text-lg sm:text-xl ${paymentMethod === 'card' ? 'text-blue-600' : 'text-slate-500'}`}>Debit Card (Paystack)</span>
                     </div>
                     <div className="flex gap-2 sm:gap-4 scale-75 sm:scale-100">
                        <img className="h-3 sm:h-4" src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" />
@@ -200,7 +200,7 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData, onN
             </div>
             
             <div className="p-6 sm:p-8 bg-blue-50 rounded-[2rem] sm:rounded-[2.5rem] border border-blue-100 flex items-center gap-4 sm:gap-6">
-               <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-600 text-white rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shrink-0">
+               <div className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-600 text-slate-900 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-lg shrink-0">
                   <Clock className="w-6 h-6 sm:w-8 sm:h-8" />
                </div>
                <div>
@@ -215,18 +215,18 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData, onN
             
             <div className="space-y-6 flex-1">
                <div className="bg-gray-50 p-6 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] text-center mb-6 sm:mb-8 border border-gray-100">
-                  <p className="text-[9px] sm:text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-3 sm:mb-4">You are buying</p>
-                  <p className="text-2xl sm:text-4xl font-black text-gray-900 mb-1 sm:mb-2 tabular-nums">{transactionData.toAmount} <span className="text-lg sm:text-xl text-gray-400">{transactionData.toCurrency}</span></p>
+                  <p className="text-[9px] sm:text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] mb-3 sm:mb-4">You are buying</p>
+                  <p className="text-2xl sm:text-4xl font-black text-gray-900 mb-1 sm:mb-2 tabular-nums">{transactionData.toAmount} <span className="text-lg sm:text-xl text-slate-500">{transactionData.toCurrency}</span></p>
                   <p className="text-blue-600 font-black text-base sm:text-lg">{Number(transactionData.fromAmount).toLocaleString()} {transactionData.fromCurrency}</p>
                </div>
 
                <div className="space-y-3 sm:space-y-4 px-2 sm:px-4 text-sm sm:text-base">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400 font-bold">Exchange Rate</span>
+                    <span className="text-slate-500 font-bold">Exchange Rate</span>
                     <span className="font-black text-gray-900 tabular-nums text-xs sm:text-base">1 {transactionData.toCurrency} = ... {transactionData.fromCurrency}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400 font-bold">Service Fee (1%)</span>
+                    <span className="text-slate-500 font-bold">Service Fee (1%)</span>
                     <span className="font-black text-gray-600 tabular-nums">{feeAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {transactionData.fromCurrency}</span>
                   </div>
                   <div className="pt-4 sm:pt-6 border-t border-gray-100 flex justify-between items-center">
@@ -239,7 +239,7 @@ const CompleteOrderPage = ({ onBack, onBuyWithBankTransfer, transactionData, onN
             <button
               onClick={handleConfirm}
               disabled={loading}
-              className="w-full mt-8 sm:mt-12 bg-[#0063BF] hover:bg-blue-700 text-white py-5 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] font-black text-lg sm:text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full mt-8 sm:mt-12 bg-[#0063BF] hover:bg-blue-700 text-slate-900 py-5 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] font-black text-lg sm:text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group disabled:opacity-70 disabled:cursor-not-allowed"
             >
                {loading ? (
                 <>

@@ -55,7 +55,7 @@ const GiftCardUpload = ({ onBack, onContinue, transactionData }) => {
 
   return (
     <div className="min-h-screen bg-white animate-fade-in pb-24">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-slate-900 shadow-xl">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <button onClick={onBack} className="mb-8 p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10">
             <ArrowLeft className="w-6 h-6" />
@@ -70,7 +70,7 @@ const GiftCardUpload = ({ onBack, onContinue, transactionData }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
             {/* Front Side */}
             <div className="space-y-4">
-              <label className="block text-gray-400 font-black uppercase text-xs tracking-widest px-2">Front Side</label>
+              <label className="block text-slate-500 font-black uppercase text-xs tracking-widest px-2">Front Side</label>
               <div className="relative group">
                 <input
                   type="file"
@@ -93,13 +93,13 @@ const GiftCardUpload = ({ onBack, onContinue, transactionData }) => {
                            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
                          </div>
                        ) : frontImage && (
-                         <div className="absolute top-4 right-4 bg-green-500 text-white p-1 rounded-full"><CheckCircle2 size={16}/></div>
+                         <div className="absolute top-4 right-4 bg-green-500 text-slate-900 p-1 rounded-full"><CheckCircle2 size={16}/></div>
                        )}
                     </div>
                   ) : (
                     <>
-                      <Upload className="text-gray-400 mb-2 group-hover:text-blue-500 transition-colors" />
-                      <span className="text-xs font-bold text-gray-400">Click to upload front</span>
+                      <Upload className="text-slate-500 mb-2 group-hover:text-blue-500 transition-colors" />
+                      <span className="text-xs font-bold text-slate-500">Click to upload front</span>
                     </>
                   )}
                 </label>
@@ -108,7 +108,7 @@ const GiftCardUpload = ({ onBack, onContinue, transactionData }) => {
 
             {/* Back Side */}
             <div className="space-y-4">
-              <label className="block text-gray-400 font-black uppercase text-xs tracking-widest px-2">Back Side (Code)</label>
+              <label className="block text-slate-500 font-black uppercase text-xs tracking-widest px-2">Back Side (Code)</label>
               <div className="relative group">
                 <input
                   type="file"
@@ -131,13 +131,13 @@ const GiftCardUpload = ({ onBack, onContinue, transactionData }) => {
                            <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
                          </div>
                        ) : backImage && (
-                         <div className="absolute top-4 right-4 bg-green-500 text-white p-1 rounded-full"><CheckCircle2 size={16}/></div>
+                         <div className="absolute top-4 right-4 bg-green-500 text-slate-900 p-1 rounded-full"><CheckCircle2 size={16}/></div>
                        )}
                     </div>
                   ) : (
                     <>
-                      <Upload className="text-gray-400 mb-2 group-hover:text-blue-500 transition-colors" />
-                      <span className="text-xs font-bold text-gray-400">Click to upload back</span>
+                      <Upload className="text-slate-500 mb-2 group-hover:text-blue-500 transition-colors" />
+                      <span className="text-xs font-bold text-slate-500">Click to upload back</span>
                     </>
                   )}
                 </label>
@@ -155,7 +155,7 @@ const GiftCardUpload = ({ onBack, onContinue, transactionData }) => {
           <button
             onClick={() => onContinue({ frontImage, backImage })}
             disabled={!frontImage || !backImage}
-            className="w-full bg-[#0063BF] hover:bg-blue-700 text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl transition-all flex items-center justify-center gap-4 group disabled:opacity-50"
+            className="w-full bg-[#0063BF] hover:bg-blue-700 text-slate-900 py-6 rounded-[2rem] font-black text-xl shadow-2xl transition-all flex items-center justify-center gap-4 group disabled:opacity-50"
           >
             <span>Confirm Upload</span>
             <ArrowLeft className="w-6 h-6 rotate-180 group-hover:translate-x-2 transition-transform" />

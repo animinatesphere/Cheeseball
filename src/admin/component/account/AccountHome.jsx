@@ -23,7 +23,7 @@ const AccountHome = ({ onNavigate }) => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-blue-600 to-indigo-800 rounded-[3rem] p-10 sm:p-14 text-white shadow-2xl relative overflow-hidden group mb-16">
+          <div className="bg-gradient-to-br from-blue-600 to-indigo-800 rounded-[3rem] p-10 sm:p-14 text-slate-900 shadow-2xl relative overflow-hidden group mb-16">
             <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -mr-48 -mt-48 transform group-hover:scale-110 transition-transform duration-1000"></div>
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl -ml-32 -mb-32"></div>
             
@@ -71,7 +71,7 @@ const AccountHome = ({ onNavigate }) => {
                        <p className="text-[10px] font-black uppercase tracking-widest mt-1" style={{ color: 'var(--text-muted)' }}>{item.sub}</p>
                     </div>
                   </div>
-                  <div className="p-3 bg-blue-500/5 text-blue-500 rounded-xl group-hover:bg-blue-500 group-hover:text-white group-hover:translate-x-1 transition-all">
+                  <div className="p-3 bg-blue-500/5 text-blue-500 rounded-xl group-hover:bg-blue-500 group-hover:text-slate-900 group-hover:translate-x-1 transition-all">
                     <ChevronRight className="w-6 h-6" />
                   </div>
                 </button>

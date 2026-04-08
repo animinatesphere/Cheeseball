@@ -52,7 +52,7 @@ const ScreenshotUpload = ({ onUploadComplete, label = "Upload Payment Receipt" }
 
   return (
     <div className="space-y-4">
-      <label className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest px-2 block">{label}</label>
+      <label className="text-slate-500 font-black uppercase text-[10px] sm:text-xs tracking-widest px-2 block">{label}</label>
       
       {!preview ? (
         <div className="relative group">
@@ -67,8 +67,8 @@ const ScreenshotUpload = ({ onUploadComplete, label = "Upload Payment Receipt" }
             htmlFor="screenshot-input"
             className="w-full h-40 border-2 border-dashed border-gray-200 rounded-[2rem] bg-white flex flex-col items-center justify-center cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-all group"
           >
-            <Upload className="text-gray-300 mb-2 group-hover:text-blue-500 transition-colors" size={32} />
-            <span className="text-xs font-bold text-gray-400 group-hover:text-blue-600">Select screenshot or photo</span>
+            <Upload className="text-slate-600 mb-2 group-hover:text-blue-500 transition-colors" size={32} />
+            <span className="text-xs font-bold text-slate-500 group-hover:text-blue-600">Select screenshot or photo</span>
           </label>
         </div>
       ) : (
@@ -78,7 +78,7 @@ const ScreenshotUpload = ({ onUploadComplete, label = "Upload Payment Receipt" }
           <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
             <button 
               onClick={clearUpload}
-              className="bg-white/20 hover:bg-white/40 backdrop-blur-md p-3 rounded-full text-white transition-all"
+              className="bg-white/20 hover:bg-white/40 backdrop-blur-md p-3 rounded-full text-slate-900 transition-all"
             >
               <X size={24} />
             </button>
@@ -92,7 +92,7 @@ const ScreenshotUpload = ({ onUploadComplete, label = "Upload Payment Receipt" }
           )}
 
           {success && (
-             <div className="absolute top-4 right-4 bg-green-500 text-white p-2 rounded-xl shadow-lg animate-bounce-in">
+             <div className="absolute top-4 right-4 bg-green-500 text-slate-900 p-2 rounded-xl shadow-lg animate-bounce-in">
                 <CheckCircle2 size={16} />
              </div>
           )}

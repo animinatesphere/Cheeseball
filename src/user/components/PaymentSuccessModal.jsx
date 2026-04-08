@@ -6,7 +6,7 @@ const PaymentSuccessModal = ({ onClose }) => {
       <div className="bg-white rounded-2xl max-w-md w-full p-8 animate-bounce-in text-center relative">
         <button
           onClick={onClose}
-          className="absolute top-6 left-6 text-gray-400 hover:text-gray-600"
+          className="absolute top-6 left-6 text-slate-500 hover:text-gray-600"
         >
           ✕
         </button>
@@ -18,7 +18,7 @@ const PaymentSuccessModal = ({ onClose }) => {
         <div className="flex justify-center mb-8">
           <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center animate-bounce-in">
             <svg
-              className="w-16 h-16 text-white"
+              className="w-16 h-16 text-slate-900"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -39,7 +39,7 @@ const PaymentSuccessModal = ({ onClose }) => {
 
         <button
           onClick={onClose}
-          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
         >
           Ok, I got it
         </button>

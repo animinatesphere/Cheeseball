@@ -39,7 +39,7 @@ const BankTransferDetails = ({ onBack, onContinue, transactionData }) => {
 
   return (
     <div className="min-h-screen bg-white animate-fade-in pb-24">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-slate-900 shadow-xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
           <button onClick={onBack} className="mb-6 sm:mb-8 p-2.5 sm:p-3 bg-white/10 hover:bg-white/20 rounded-xl sm:rounded-2xl transition-all border border-white/10">
             <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -60,7 +60,7 @@ const BankTransferDetails = ({ onBack, onContinue, transactionData }) => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
           <div className="space-y-6 sm:space-y-8">
             <div className="bg-gray-50 rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 border border-gray-100">
-               <label className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest mb-4 sm:mb-6 block px-1">Payment Method</label>
+               <label className="text-slate-500 font-black uppercase text-[10px] sm:text-xs tracking-widest mb-4 sm:mb-6 block px-1">Payment Method</label>
                <div className="grid grid-cols-1 gap-4">
                   <div className="flex items-center justify-between bg-white px-6 sm:px-8 py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] border-2 border-blue-600 shadow-xl shadow-blue-50">
                     <div className="flex items-center gap-4 sm:gap-6">
@@ -108,12 +108,12 @@ const BankTransferDetails = ({ onBack, onContinue, transactionData }) => {
                 { label: "Bank Name", value: "Zenith Bank" }
               ].map((item, i) => (
                 <div key={i}>
-                  <p className="text-gray-400 font-black uppercase text-[10px] sm:text-xs tracking-widest mb-2 sm:mb-3 px-2">{item.label}</p>
+                  <p className="text-slate-500 font-black uppercase text-[10px] sm:text-xs tracking-widest mb-2 sm:mb-3 px-2">{item.label}</p>
                   <div className="flex items-center justify-between bg-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 group hover:bg-gray-100 transition-colors">
                     <span className="font-black text-base sm:text-xl text-gray-900">{item.value}</span>
                     <button
                       onClick={() => handleCopy(item.label.toLowerCase().split(' ')[0], item.value)}
-                      className="bg-[#0063BF] text-white px-4 sm:px-6 py-1.5 sm:py-2 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-50 active:scale-95"
+                      className="bg-[#0063BF] text-slate-900 px-4 sm:px-6 py-1.5 sm:py-2 rounded-lg sm:rounded-xl font-black text-xs sm:text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-50 active:scale-95"
                     >
                       {copied[item.label.toLowerCase().split(' ')[0]] ? "Copied" : "Copy"}
                     </button>
@@ -132,7 +132,7 @@ const BankTransferDetails = ({ onBack, onContinue, transactionData }) => {
             <button
               onClick={() => onContinue({ screenshotUrl })}
               disabled={!screenshotUrl}
-              className="w-full mt-8 sm:mt-12 bg-[#0063BF] hover:bg-blue-700 text-white py-5 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] font-black text-lg sm:text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group disabled:opacity-50"
+              className="w-full mt-8 sm:mt-12 bg-[#0063BF] hover:bg-blue-700 text-slate-900 py-5 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] font-black text-lg sm:text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all flex items-center justify-center gap-4 group disabled:opacity-50"
             >
               <span>I've Made The Transfer</span>
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover:translate-x-2 transition-transform">

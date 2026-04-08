@@ -7,7 +7,7 @@ const ExchangePageModal = ({ onAccept, onClose }) => {
         <div className="flex justify-between items-start mb-6">
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-slate-500 hover:text-gray-600"
           >
             ✕
           </button>
@@ -27,7 +27,7 @@ const ExchangePageModal = ({ onAccept, onClose }) => {
 
         <button
           onClick={onAccept}
-          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+          className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-slate-900 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
         >
           Ok, I got it
         </button>

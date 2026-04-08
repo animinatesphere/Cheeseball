@@ -33,7 +33,7 @@ const AdminNotificationForm = ({ onClose, onSave }) => {
               onClick={onClose}
               className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 rounded-xl transition-all active:scale-95"
             >
-              <X className="w-6 h-6 text-gray-400" />
+              <X className="w-6 h-6 text-slate-500" />
             </button>
           </div>
 
@@ -50,7 +50,7 @@ const AdminNotificationForm = ({ onClose, onSave }) => {
 
             <div className="space-y-6">
               <div>
-                <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 px-1">
+                <label className="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 px-1">
                   Subject Header (Title)
                 </label>
                 <input
@@ -63,7 +63,7 @@ const AdminNotificationForm = ({ onClose, onSave }) => {
               </div>
 
                <div>
-                <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 px-1">
+                <label className="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 px-1">
                   Alert Heading
                 </label>
                 <input
@@ -76,7 +76,7 @@ const AdminNotificationForm = ({ onClose, onSave }) => {
               </div>
 
               <div>
-                <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 px-1">
+                <label className="block text-[10px] font-black uppercase text-slate-500 tracking-widest mb-2 px-1">
                   Payload Metadata (Body)
                 </label>
                 <textarea
@@ -91,7 +91,7 @@ const AdminNotificationForm = ({ onClose, onSave }) => {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full mt-4 bg-blue-600 text-white py-5 rounded-[2rem] font-black text-lg shadow-2xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+              className="w-full mt-4 bg-blue-600 text-slate-900 py-5 rounded-[2rem] font-black text-lg shadow-2xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
             >
               {loading ? <Loader2 className="w-6 h-6 animate-spin" /> : "Initialize Broadcast"}
             </button>

@@ -191,13 +191,13 @@ const AdminOrders = () => {
               <div className="flex bg-gray-100/50 dark:bg-gray-800/30 p-1 rounded-xl mt-4 w-fit">
                 <button 
                   onClick={() => setViewTab("crypto")}
-                  className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${viewTab === 'crypto' ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
+                  className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${viewTab === 'crypto' ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-md' : 'text-slate-500 hover:text-gray-600'}`}
                 >
                   Crypto
                 </button>
                 <button 
                   onClick={() => setViewTab("giftcard")}
-                  className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${viewTab === 'giftcard' ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
+                  className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${viewTab === 'giftcard' ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-md' : 'text-slate-500 hover:text-gray-600'}`}
                 >
                   Gift Cards
                 </button>
@@ -227,7 +227,7 @@ const AdminOrders = () => {
         {(fetchStatus.tx !== 'Success' || fetchStatus.gc !== 'Success') && (
           <div className="mb-10 p-6 rounded-[2rem] border-2 border-red-500/20 bg-red-500/5 backdrop-blur-sm animate-fade-in">
              <div className="flex items-start gap-4">
-               <div className="p-3 bg-red-500 rounded-2xl text-white shadow-lg shadow-red-500/30">
+               <div className="p-3 bg-red-500 rounded-2xl text-slate-900 shadow-lg shadow-red-500/30">
                  <Activity className="w-6 h-6 animate-pulse" />
                </div>
                <div className="flex-1">
@@ -235,7 +235,7 @@ const AdminOrders = () => {
                  <p className="text-red-500/70 text-xs font-medium mb-4">Your connection to the Supabase rest cache is currently being throttled or redirected (Status 406/401).</p>
                  <button 
                   onClick={handleClearSession}
-                  className="bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all active:scale-95 shadow-lg shadow-red-500/20"
+                  className="bg-red-500 hover:bg-red-600 text-slate-900 px-5 py-2.5 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all active:scale-95 shadow-lg shadow-red-500/20"
                 >
                   Repair Connection
                 </button>
@@ -269,10 +269,10 @@ const AdminOrders = () => {
                       
                       <div className="flex-1 flex items-center gap-8">
                          <div className="flex items-center -space-x-4 flex-shrink-0">
-                            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center text-white font-black text-xs sm:text-xl shadow-xl border-2 sm:border-4 border-white dark:border-gray-800 relative z-10 overflow-hidden transform group-hover:-rotate-6 transition-transform">
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center text-slate-900 font-black text-xs sm:text-xl shadow-xl border-2 sm:border-4 border-white dark:border-gray-800 relative z-10 overflow-hidden transform group-hover:-rotate-6 transition-transform">
                               {order.fromIcon?.length > 2 ? <img src={order.fromIcon} alt="" className="w-full h-full object-cover"/> : order.fromIcon}
                             </div>
-                            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl flex items-center justify-center text-white font-black text-xs sm:text-xl shadow-xl border-2 sm:border-4 border-white dark:border-gray-800 relative z-0 transform group-hover:translate-x-4 group-hover:rotate-6 transition-all overflow-hidden">
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl flex items-center justify-center text-slate-900 font-black text-xs sm:text-xl shadow-xl border-2 sm:border-4 border-white dark:border-gray-800 relative z-0 transform group-hover:translate-x-4 group-hover:rotate-6 transition-all overflow-hidden">
                               {order.toIcon?.length > 2 ? <img src={order.toIcon} alt="" className="w-full h-full object-cover"/> : order.toIcon}
                             </div>
                          </div>
@@ -293,7 +293,7 @@ const AdminOrders = () => {
 
                        <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-10 sm:pl-10 sm:border-l border-gray-100 dark:border-gray-800 w-full sm:w-auto mt-4 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-t-0">
                           <div className="text-left hidden lg:block">
-                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Network</p>
+                             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Network</p>
                              <p className="text-sm font-bold mt-1" style={{ color: 'var(--text-primary)' }}>{order.toToken || 'NGN'}</p>
                           </div>
                           
@@ -304,7 +304,7 @@ const AdminOrders = () => {
                           }`}>
                             {order.status}
                          </span>
-                                                  <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-blue-500/5 text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all shadow-lg group-hover:shadow-blue-500/20 group-hover:-translate-x-1">
+                                                  <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl bg-blue-500/5 text-blue-500 group-hover:bg-blue-500 group-hover:text-slate-900 transition-all shadow-lg group-hover:shadow-blue-500/20 group-hover:-translate-x-1">
                              <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
                           </div>
                        </div>

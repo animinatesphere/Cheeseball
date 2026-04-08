@@ -14,7 +14,7 @@ const AdminsList = ({ admins, onBack, onAdd, onSelectAdmin }) => {
           </div>
           <button
             onClick={onAdd}
-            className="bg-blue-600 text-white p-3 rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-2"
+            className="bg-blue-600 text-slate-900 p-3 rounded-xl shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95 flex items-center gap-2"
           >
             <Plus className="w-5 h-5" />
             <span className="hidden sm:inline font-black uppercase text-[10px] tracking-widest px-1">Provision Admin</span>
@@ -23,7 +23,7 @@ const AdminsList = ({ admins, onBack, onAdd, onSelectAdmin }) => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-[2.5rem] p-8 text-white shadow-2xl shadow-blue-100 mb-10 relative overflow-hidden group">
+        <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-[2.5rem] p-8 text-slate-900 shadow-2xl shadow-blue-100 mb-10 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 transform group-hover:scale-110 transition-transform duration-700"></div>
           <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
             <div className="flex items-center gap-5">
@@ -35,7 +35,7 @@ const AdminsList = ({ admins, onBack, onAdd, onSelectAdmin }) => {
                 <p className="text-blue-100 font-bold">creativeomotayo@gmail.com</p>
               </div>
             </div>
-            <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-black uppercase tracking-[0.2em] px-5 py-2.5 rounded-full border border-white/20">
+            <span className="bg-white/20 backdrop-blur-md text-slate-900 text-[10px] font-black uppercase tracking-[0.2em] px-5 py-2.5 rounded-full border border-white/20">
               Super Administrator
             </span>
           </div>
@@ -52,7 +52,7 @@ const AdminsList = ({ admins, onBack, onAdd, onSelectAdmin }) => {
             >
               <div className="flex justify-between items-start w-full">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-black text-lg group-hover:bg-blue-600 group-hover:text-white transition-all">
+                  <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-black text-lg group-hover:bg-blue-600 group-hover:text-slate-900 transition-all">
                     {admin.name.charAt(0)}
                   </div>
                   <div>
@@ -62,13 +62,13 @@ const AdminsList = ({ admins, onBack, onAdd, onSelectAdmin }) => {
                     </span>
                   </div>
                 </div>
-                <button className="p-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all active:scale-95">
+                <button className="p-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-slate-900 transition-all active:scale-95">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
               <div className="w-full pt-4 border-t border-gray-50 flex items-center justify-between mt-auto">
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Manage Permission</span>
-                <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
+                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Manage Permission</span>
+                <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-slate-500 group-hover:bg-blue-50 group-hover:text-blue-600 transition-all">
                    <ChevronLeft className="w-4 h-4 rotate-180" />
                 </div>
               </div>

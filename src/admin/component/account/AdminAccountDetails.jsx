@@ -32,10 +32,10 @@ const AdminAccountDetails = ({ onBack, onBackToIncome }) => {
                 { label: "Mobile Endpoint", value: "Loopay" }
               ].map((item, i) => (
                 <div key={i} className="bg-gray-50 rounded-[1.5rem] p-6 border border-transparent hover:border-blue-100 transition-all group">
-                  <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 leading-none">{item.label}</span>
+                  <span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 leading-none">{item.label}</span>
                   <div className="flex items-center justify-between gap-4 font-bold text-gray-900">
                     <span className="truncate">{item.value}</span>
-                    <button onClick={() => copyToClipboard(item.value)} className="bg-white p-2 rounded-xl border border-gray-100 text-blue-600 hover:bg-blue-600 hover:text-white transition-all shadow-sm">
+                    <button onClick={() => copyToClipboard(item.value)} className="bg-white p-2 rounded-xl border border-gray-100 text-blue-600 hover:bg-blue-600 hover:text-slate-900 transition-all shadow-sm">
                       <Copy className="w-4 h-4" />
                     </button>
                   </div>
@@ -47,13 +47,13 @@ const AdminAccountDetails = ({ onBack, onBackToIncome }) => {
           <section>
             <h3 className="text-gray-900 font-black uppercase text-xs tracking-[0.2em] ml-2 mb-6">Financial Settlement Details</h3>
             <div className="bg-gray-50 rounded-[2.5rem] p-8 border border-transparent hover:border-blue-100 transition-all">
-                <span className="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4 leading-none px-2">Primary USDT Settlement Address</span>
+                <span className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 leading-none px-2">Primary USDT Settlement Address</span>
                 <div className="bg-white p-6 rounded-2xl shadow-inner border border-gray-100 break-all font-mono text-xs font-bold text-gray-900 leading-relaxed mb-6">
                   Tcndjh73j6fhe78ej87hwey73h
                 </div>
                 <button
                   onClick={() => copyToClipboard("Tcndjh73j6fhe78ej87hwey73h")}
-                  className="w-full bg-blue-600 text-white py-5 rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-xl shadow-blue-50 active:scale-95 transition-all"
+                  className="w-full bg-blue-600 text-slate-900 py-5 rounded-[1.5rem] font-black uppercase text-[10px] tracking-[0.2em] shadow-xl shadow-blue-50 active:scale-95 transition-all"
                 >
                   Synchronize Address
                 </button>
@@ -62,7 +62,7 @@ const AdminAccountDetails = ({ onBack, onBackToIncome }) => {
 
           <button
             onClick={onBackToIncome}
-            className="w-full bg-blue-600 text-white py-6 rounded-3xl font-black text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all active:scale-[0.98]"
+            className="w-full bg-blue-600 text-slate-900 py-6 rounded-3xl font-black text-xl shadow-2xl shadow-blue-200 transform hover:-translate-y-1 transition-all active:scale-[0.98]"
           >
             Acknowledge Profile
           </button>

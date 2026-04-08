@@ -23,7 +23,7 @@ const AddressBook = ({ onBack }) => {
 
   return (
     <div className="min-h-screen bg-white pb-32">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-slate-900 shadow-xl">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <button onClick={onBack} className="mb-8 p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10">
             <ChevronLeft size={24} />
@@ -40,7 +40,7 @@ const AddressBook = ({ onBack }) => {
               <button
                 onClick={() => setActiveTab("recent")}
                 className={`flex-1 py-3 rounded-[1.2rem] font-black tracking-tight transition-all ${
-                  activeTab === "recent" ? "bg-white text-blue-600 shadow-lg shadow-blue-50" : "text-gray-400 hover:text-gray-600"
+                  activeTab === "recent" ? "bg-white text-blue-600 shadow-lg shadow-blue-50" : "text-slate-500 hover:text-gray-600"
                 }`}
               >
                 Recent
@@ -48,7 +48,7 @@ const AddressBook = ({ onBack }) => {
               <button
                 onClick={() => setActiveTab("saved")}
                 className={`flex-1 py-3 rounded-[1.2rem] font-black tracking-tight transition-all ${
-                  activeTab === "saved" ? "bg-white text-blue-600 shadow-lg shadow-blue-50" : "text-gray-400 hover:text-gray-600"
+                  activeTab === "saved" ? "bg-white text-blue-600 shadow-lg shadow-blue-50" : "text-slate-500 hover:text-gray-600"
                 }`}
               >
                 Saved
@@ -56,7 +56,7 @@ const AddressBook = ({ onBack }) => {
             </div>
 
             <div className="relative flex-1 group">
-              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-600 transition-colors" size={24} />
+              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-blue-600 transition-colors" size={24} />
               <input
                 type="text"
                 placeholder="Search by address or label..."
@@ -76,11 +76,11 @@ const AddressBook = ({ onBack }) => {
                     ₿
                   </div>
                   <button onClick={() => toggleSave(addr.id)} className="p-2 hover:bg-blue-50 rounded-xl transition-all">
-                    <Bookmark size={24} className={addr.saved ? "fill-blue-600 text-blue-600" : "text-gray-300"} />
+                    <Bookmark size={24} className={addr.saved ? "fill-blue-600 text-blue-600" : "text-slate-600"} />
                   </button>
                 </div>
                 
-                <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-2 px-1">Receiver Address</p>
+                <p className="text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] mb-2 px-1">Receiver Address</p>
                 <div className="bg-gray-50 p-4 rounded-xl">
                   <p className="text-xs font-mono font-bold text-gray-600 break-all leading-relaxed">
                     {addr.address}

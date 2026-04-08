@@ -83,7 +83,7 @@ const AdminHistory = ({ onBack }) => {
             </div>
             <button
               onClick={() => setShowFilter(true)}
-              className="p-4 btn-ghost rounded-2xl text-gray-400 hover:text-blue-500 transition-all active:scale-95"
+              className="p-4 btn-ghost rounded-2xl text-slate-500 hover:text-blue-500 transition-all active:scale-95"
             >
               <SlidersHorizontal className="w-6 h-6" />
             </button>
@@ -102,7 +102,7 @@ const AdminHistory = ({ onBack }) => {
                 {showDate && (
                    <div className="flex items-center gap-6 px-2">
                        <div className="flex items-center gap-2">
-                         <Calendar className="w-4 h-4 text-gray-400" />
+                         <Calendar className="w-4 h-4 text-slate-500" />
                          <span className="text-[10px] font-black uppercase text-gray-500 tracking-[0.4em]">{transaction.date}</span>
                        </div>
                        <div className="h-px bg-gradient-to-r from-gray-200 dark:from-gray-800 to-transparent flex-1"></div>
@@ -112,7 +112,7 @@ const AdminHistory = ({ onBack }) => {
                 <div className="card p-6 sm:p-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-8 group animate-fade-in relative overflow-hidden transition-all hover:bg-gray-50/50 dark:hover:bg-gray-900/10">
                   <div className="flex-1 flex items-center justify-between sm:justify-start gap-10">
                     <div className="flex items-center gap-6">
-                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-xl transition-transform group-hover:scale-110 group-hover:rotate-6 overflow-hidden">
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-slate-900 font-black text-xl shadow-xl transition-transform group-hover:scale-110 group-hover:rotate-6 overflow-hidden">
                         {transaction.from.icon?.length > 2 ? <img src={transaction.from.icon} alt="" className="w-full h-full object-cover" /> : transaction.from.icon}
                       </div>
                       <div>
@@ -132,7 +132,7 @@ const AdminHistory = ({ onBack }) => {
                     </div>
 
                     <div className="flex items-center gap-6 text-right sm:text-left">
-                      <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-white font-black text-xl shadow-xl order-last sm:order-first transition-transform group-hover:scale-110 group-hover:-rotate-6 overflow-hidden">
+                      <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-slate-900 font-black text-xl shadow-xl order-last sm:order-first transition-transform group-hover:scale-110 group-hover:-rotate-6 overflow-hidden">
                         {transaction.to.icon?.length > 2 ? <img src={transaction.to.icon} alt="" className="w-full h-full object-cover" /> : transaction.to.icon}
                       </div>
                       <div className="order-first sm:order-last">
@@ -155,7 +155,7 @@ const AdminHistory = ({ onBack }) => {
                       </div>
                     </div>
                     <div className="text-right">
-                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Tracking ID</p>
+                       <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Tracking ID</p>
                        <p className="text-xs font-black mt-1" style={{ color: 'var(--text-primary)' }}>{transaction.exchangeId.split(':')[1]?.slice(-8) || transaction.exchangeId.slice(-8)}</p>
                     </div>
                   </div>

@@ -63,7 +63,7 @@ const AdminDashboardHome = ({ onNavigate }) => {
           <button className="btn-ghost flex items-center gap-3 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl group active:scale-95">
             <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
             <span className="font-extrabold text-xs sm:text-sm uppercase tracking-widest" style={{ color: 'var(--text-primary)' }}>Today</span>
-            <ChevronDown className="w-4 h-4 text-gray-400 group-hover:rotate-180 transition-transform" />
+            <ChevronDown className="w-4 h-4 text-slate-500 group-hover:rotate-180 transition-transform" />
           </button>
         </div>
 
@@ -145,7 +145,7 @@ const AdminDashboardHome = ({ onNavigate }) => {
 
           {/* Right Cards: System Highlights */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6 sm:gap-8">
-            <div className="rounded-[2.5rem] p-8 text-white relative overflow-hidden group shadow-2xl transition-all hover:-translate-y-1" style={{ background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }}>
+            <div className="rounded-[2.5rem] p-8 text-slate-900 relative overflow-hidden group shadow-2xl transition-all hover:-translate-y-1" style={{ background: 'linear-gradient(135deg, #3b82f6, #1d4ed8)' }}>
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 transform group-hover:scale-150 transition-transform duration-700" />
               <div className="relative z-10">
                 <div className="flex justify-between items-start mb-8">
@@ -170,7 +170,7 @@ const AdminDashboardHome = ({ onNavigate }) => {
                   <div className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-500">
                     <FileText className="w-7 h-7" />
                   </div>
-                  <div className="text-[10px] font-black text-gray-400 border border-gray-400/20 px-3 py-1 rounded-full">INTERNAL</div>
+                  <div className="text-[10px] font-black text-slate-500 border border-gray-400/20 px-3 py-1 rounded-full">INTERNAL</div>
                </div>
                <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest mb-1" style={{ color: 'var(--text-muted)' }}>Market Listings</p>
@@ -206,7 +206,7 @@ const AdminDashboardHome = ({ onNavigate }) => {
                       <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>{item.sub}</span>
                     </div>
                   </div>
-                  <ChevronRight className="w-6 h-6 text-gray-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+                  <ChevronRight className="w-6 h-6 text-slate-600 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
                 </button>
               ))}
             </div>
@@ -238,7 +238,7 @@ const AdminDashboardHome = ({ onNavigate }) => {
               ) : (
                 <div className="text-center py-12 px-6 rounded-3xl border-2 border-dashed border-gray-100/10">
                   <Shield className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-                  <p className="text-gray-400 font-bold">Systems Diagnostic Offline</p>
+                  <p className="text-slate-500 font-bold">Systems Diagnostic Offline</p>
                   <p className="text-[10px] text-gray-500 uppercase tracking-widest mt-2">Checking node availability...</p>
                 </div>
               )}

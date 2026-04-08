@@ -104,7 +104,7 @@ export default function CheeseBallLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-bold py-5 rounded-2xl shadow-lg shadow-blue-200 transition-all hover:scale-[1.02] active:scale-[0.98] op flex items-center justify-center gap-3"
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-slate-900 font-bold py-5 rounded-2xl shadow-lg shadow-blue-200 transition-all hover:scale-[1.02] active:scale-[0.98] op flex items-center justify-center gap-3"
             >
               {loading ? (
                 <>
@@ -118,7 +118,7 @@ export default function CheeseBallLogin() {
           </div>
         </form>
 
-        <div className="mt-12 text-center text-gray-400 text-sm">
+        <div className="mt-12 text-center text-slate-500 text-sm">
           <p>Protected by industrial grade encryption</p>
         </div>
       </div>

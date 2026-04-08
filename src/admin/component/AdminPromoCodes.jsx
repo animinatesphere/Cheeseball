@@ -99,21 +99,21 @@ const AdminPromoCodes = () => {
                <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-all">
                   <button 
                     onClick={() => handleDelete(promo.id)}
-                    className="p-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-lg"
+                    className="p-3 bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-slate-900 rounded-xl transition-all shadow-lg"
                   >
                     <Trash2 size={20} />
                   </button>
                </div>
                
                <div className="flex items-start gap-6 mb-10">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl relative overflow-hidden">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-slate-900 shadow-xl relative overflow-hidden">
                     <div className="absolute inset-0 bg-white/10 group-hover:translate-x-full transition-transform duration-700"></div>
                      <Ticket size={28} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-black text-2xl tracking-tighter uppercase mb-1 leading-none group-hover:text-blue-500 transition-colors" style={{ color: 'var(--text-primary)' }}>{promo.code}</h3>
                     <div className="flex items-center gap-3">
-                       <span className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest ${promo.is_active ? 'text-emerald-500' : 'text-gray-400'}`}>
+                       <span className={`flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest ${promo.is_active ? 'text-emerald-500' : 'text-slate-500'}`}>
                           <div className={`w-2 h-2 rounded-full ${promo.is_active ? 'bg-emerald-500 animate-pulse' : 'bg-gray-300'}`}></div>
                           {promo.is_active ? 'Active Now' : 'Disabled'}
                        </span>
@@ -231,7 +231,7 @@ const AdminPromoCodes = () => {
                     <span>INITIALIZE NODE</span>
                   </>}
                 </button>
-                <p className="text-[8px] text-center font-bold text-gray-400 uppercase tracking-widest mt-6">Secure Transaction • Logged as System Admin</p>
+                <p className="text-[8px] text-center font-bold text-slate-500 uppercase tracking-widest mt-6">Secure Transaction • Logged as System Admin</p>
               </div>
             </form>
           </div>

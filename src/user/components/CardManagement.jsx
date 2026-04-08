@@ -10,7 +10,7 @@ const CardManagement = ({ onBack }) => {
 
   return (
     <div className="min-h-screen bg-white animate-fade-in pb-24">
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-xl">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-slate-900 shadow-xl">
         <div className="max-w-7xl mx-auto px-6 py-12">
           <button onClick={onBack} className="mb-8 p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/10">
             <ArrowLeft className="w-6 h-6" />
@@ -41,7 +41,7 @@ const CardManagement = ({ onBack }) => {
 
           <button 
             onClick={() => setShowAddModal(true)}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-100"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-slate-900 py-5 rounded-2xl font-black text-lg transition-all flex items-center justify-center gap-3 shadow-xl shadow-blue-100"
           >
             <Plus className="w-6 h-6" />
             <span>Add New Card</span>
@@ -55,21 +55,21 @@ const CardManagement = ({ onBack }) => {
               <h2 className="text-2xl font-black mb-6 tracking-tight">Add New Card</h2>
               <div className="space-y-6">
                  <div>
-                    <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest block mb-2 px-1">Card Number</label>
+                    <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest block mb-2 px-1">Card Number</label>
                     <input type="text" placeholder="0000 0000 0000 0000" className="w-full p-4 bg-gray-50 border-2 border-transparent focus:border-blue-100 rounded-2xl outline-none font-bold" />
                  </div>
                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                       <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest block mb-2 px-1">Expiry</label>
+                       <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest block mb-2 px-1">Expiry</label>
                        <input type="text" placeholder="MM/YY" className="w-full p-4 bg-gray-50 border-2 border-transparent focus:border-blue-100 rounded-2xl outline-none font-bold" />
                     </div>
                     <div>
-                       <label className="text-[10px] font-black uppercase text-gray-400 tracking-widest block mb-2 px-1">CVV</label>
+                       <label className="text-[10px] font-black uppercase text-slate-500 tracking-widest block mb-2 px-1">CVV</label>
                        <input type="text" placeholder="***" className="w-full p-4 bg-gray-50 border-2 border-transparent focus:border-blue-100 rounded-2xl outline-none font-bold" />
                     </div>
                  </div>
-                 <button onClick={() => setShowAddModal(false)} className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-100">Save Card</button>
-                 <button onClick={() => setShowAddModal(false)} className="w-full text-gray-400 font-bold">Cancel</button>
+                 <button onClick={() => setShowAddModal(false)} className="w-full bg-blue-600 text-slate-900 py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-100">Save Card</button>
+                 <button onClick={() => setShowAddModal(false)} className="w-full text-slate-500 font-bold">Cancel</button>
               </div>
            </div>
         </div>

@@ -4,7 +4,7 @@ import SharedFooterLayout from "../components/SharedFooterLayout";
 const TermsOfService = () => {
   return (
     <SharedFooterLayout title="Terms of Service">
-      <p className="mb-8 text-sm text-gray-400 uppercase font-black tracking-widest">Last Updated: February 2024</p>
+      <p className="mb-8 text-sm text-slate-500 uppercase font-black tracking-widest">Last Updated: February 2024</p>
       
       <h2 className="text-2xl font-black text-gray-900 mb-4 uppercase tracking-tight">1. Acceptance of Terms</h2>
       <p className="mb-8">

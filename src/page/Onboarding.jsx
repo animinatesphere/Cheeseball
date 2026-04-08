@@ -34,7 +34,7 @@ const Onboarding = () => {
               Join thousands of users trading on Cheeseball today.
             </p>
             <Link to="/welcome" className="w-full sm:w-auto">
-              <button className="bg-[#0063BF] hover:bg-blue-700 text-white px-12 py-4 rounded-full font-bold text-lg shadow-xl shadow-blue-200 transition-all hover:scale-105 active:scale-95 op">
+              <button className="bg-[#0063BF] hover:bg-blue-700 text-slate-900 px-12 py-4 rounded-full font-bold text-lg shadow-xl shadow-blue-200 transition-all hover:scale-105 active:scale-95 op">
                 Get started
               </button>
             </Link>

@@ -23,19 +23,19 @@ const AdminSupportSettings = ({ onBack, onSave }) => {
 
         <div className="bg-white border-2 border-gray-50 rounded-[2.5rem] p-8 sm:p-10 shadow-sm space-y-8">
            <section>
-              <label className="block text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] ml-2 mb-4">Official Escalation Channel</label>
+              <label className="block text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] ml-2 mb-4">Official Escalation Channel</label>
               <div className="relative group">
                 <input
                   type="email"
                   defaultValue="customersupport@loopay.com"
                   className="w-full pl-14 pr-6 py-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-blue-100 outline-none transition-all font-black text-gray-900 shadow-inner"
                 />
-                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-500 group-focus-within:text-blue-600 transition-colors" />
               </div>
            </section>
 
            <section>
-              <label className="block text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] ml-2 mb-4">Immediate Response Hotline</label>
+              <label className="block text-[10px] font-black uppercase text-slate-500 tracking-[0.2em] ml-2 mb-4">Immediate Response Hotline</label>
               <div className="flex flex-col sm:flex-row gap-4">
                  <div className="w-full sm:w-32">
                     <select className="w-full px-5 py-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-blue-100 outline-none transition-all font-black text-gray-900 shadow-inner appearance-none text-center">
@@ -50,14 +50,14 @@ const AdminSupportSettings = ({ onBack, onSave }) => {
                       defaultValue="9012456789"
                       className="w-full pl-14 pr-6 py-5 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-blue-100 outline-none transition-all font-black text-gray-900 shadow-inner"
                     />
-                    <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                    <Phone className="absolute left-5 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-500 group-focus-within:text-blue-600 transition-colors" />
                  </div>
               </div>
            </section>
 
            <button
               onClick={onSave}
-              className="w-full mt-4 bg-blue-600 text-white py-6 rounded-3xl font-black text-xl shadow-2xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-[0.98]"
+              className="w-full mt-4 bg-blue-600 text-slate-900 py-6 rounded-3xl font-black text-xl shadow-2xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-[0.98]"
            >
               Update Security Matrix
            </button>

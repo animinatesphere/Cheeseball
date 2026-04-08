@@ -94,19 +94,19 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0B0E11]">
-        <div className="w-12 h-12 border-4 border-[#FFB11A]/20 border-t-[#FFB11A] rounded-full animate-spin"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[#ffffff]">
+        <div className="w-12 h-12 border-4 border-[#2563eb]/20 border-t-[#2563eb] rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0E11] text-[#EAECEF] selection:bg-[#FFB11A]/30 pb-32">
+    <div className="min-h-screen bg-[#ffffff] text-slate-800 selection:bg-[#2563eb]/30 pb-32">
       
       {/* 1. Bybit-style Announcement Bar */}
-      <div className="bg-[#181A20] py-2 px-4 border-b border-white/5 overflow-hidden">
+      <div className="bg-[#f8f9fa] py-2 px-4 border-b border-white/5 overflow-hidden">
         <div className="max-w-7xl mx-auto flex items-center gap-3">
-          <Megaphone className="w-4 h-4 text-[#FFB11A] shrink-0" />
+          <Megaphone className="w-4 h-4 text-[#2563eb] shrink-0" />
           <div className="relative h-5 flex-1 overflow-hidden">
             {news.map((item, i) => (
               <div
@@ -114,7 +114,7 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
                 className={`absolute inset-0 transition-transform duration-500 ease-in-out flex items-center`}
                 style={{ transform: `translateY(${(i - newsIndex) * 100}%)` }}
               >
-                <span className="text-xs font-medium text-gray-400 truncate">{item}</span>
+                <span className="text-xs font-medium text-slate-500 truncate">{item}</span>
               </div>
             ))}
           </div>
@@ -125,25 +125,25 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
       {/* 2. Premium Promo Banners (CSS Gradients) */}
       <div className="px-4 pt-6 pb-2 overflow-x-auto no-scrollbar">
         <div className="max-w-7xl mx-auto flex gap-4 min-w-max">
-          <div onClick={() => onNavigate('buy')} className="w-[300px] h-40 rounded-2xl p-6 relative overflow-hidden group cursor-pointer bg-gradient-to-br from-[#1E2329] to-[#0B0E11] border border-white/5">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#FFB11A]/10 rounded-full blur-2xl -mr-12 -mt-12"></div>
+          <div onClick={() => onNavigate('buy')} className="w-[300px] h-40 rounded-2xl p-6 relative overflow-hidden group cursor-pointer bg-gradient-to-br from-[#f1f3f5] to-[#ffffff] border border-white/5">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-[#2563eb]/10 rounded-full blur-2xl -mr-12 -mt-12"></div>
             <div className="relative z-10 h-full flex flex-col justify-between">
               <div>
-                <h4 className="text-xl font-black leading-tight text-white italic">Double Your<br/>Rewards</h4>
-                <p className="text-[10px] uppercase font-black text-[#FFB11A] mt-2 tracking-widest">Launchpad Live</p>
+                <h4 className="text-xl font-black leading-tight text-slate-900 italic">Double Your<br/>Rewards</h4>
+                <p className="text-[10px] uppercase font-black text-[#2563eb] mt-2 tracking-widest">Launchpad Live</p>
               </div>
-              <button className="bg-[#FFB11A] text-black text-[10px] font-black px-4 py-2 rounded-lg w-fit uppercase tracking-tighter">Participate</button>
+              <button className="bg-[#2563eb] text-black text-[10px] font-black px-4 py-2 rounded-lg w-fit uppercase tracking-tighter">Participate</button>
             </div>
-            <Coins className="absolute bottom-4 right-4 w-20 h-20 text-[#FFB11A]/10 rotate-12" />
+            <Coins className="absolute bottom-4 right-4 w-20 h-20 text-[#2563eb]/10 rotate-12" />
           </div>
 
-          <div onClick={() => onNavigate('swap')} className="w-[300px] h-40 rounded-2xl p-6 relative overflow-hidden group cursor-pointer bg-gradient-to-br from-[#2B3139] to-[#1E2329] border border-white/5">
+          <div onClick={() => onNavigate('swap')} className="w-[300px] h-40 rounded-2xl p-6 relative overflow-hidden group cursor-pointer bg-gradient-to-br from-[#e9ecef] to-[#f1f3f5] border border-white/5">
              <div className="relative z-10 h-full flex flex-col justify-between">
               <div>
-                <h4 className="text-xl font-black leading-tight text-white italic">Zero Fee<br/>Trading</h4>
+                <h4 className="text-xl font-black leading-tight text-slate-900 italic">Zero Fee<br/>Trading</h4>
                 <p className="text-[10px] uppercase font-black text-blue-400 mt-2 tracking-widest">Limited Offer</p>
               </div>
-              <button className="bg-white/10 backdrop-blur-md text-white border border-white/10 text-[10px] font-black px-4 py-2 rounded-lg w-fit uppercase tracking-tighter">Trade Now</button>
+              <button className="bg-white/10 backdrop-blur-md text-slate-900 border border-white/10 text-[10px] font-black px-4 py-2 rounded-lg w-fit uppercase tracking-tighter">Trade Now</button>
             </div>
             <Zap className="absolute bottom-4 right-4 w-20 h-20 text-blue-500/10 -rotate-12" />
           </div>
@@ -151,7 +151,7 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
           <div onClick={() => onNavigate('support')} className="w-[300px] h-40 rounded-2xl p-6 relative overflow-hidden group cursor-pointer bg-[#000000] border border-white/5">
              <div className="relative z-10 h-full flex flex-col justify-between">
               <div>
-                <h4 className="text-xl font-black leading-tight text-white italic">Invite &<br/>Earn $50</h4>
+                <h4 className="text-xl font-black leading-tight text-slate-900 italic">Invite &<br/>Earn $50</h4>
                 <p className="text-[10px] uppercase font-black text-emerald-400 mt-2 tracking-widest">Referral Hub</p>
               </div>
               <button className="bg-emerald-500 text-black text-[10px] font-black px-4 py-2 rounded-lg w-fit uppercase tracking-tighter">Copy Link</button>
@@ -165,7 +165,7 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
       <div className="px-4 py-8">
         <div className="max-w-7xl mx-auto grid grid-cols-4 sm:grid-cols-5 gap-y-8 gap-x-2">
           {[
-            { label: "Deposit", icon: LayoutGrid, color: "text-[#FFB11A]", bg: "bg-[#FFB11A]/10", page: "buy" },
+            { label: "Deposit", icon: LayoutGrid, color: "text-[#2563eb]", bg: "bg-[#2563eb]/10", page: "buy" },
             { label: "Buy Crypto", icon: CreditCard, color: "text-blue-400", bg: "bg-blue-400/10", page: "buy" },
             { label: "P2P Trading", icon: Users, color: "text-purple-400", bg: "bg-purple-400/10", page: "buy" },
             { label: "Convert", icon: Repeat, color: "text-pink-400", bg: "bg-pink-400/10", page: "swap" },
@@ -175,7 +175,7 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
               <div className={`w-12 h-12 ${action.bg} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
                 <action.icon className={`w-6 h-6 ${action.color}`} />
               </div>
-              <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter group-hover:text-white transition-colors">{action.label}</span>
+              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter group-hover:text-slate-900 transition-colors">{action.label}</span>
             </button>
           ))}
         </div>
@@ -194,12 +194,12 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`px-6 py-4 text-sm font-black uppercase tracking-widest relative transition-colors whitespace-nowrap ${
-                activeTab === tab.id ? "text-[#FFB11A]" : "text-gray-500 hover:text-gray-300"
+                activeTab === tab.id ? "text-[#2563eb]" : "text-gray-500 hover:text-slate-600"
               }`}
             >
               {tab.label}
               {activeTab === tab.id && (
-                <div className="absolute bottom-0 left-6 right-6 h-0.5 bg-[#FFB11A] shadow-[0_0_8px_rgba(255,177,26,0.5)]"></div>
+                <div className="absolute bottom-0 left-6 right-6 h-0.5 bg-[#2563eb] shadow-[0_0_8px_rgba(255,177,26,0.5)]"></div>
               )}
             </button>
           ))}
@@ -207,13 +207,13 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
 
         {/* 5. Asset Search */}
         <div className="mb-8 px-2 relative group">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-[#FFB11A] transition-colors" />
+          <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-[#2563eb] transition-colors" />
           <input
             type="text"
             placeholder="Search Coin"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-[#1e2329]/50 border border-transparent focus:border-[#FFB11A]/30 focus:bg-[#1e2329] py-3 pl-12 pr-6 rounded-xl text-sm font-bold outline-none transition-all"
+            className="w-full bg-[#f1f3f5]/50 border border-transparent focus:border-[#2563eb]/30 focus:bg-[#f1f3f5] py-3 pl-12 pr-6 rounded-xl text-sm font-bold outline-none transition-all"
           />
         </div>
 
@@ -233,17 +233,17 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
               className="flex items-center px-4 py-5 hover:bg-white/[0.02] active:bg-white/[0.04] transition-colors cursor-pointer group rounded-xl"
             >
               <div className="w-[45%] flex items-center gap-3">
-                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white font-black shadow-lg shadow-black/40 overflow-hidden ${currency.colorClass || 'bg-blue-600'}`}>
+                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-slate-900 font-black shadow-lg shadow-black/40 overflow-hidden ${currency.colorClass || 'bg-blue-600'}`}>
                     {currency.icon ? <img src={currency.icon} alt="" className="w-full h-full object-cover" /> : currency.symbol[0]}
                  </div>
                  <div className="min-w-0">
-                    <div className="text-sm font-black leading-none mb-1 text-white group-hover:text-[#FFB11A] transition-colors">{currency.symbol}</div>
+                    <div className="text-sm font-black leading-none mb-1 text-slate-900 group-hover:text-[#2563eb] transition-colors">{currency.symbol}</div>
                     <div className="text-[10px] font-bold text-gray-600 truncate">{currency.volume}</div>
                  </div>
               </div>
 
               <div className="w-[30%] text-right">
-                <div className="text-sm font-black text-white tabular-nums leading-none mb-1">{currency.price}</div>
+                <div className="text-sm font-black text-slate-900 tabular-nums leading-none mb-1">{currency.price}</div>
                 <div className="text-[10px] font-bold text-gray-600">≈ $...</div>
               </div>
 

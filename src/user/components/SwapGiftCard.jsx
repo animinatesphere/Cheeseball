@@ -91,7 +91,7 @@ const SwapGiftCard = ({ onBack, onSwap, onNavigate }) => {
         <div className="max-w-3xl mx-auto card rounded-[2rem] sm:rounded-[3rem] p-6 sm:p-10 relative overflow-hidden group">
           <div className="space-y-8 relative z-10">
             <div>
-              <label className="text-gray-400 font-black uppercase text-xs tracking-widest mb-4 block px-2">Gift Card Type</label>
+              <label className="text-slate-500 font-black uppercase text-xs tracking-widest mb-4 block px-2">Gift Card Type</label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {giftCards.map((card) => (
                   <button
@@ -99,7 +99,7 @@ const SwapGiftCard = ({ onBack, onSwap, onNavigate }) => {
                     onClick={() => setSelectedCard(card.id)}
                     className={`p-6 rounded-2xl border-2 transition-all flex flex-col items-center gap-3 group/card ${
                       selectedCard === card.id 
-                      ? "bg-blue-600 border-blue-600 text-white shadow-xl translate-y-[-4px]" 
+                      ? "bg-blue-600 border-blue-600 text-slate-900 shadow-xl translate-y-[-4px]" 
                       : "bg-white border-transparent hover:border-blue-100 text-gray-900"
                     }`}
                   >
@@ -114,7 +114,7 @@ const SwapGiftCard = ({ onBack, onSwap, onNavigate }) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                <div className="space-y-4">
-                  <label className="text-gray-400 font-black uppercase text-xs tracking-widest px-2 block">Amount (USD)</label>
+                  <label className="text-slate-500 font-black uppercase text-xs tracking-widest px-2 block">Amount (USD)</label>
                   <input
                     type="number"
                     placeholder="0.00"
@@ -124,7 +124,7 @@ const SwapGiftCard = ({ onBack, onSwap, onNavigate }) => {
                   />
                </div>
                <div className="space-y-4">
-                  <label className="text-gray-400 font-black uppercase text-xs tracking-widest px-2 block">You Get (NGN)</label>
+                  <label className="text-slate-500 font-black uppercase text-xs tracking-widest px-2 block">You Get (NGN)</label>
                   <div className="w-full px-8 py-6 bg-white rounded-2xl border-2 border-transparent text-xl font-black text-blue-600 shadow-inner flex items-center justify-between">
                      <span>{receiveAmount || '0.00'}</span>
                      <span className="text-xs text-blue-300 font-black uppercase tracking-widest">NGN</span>
@@ -135,7 +135,7 @@ const SwapGiftCard = ({ onBack, onSwap, onNavigate }) => {
             {/* Promo Code Card */}
             <div>
               <div className="flex justify-between items-center mb-4 px-2">
-                <label className="text-gray-400 font-black uppercase text-xs tracking-widest block">Promo Code</label>
+                <label className="text-slate-500 font-black uppercase text-xs tracking-widest block">Promo Code</label>
               </div>
               <div className="bg-white p-6 rounded-2xl border-2 border-transparent focus-within:border-blue-100 transition-all shadow-sm">
                 <div className="flex items-center gap-4">
@@ -152,7 +152,7 @@ const SwapGiftCard = ({ onBack, onSwap, onNavigate }) => {
                    <button 
                      onClick={handleApplyPromo}
                      disabled={promoLoading || !promoCode}
-                     className="px-6 py-3 bg-gray-900 text-white rounded-xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all disabled:opacity-50"
+                     className="px-6 py-3 bg-gray-900 text-slate-900 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all disabled:opacity-50"
                    >
                      {promoLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Apply"}
                    </button>
@@ -179,7 +179,7 @@ const SwapGiftCard = ({ onBack, onSwap, onNavigate }) => {
               });
             }}
             disabled={!selectedCard || !amount}
-            className="w-full mt-10 bg-[#0063BF] hover:bg-blue-700 text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl transition-all flex items-center justify-center gap-4 group disabled:opacity-50"
+            className="w-full mt-10 bg-[#0063BF] hover:bg-blue-700 text-slate-900 py-6 rounded-[2rem] font-black text-xl shadow-2xl transition-all flex items-center justify-center gap-4 group disabled:opacity-50"
           >
             <span>Preview Swap</span>
             <ArrowLeft className="w-6 h-6 rotate-180 group-hover:translate-x-2 transition-transform" />

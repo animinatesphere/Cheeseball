@@ -39,7 +39,7 @@ const AdminIncome = ({ onBack, onSelectTransaction }) => {
       <AdminAccountHeader title="Revenue Stream" onBack={onBack} />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-[2.5rem] p-8 sm:p-10 text-white shadow-2xl shadow-blue-100 mb-12 relative overflow-hidden group">
+        <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-[2.5rem] p-8 sm:p-10 text-slate-900 shadow-2xl shadow-blue-100 mb-12 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 transform group-hover:scale-110 transition-transform duration-700"></div>
           <div className="relative z-10">
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-200 mb-2">Aggregate Earnings</p>
@@ -50,7 +50,7 @@ const AdminIncome = ({ onBack, onSelectTransaction }) => {
             
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 pt-8 border-t border-white/10">
               <div className="text-blue-100 font-bold">
-                Pending Settlement: <span className="text-white font-black ml-2 tabular-nums">₦ 2,859.87</span>
+                Pending Settlement: <span className="text-slate-900 font-black ml-2 tabular-nums">₦ 2,859.87</span>
               </div>
               <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full backdrop-blur-md">
                 <div className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div>
@@ -64,7 +64,7 @@ const AdminIncome = ({ onBack, onSelectTransaction }) => {
 
         <div className="flex justify-between items-center mb-8 px-2">
           <h2 className="text-xl font-black text-gray-900 tracking-tight">Recent Influx</h2>
-          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1.5 rounded-full">This Month</span>
+          <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest bg-gray-50 px-3 py-1.5 rounded-full">This Month</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -86,14 +86,14 @@ const AdminIncome = ({ onBack, onSelectTransaction }) => {
               </div>
               <button
                 onClick={() => onSelectTransaction(transaction)}
-                className="bg-blue-600 text-white px-6 py-2.5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95"
+                className="bg-blue-600 text-slate-900 px-6 py-2.5 rounded-xl font-black uppercase text-[10px] tracking-widest shadow-lg shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95"
               >
                 Inspect
               </button>
             </div>
           ))}
           {transactions.length === 0 && (
-             <div className="col-span-full text-center py-12 text-gray-400 font-bold">
+             <div className="col-span-full text-center py-12 text-slate-500 font-bold">
                 No revenue logs recorded.
              </div>
           )}
