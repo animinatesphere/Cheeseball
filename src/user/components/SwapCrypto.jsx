@@ -146,7 +146,7 @@ const SwapCrypto = ({ onBack, onSwap, onNavigate }) => {
               </div>
 
               <div className="flex justify-center -my-10 relative z-20">
-                 <button className="w-12 h-12 bg-[#2563eb] text-black border-4 border-[#ffffff] rounded-2xl flex items-center justify-center hover:rotate-180 active:scale-90 transition-all duration-500 shadow-2xl">
+                 <button className="w-12 h-12 bg-blue-600 text-white border-4 border-white rounded-2xl flex items-center justify-center hover:rotate-180 active:scale-90 transition-all duration-500 shadow-xl shadow-blue-500/20">
                     <Repeat className="w-6 h-6" />
                  </button>
               </div>
@@ -205,7 +205,7 @@ const SwapCrypto = ({ onBack, onSwap, onNavigate }) => {
                   });
                 }}
                 disabled={!fromAmount || parseFloat(fromAmount) === 0}
-                className="w-full bg-[#2563eb] hover:bg-[#2563eb]/90 text-black py-6 rounded-[2rem] font-black text-xl shadow-2xl transition-all flex items-center justify-center gap-4 group disabled:opacity-30 active:scale-95"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-6 rounded-[2rem] font-black text-xl shadow-2xl shadow-blue-500/20 transition-all flex items-center justify-center gap-4 group disabled:opacity-30 active:scale-95"
               >
                 <span>Convert Now</span>
                 <ChevronRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
