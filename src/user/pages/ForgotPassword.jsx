@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabaseClient";
 import logo from "../../assets/CHEESEBALL 1.png";
+import authService from "../../lib/authService";
 import {
   ArrowRight,
   ArrowLeft,
@@ -22,49 +23,40 @@ const EmailStep = ({ onNext, loading, setLoading, setToast }) => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + "/forgot-password",
-    });
-
-    if (error) {
-      const raw = error.message?.toLowerCase() || "";
-      const msg = raw.includes("rate limit") || raw.includes("too many")
-        ? "You've sent too many requests. Please wait a minute and try again."
-        : raw.includes("invalid email") || raw.includes("unable to validate")
-        ? "That doesn't look like a valid email address. Please check it."
-        : "We couldn't send the code right now. Please try again in a moment.";
-      setToast({ message: msg, type: "error" });
-    } else {
+    try {
+      await authService.forgotPassword(email);
       setToast({ message: "Done! Check your inbox — we've sent a 6-digit reset code to your email.", type: "success" });
       onNext(email);
+    } catch (err) {
+      setToast({ message: err.message || "Failed to send reset code. Please try again.", type: "error" });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="text-center mb-10">
-        <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-2">
+        <h2 className="text-2xl font-black tracking-tight mb-2" style={{ color: "var(--text-primary)" }}>
           Forgot Password?
         </h2>
-        <p className="text-gray-500 text-sm font-medium">
+        <p className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>
           Enter your email and we'll send you a 6-digit reset code.
         </p>
       </div>
 
       <div className="relative group">
-        <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 px-1">
+        <label className="block text-[10px] font-black uppercase tracking-widest mb-2 px-1" style={{ color: "var(--text-muted)" }}>
           Email Address
         </label>
-        <div className="relative">
-          <Mail className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+        <div className="relative glow-ring rounded-xl">
           <input
             type="email"
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="your@email.com"
-            className="w-full bg-gray-50 hover:bg-gray-100 focus:bg-white border-2 border-gray-100 focus:border-blue-500 rounded-xl py-4 px-5 pl-14 font-medium text-gray-900 placeholder-gray-400 transition-all outline-none focus:shadow-lg focus:shadow-blue-200/50"
+            className="input-field"
           />
         </div>
       </div>
@@ -72,7 +64,7 @@ const EmailStep = ({ onNext, loading, setLoading, setToast }) => {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-200 transition-all transform active:scale-95 flex items-center justify-center gap-3 group"
+        className="btn-primary w-full py-4 text-base flex items-center justify-center gap-3 group"
       >
         {loading ? (
           <Loader2 className="w-6 h-6 animate-spin" />
@@ -136,20 +128,15 @@ const OTPStep = ({ email, onNext, onBack, loading, setLoading, setToast }) => {
   const handleResend = async () => {
     if (countdown > 0 || loading) return;
     setLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + "/forgot-password",
-    });
-    if (error) {
-      const raw = error.message?.toLowerCase() || "";
-      const msg = raw.includes("rate limit") || raw.includes("too many")
-        ? "You've sent too many requests. Please wait a minute before trying again."
-        : "We had trouble sending the code. Please try again.";
-      setToast({ message: msg, type: "error" });
-    } else {
+    try {
+      await authService.resendOTP(email);
       setToast({ message: "New code sent! Check your inbox.", type: "success" });
       setCountdown(60);
+    } catch (err) {
+      setToast({ message: err.message || "Failed to resend code. Please try again.", type: "error" });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleVerify = async () => {
@@ -160,47 +147,33 @@ const OTPStep = ({ email, onNext, onBack, loading, setLoading, setToast }) => {
     }
     setLoading(true);
 
-    const { error } = await supabase.auth.verifyOtp({
-      email,
-      token,
-      type: "recovery",
-    });
-
-    if (error) {
-      const msg = error.message?.toLowerCase() || "";
-      setToast({
-        message: msg.includes("expired")
-          ? "That code has expired. Tap 'Resend Code' to get a fresh one."
-          : msg.includes("invalid") || msg.includes("incorrect")
-          ? "That code doesn't look right. Please check it and try again."
-          : msg.includes("rate limit") || msg.includes("too many")
-          ? "Too many attempts. Please wait a moment before trying again."
-          : "Verification didn't work. Please try again.",
-        type: "error",
-      });
+    try {
+      await authService.verifyOTP(email, token);
+      setToast({ message: "Code verified! Now let's set your new password.", type: "success" });
+      onNext(token);
+    } catch (err) {
+      setToast({ message: err.message || "Verification failed. Please try again.", type: "error" });
       setDigits(["", "", "", "", "", ""]);
       inputRefs.current[0]?.focus();
-    } else {
-      setToast({ message: "Code verified! Now let's set your new password.", type: "success" });
-      onNext();
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
     <div className="space-y-6">
       <div className="text-center mb-10">
-        <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-2">
+        <h2 className="text-2xl font-black tracking-tight mb-2" style={{ color: "var(--text-primary)" }}>
           Enter Reset Code
         </h2>
-        <p className="text-gray-500 text-sm font-medium">
+        <p className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>
           We sent a 6-digit code to{" "}
-          <span className="text-blue-600 font-bold break-all">{email}</span>
+          <span className="text-blue-400 font-bold break-all">{email}</span>
         </p>
       </div>
 
       {/* 6 digit boxes */}
-      <div className="flex gap-3 justify-center" onPaste={handlePaste}>
+      <div className="flex gap-2 justify-center" onPaste={handlePaste}>
         {digits.map((digit, i) => (
           <input
             key={i}
@@ -211,9 +184,9 @@ const OTPStep = ({ email, onNext, onBack, loading, setLoading, setToast }) => {
             value={digit}
             onChange={(e) => handleChange(i, e.target.value)}
             onKeyDown={(e) => handleKeyDown(i, e)}
-            className={`w-12 h-14 text-center text-2xl font-black rounded-xl border-2 outline-none transition-all
-              ${digit ? "border-blue-500 bg-blue-50 text-blue-700" : "border-gray-200 bg-gray-50 text-gray-900"}
-              focus:border-blue-500 focus:bg-white focus:shadow-lg focus:shadow-blue-200/50`}
+            className={`w-11 h-14 text-center text-2xl font-black rounded-xl border-2 outline-none transition-all
+              ${digit ? "border-blue-500 bg-blue-500/10 text-blue-400" : "border-white/10 bg-white/5 text-white"}
+              focus:border-blue-500 focus:bg-white/10 focus:shadow-lg focus:shadow-blue-500/20`}
           />
         ))}
       </div>
@@ -224,16 +197,16 @@ const OTPStep = ({ email, onNext, onBack, loading, setLoading, setToast }) => {
           type="button"
           onClick={handleResend}
           disabled={loading || countdown > 0}
-          className={`text-sm font-bold transition-all ${
+          className={`text-xs font-bold transition-all ${
             loading || countdown > 0
-              ? "text-gray-300 cursor-not-allowed"
-              : "text-blue-600 hover:text-blue-700"
+              ? "opacity-30 cursor-not-allowed"
+              : "text-blue-400 hover:text-blue-300"
           }`}
         >
           {loading ? "Sending..." : "Resend Code"}
         </button>
         {countdown > 0 && (
-          <span className="text-gray-400 text-sm font-bold tabular-nums">
+          <span className="text-[10px] font-black uppercase tracking-widest tabular-nums" style={{ color: "var(--text-muted)" }}>
             {countdown}s
           </span>
         )}
@@ -243,7 +216,7 @@ const OTPStep = ({ email, onNext, onBack, loading, setLoading, setToast }) => {
         type="button"
         onClick={handleVerify}
         disabled={loading || digits.join("").length < 6}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-200 transition-all transform active:scale-95 flex items-center justify-center gap-3 group"
+        className="btn-primary w-full py-4 text-base flex items-center justify-center gap-3 group"
       >
         {loading ? (
           <Loader2 className="w-6 h-6 animate-spin" />
@@ -258,7 +231,8 @@ const OTPStep = ({ email, onNext, onBack, loading, setLoading, setToast }) => {
       <button
         type="button"
         onClick={onBack}
-        className="w-full text-gray-400 hover:text-gray-600 text-sm font-bold transition-colors"
+        className="w-full text-xs font-bold transition-colors"
+        style={{ color: "var(--text-muted)" }}
       >
         Use a different email
       </button>
@@ -267,7 +241,7 @@ const OTPStep = ({ email, onNext, onBack, loading, setLoading, setToast }) => {
 };
 
 // Step 3: New Password Entry
-const NewPasswordStep = ({ onDone, loading, setLoading, setToast }) => {
+const NewPasswordStep = ({ email, token, onDone, loading, setLoading, setToast }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -286,46 +260,51 @@ const NewPasswordStep = ({ onDone, loading, setLoading, setToast }) => {
     }
 
     setLoading(true);
-    const { error } = await supabase.auth.updateUser({ password });
-
-    if (error) {
-      setToast({ message: "We couldn't update your password. Please go back and try the reset process again.", type: "error" });
-    } else {
+    try {
+      await authService.resetPassword({
+        email,
+        token,
+        password,
+        confirm_password: confirmPassword
+      });
       onDone();
+    } catch (err) {
+      setToast({ message: err.message || "We couldn't update your password. Please try again.", type: "error" });
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="text-center mb-10">
-        <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-2">
+        <h2 className="text-2xl font-black tracking-tight mb-2" style={{ color: "var(--text-primary)" }}>
           Set New Password
         </h2>
-        <p className="text-gray-500 text-sm font-medium">
+        <p className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>
           Choose a strong password for your account.
         </p>
       </div>
 
       {/* New Password */}
       <div className="relative group">
-        <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 px-1">
+        <label className="block text-[10px] font-black uppercase tracking-widest mb-2 px-1" style={{ color: "var(--text-muted)" }}>
           New Password
         </label>
-        <div className="relative">
-          <KeyRound className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+        <div className="relative glow-ring rounded-xl">
           <input
             type={showPassword ? "text" : "password"}
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="At least 6 characters"
-            className="w-full bg-gray-50 hover:bg-gray-100 focus:bg-white border-2 border-gray-100 focus:border-blue-500 rounded-xl py-4 px-5 pl-14 pr-14 font-medium text-gray-900 placeholder-gray-400 transition-all outline-none focus:shadow-lg focus:shadow-blue-200/50"
+            className="input-field pr-14"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
+            className="absolute right-5 top-1/2 -translate-y-1/2 hover:text-blue-400 transition-colors"
+            style={{ color: "var(--text-muted)" }}
           >
             {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </button>
@@ -334,23 +313,23 @@ const NewPasswordStep = ({ onDone, loading, setLoading, setToast }) => {
 
       {/* Confirm Password */}
       <div className="relative group">
-        <label className="block text-[10px] font-black uppercase text-gray-400 tracking-widest mb-2 px-1">
+        <label className="block text-[10px] font-black uppercase tracking-widest mb-2 px-1" style={{ color: "var(--text-muted)" }}>
           Confirm Password
         </label>
-        <div className="relative">
-          <KeyRound className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+        <div className="relative glow-ring rounded-xl">
           <input
             type={showConfirm ? "text" : "password"}
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             placeholder="Re-enter new password"
-            className="w-full bg-gray-50 hover:bg-gray-100 focus:bg-white border-2 border-gray-100 focus:border-blue-500 rounded-xl py-4 px-5 pl-14 pr-14 font-medium text-gray-900 placeholder-gray-400 transition-all outline-none focus:shadow-lg focus:shadow-blue-200/50"
+            className="input-field pr-14"
           />
           <button
             type="button"
             onClick={() => setShowConfirm(!showConfirm)}
-            className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
+            className="absolute right-5 top-1/2 -translate-y-1/2 hover:text-blue-400 transition-colors"
+            style={{ color: "var(--text-muted)" }}
           >
             {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
           </button>
@@ -360,7 +339,7 @@ const NewPasswordStep = ({ onDone, loading, setLoading, setToast }) => {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-200 transition-all transform active:scale-95 flex items-center justify-center gap-3 group"
+        className="btn-primary w-full py-4 text-base flex items-center justify-center gap-3 group"
       >
         {loading ? (
           <Loader2 className="w-6 h-6 animate-spin" />
@@ -384,16 +363,16 @@ const SuccessStep = ({ onLogin }) => (
       </div>
     </div>
     <div>
-      <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-2">
+      <h2 className="text-2xl font-black tracking-tight mb-2" style={{ color: "var(--text-primary)" }}>
         Password Updated!
       </h2>
-      <p className="text-gray-500 text-sm font-medium">
+      <p className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>
         Your password has been changed successfully. You can now sign in with your new password.
       </p>
     </div>
     <button
       onClick={onLogin}
-      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-blue-200 transition-all transform active:scale-95 flex items-center justify-center gap-3 group"
+      className="btn-primary w-full py-4 text-base flex items-center justify-center gap-3 group"
     >
       <span>Back to Sign In</span>
       <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -405,6 +384,7 @@ const SuccessStep = ({ onLogin }) => (
 const ForgotPassword = () => {
   const [step, setStep] = useState("email"); // email | otp | password | success
   const [email, setEmail] = useState("");
+  const [token, setToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
   const navigate = useNavigate();
@@ -413,7 +393,7 @@ const ForgotPassword = () => {
   const totalSteps = 3;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-white to-blue-50 page-container slide-in justify-center items-center py-12">
+    <div className="min-h-screen flex flex-col mesh-gradient slide-in justify-center items-center py-12 px-4 text-center">
       {toast && (
         <Toast
           message={toast.message}
@@ -422,19 +402,20 @@ const ForgotPassword = () => {
         />
       )}
 
-      <div className="max-w-md w-full bg-white p-8 sm:p-12 rounded-[2.5rem] shadow-2xl shadow-blue-100 border border-blue-50 relative overflow-hidden">
+      <div className="max-w-md w-full card p-8 sm:p-10 relative overflow-hidden text-left">
         {/* Back button */}
         {step !== "success" && (
           <button
             onClick={() => (step === "email" ? navigate("/login") : setStep("email"))}
-            className="absolute top-8 left-8 p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all group"
+            className="absolute top-6 left-6 p-2 rounded-xl transition-all group hover:bg-white/5"
+            style={{ color: "var(--text-muted)" }}
           >
             <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           </button>
         )}
 
-        {/* Abstract background */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/5 rounded-full blur-3xl" />
+        <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl"></div>
 
         <div className="relative z-10">
           <img
@@ -473,7 +454,7 @@ const ForgotPassword = () => {
           {step === "otp" && (
             <OTPStep
               email={email}
-              onNext={() => setStep("password")}
+              onNext={(t) => { setToken(t); setStep("password"); }}
               onBack={() => setStep("email")}
               loading={loading}
               setLoading={setLoading}
@@ -483,6 +464,8 @@ const ForgotPassword = () => {
 
           {step === "password" && (
             <NewPasswordStep
+              email={email}
+              token={token}
               onDone={() => setStep("success")}
               loading={loading}
               setLoading={setLoading}
@@ -495,9 +478,15 @@ const ForgotPassword = () => {
           )}
 
           {step !== "success" && (
-            <div className="mt-8 pt-8 border-t border-gray-100 text-center">
-              <p className="text-gray-400 text-[10px] font-black uppercase tracking-[0.2em]">
-                Secured by Supabase Infrastructure
+            <div
+              className="mt-8 pt-8 text-center"
+              style={{ borderTop: "1px solid var(--border-primary)" }}
+            >
+              <p
+                className="text-[10px] font-black uppercase tracking-widest"
+                style={{ color: "var(--text-muted)" }}
+              >
+                Secured by Cheeseball Infrastructure
               </p>
             </div>
           )}
