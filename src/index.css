@@ -1,5 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&family=Inter:wght@100..900&display=swap");
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');@import "tailwindcss";
 
 @theme {
   --font-heading: "Outfit", sans-serif;
@@ -22,6 +21,12 @@
   --color-accent-600: #0284c7;
 }
 
+.in{
+   font-family: "Inter", sans-serif;
+}
+.op{
+   font-family: "Open Sans", sans-serif;
+}
 /* ============================================================
    THEME VARIABLES — Dark first, light override
    ============================================================ */

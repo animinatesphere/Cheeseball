@@ -1,247 +1,129 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "../../lib/supabaseClient";
 import logo from "../../assets/CHEESEBALL 1.png";
-import authService from "../../lib/authService";
-import {
-  ArrowRight,
-  ArrowLeft,
-  Mail,
-  KeyRound,
-  Loader2,
-  Eye,
-  EyeOff,
-  CheckCircle,
-} from "lucide-react";
+import hand from "../../assets/6ea63607c4c189087888a13bff995a50efe7783e.png";
+import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import Toast from "../components/Toast";
+import authService from "../../lib/authService";
 
-// Step 1: Email Entry
-const EmailStep = ({ onNext, loading, setLoading, setToast }) => {
+/* ─────────────────────────────────────────────
+   Shared layout wrapper (left panel + right panel)
+───────────────────────────────────────────── */
+const Layout = ({ children }) => (
+  <div
+    className="flex min-h-screen w-full overflow-hidden bg-[#f5f6fa]"
+    style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif" }}
+  >
+    {/* Left blurred panel */}
+    <div className="relative hidden lg:flex w-[45%] max-w-[45%] overflow-hidden items-end shrink-0">
+      <img
+        src={hand}
+        alt="Cheeseball background"
+        className="absolute inset-0 w-full h-full object-cover blur-[3px] brightness-75 scale-105"
+      />
+      <div className="absolute inset-0 bg-linear-to-b from-[rgba(0,20,255,0.18)] to-[rgba(9,19,127,0.72)]" />
+      <div className="relative z-2 bg-[#FCFCFC3B] px-9 py-10 text-white w-full">
+        <h2
+          className="font-bold leading-tight mb-3 tracking-tight text-[18px] sm:text-[20px] md:text-[22px] lg:text-[24px] text-center"
+          style={{ textShadow: "0 2px 12px rgba(0,0,0,0.4)" }}
+        >
+          Spend crypto like cash
+        </h2>
+        <p
+          className="text-[clamp(13px,1.2vw,16px)] leading-relaxed text-white/85 text-center mx-auto"
+          style={{ textShadow: "0 1px 6px rgba(0,0,0,0.3)" }}
+        >
+          Convert crypto and use it for real-life payments instantly
+        </p>
+      </div>
+    </div>
+
+    {/* Right content panel */}
+    <div className="flex-1 overflow-y-auto flex justify-center items-center py-10 px-5 max-[480px]:py-7 max-[480px]:px-4 bg-white">
+      <div className="w-full max-w-sm">
+        <img
+          src={logo}
+          alt="Cheeseball logo"
+          className="block max-w-35 mx-auto mb-8 object-contain"
+        />
+        {children}
+      </div>
+    </div>
+  </div>
+);
+
+/* ─────────────────────────────────────────────
+   STEP 1 — Forgot Password (email entry)
+───────────────────────────────────────────── */
+const EmailStep = ({ onNext, onBack, loading, setLoading, setToast }) => {
   const [email, setEmail] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       await authService.forgotPassword(email);
-      setToast({ message: "Done! Check your inbox — we've sent a 6-digit reset code to your email.", type: "success" });
+      setToast({ message: "Reset link sent! Check your inbox.", type: "success" });
       onNext(email);
     } catch (err) {
-      setToast({ message: err.message || "Failed to send reset code. Please try again.", type: "error" });
+      setToast({ message: err.message || "Failed to send reset link. Please try again.", type: "error" });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="text-center mb-10">
-        <h2 className="text-2xl font-black tracking-tight mb-2" style={{ color: "var(--text-primary)" }}>
-          Forgot Password?
-        </h2>
-        <p className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>
-          Enter your email and we'll send you a 6-digit reset code.
-        </p>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      {/* Back + title */}
+      <div className="flex items-center gap-3 mb-1">
+        <button
+          type="button"
+          onClick={onBack}
+          className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="w-5 h-5 text-[#1e1e1e]" />
+        </button>
+        <h1 className="font-bold text-[#1e1e1e] text-[16px] sm:text-[18px]">
+          forgot password
+        </h1>
       </div>
 
-      <div className="relative group">
-        <label className="block text-[10px] font-black uppercase tracking-widest mb-2 px-1" style={{ color: "var(--text-muted)" }}>
-          Email Address
+      <p className="text-[clamp(11px,1vw,13px)] text-center text-[#636567] -mt-2 mb-2">
+        enter your email below, if there's an account associated with this email, we'll send a reset link
+      </p>
+
+      {/* Email field */}
+      <div className="flex flex-col gap-1">
+        <label className="text-[clamp(12px,1vw,14px)] font-semibold text-[#1e1e1e]">
+          Email
         </label>
-        <div className="relative glow-ring rounded-xl">
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            className="input-field"
-          />
-        </div>
+        <input
+          id="forgot-email"
+          type="email"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter email addresss"
+          className="w-full h-11 border border-[#a2a2a2] rounded-md outline-none px-3 text-[clamp(12px,1.1vw,14px)] text-[#1e1e1e] bg-[#fafafa] transition-colors focus:border-[#0014ff] focus:bg-white"
+        />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="btn-primary w-full py-4 text-base flex items-center justify-center gap-3 group"
+        className="mt-2 block w-full h-12 border-none rounded-full cursor-pointer text-[clamp(13px,1.2vw,15px)] font-semibold text-white bg-linear-to-r from-[#0014FF] to-[#09137F] transition-all hover:opacity-90 hover:-translate-y-px disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
       >
-        {loading ? (
-          <Loader2 className="w-6 h-6 animate-spin" />
-        ) : (
-          <>
-            <span>Send Reset Code</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </>
-        )}
+        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Continue"}
       </button>
     </form>
   );
 };
 
-// Step 2: 6-Digit OTP Entry
-const OTPStep = ({ email, onNext, onBack, loading, setLoading, setToast }) => {
-  const [digits, setDigits] = useState(["", "", "", "", "", ""]);
-  const [countdown, setCountdown] = useState(0);
-  const inputRefs = useRef([]);
-
-  useEffect(() => {
-    inputRefs.current[0]?.focus();
-  }, []);
-
-  useEffect(() => {
-    let id;
-    if (countdown > 0) {
-      id = setInterval(() => setCountdown((c) => c - 1), 1000);
-    }
-    return () => clearInterval(id);
-  }, [countdown]);
-
-  const handleChange = (index, value) => {
-    if (!/^\d*$/.test(value)) return;
-    const newDigits = [...digits];
-    newDigits[index] = value.slice(-1);
-    setDigits(newDigits);
-    if (value && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyDown = (index, e) => {
-    if (e.key === "Backspace" && !digits[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    }
-  };
-
-  const handlePaste = (e) => {
-    e.preventDefault();
-    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
-    const newDigits = [...digits];
-    pasted.split("").forEach((char, i) => {
-      newDigits[i] = char;
-    });
-    setDigits(newDigits);
-    const nextEmpty = newDigits.findIndex((d) => !d);
-    inputRefs.current[nextEmpty === -1 ? 5 : nextEmpty]?.focus();
-  };
-
-  const handleResend = async () => {
-    if (countdown > 0 || loading) return;
-    setLoading(true);
-    try {
-      await authService.resendOTP(email);
-      setToast({ message: "New code sent! Check your inbox.", type: "success" });
-      setCountdown(60);
-    } catch (err) {
-      setToast({ message: err.message || "Failed to resend code. Please try again.", type: "error" });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerify = async () => {
-    const token = digits.join("");
-    if (token.length < 6) {
-      setToast({ message: "Please fill in all 6 digits of your code.", type: "error" });
-      return;
-    }
-    setLoading(true);
-
-    try {
-      await authService.verifyOTP(email, token);
-      setToast({ message: "Code verified! Now let's set your new password.", type: "success" });
-      onNext(token);
-    } catch (err) {
-      setToast({ message: err.message || "Verification failed. Please try again.", type: "error" });
-      setDigits(["", "", "", "", "", ""]);
-      inputRefs.current[0]?.focus();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="space-y-6">
-      <div className="text-center mb-10">
-        <h2 className="text-2xl font-black tracking-tight mb-2" style={{ color: "var(--text-primary)" }}>
-          Enter Reset Code
-        </h2>
-        <p className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>
-          We sent a 6-digit code to{" "}
-          <span className="text-blue-400 font-bold break-all">{email}</span>
-        </p>
-      </div>
-
-      {/* 6 digit boxes */}
-      <div className="flex gap-2 justify-center" onPaste={handlePaste}>
-        {digits.map((digit, i) => (
-          <input
-            key={i}
-            ref={(el) => (inputRefs.current[i] = el)}
-            type="text"
-            inputMode="numeric"
-            maxLength={1}
-            value={digit}
-            onChange={(e) => handleChange(i, e.target.value)}
-            onKeyDown={(e) => handleKeyDown(i, e)}
-            className={`w-11 h-14 text-center text-2xl font-black rounded-xl border-2 outline-none transition-all
-              ${digit ? "border-blue-500 bg-blue-500/10 text-blue-400" : "border-white/10 bg-white/5 text-slate-900"}
-              focus:border-blue-500 focus:bg-white/10 focus:shadow-lg focus:shadow-blue-500/20`}
-          />
-        ))}
-      </div>
-
-      {/* Resend row */}
-      <div className="flex items-center justify-center gap-4">
-        <button
-          type="button"
-          onClick={handleResend}
-          disabled={loading || countdown > 0}
-          className={`text-xs font-bold transition-all ${
-            loading || countdown > 0
-              ? "opacity-30 cursor-not-allowed"
-              : "text-blue-400 hover:text-blue-300"
-          }`}
-        >
-          {loading ? "Sending..." : "Resend Code"}
-        </button>
-        {countdown > 0 && (
-          <span className="text-[10px] font-black uppercase tracking-widest tabular-nums" style={{ color: "var(--text-muted)" }}>
-            {countdown}s
-          </span>
-        )}
-      </div>
-
-      <button
-        type="button"
-        onClick={handleVerify}
-        disabled={loading || digits.join("").length < 6}
-        className="btn-primary w-full py-4 text-base flex items-center justify-center gap-3 group"
-      >
-        {loading ? (
-          <Loader2 className="w-6 h-6 animate-spin" />
-        ) : (
-          <>
-            <span>Verify Code</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </>
-        )}
-      </button>
-
-      <button
-        type="button"
-        onClick={onBack}
-        className="w-full text-xs font-bold transition-colors"
-        style={{ color: "var(--text-muted)" }}
-      >
-        Use a different email
-      </button>
-    </div>
-  );
-};
-
-// Step 3: New Password Entry
-const NewPasswordStep = ({ email, token, onDone, loading, setLoading, setToast }) => {
+/* ─────────────────────────────────────────────
+   STEP 2 — Reset Password (new password entry)
+───────────────────────────────────────────── */
+const ResetPasswordStep = ({ email, token, onDone, onBack, loading, setLoading, setToast }) => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -249,89 +131,92 @@ const NewPasswordStep = ({ email, token, onDone, loading, setLoading, setToast }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (password.length < 6) {
-      setToast({ message: "Your password needs to be at least 6 characters long.", type: "error" });
+      setToast({ message: "Password must be at least 6 characters.", type: "error" });
       return;
     }
     if (password !== confirmPassword) {
-      setToast({ message: "Those passwords don't match. Please make sure both fields are the same.", type: "error" });
+      setToast({ message: "Passwords don't match.", type: "error" });
       return;
     }
-
     setLoading(true);
     try {
-      await authService.resetPassword({
-        email,
-        token,
-        password,
-        confirm_password: confirmPassword
-      });
+      await authService.resetPassword({ email, token, password, confirm_password: confirmPassword });
       onDone();
     } catch (err) {
-      setToast({ message: err.message || "We couldn't update your password. Please try again.", type: "error" });
+      setToast({ message: err.message || "Could not update password. Please try again.", type: "error" });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="text-center mb-10">
-        <h2 className="text-2xl font-black tracking-tight mb-2" style={{ color: "var(--text-primary)" }}>
-          Set New Password
-        </h2>
-        <p className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>
-          Choose a strong password for your account.
-        </p>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+      {/* Back + title */}
+      <div className="flex items-center gap-3 mb-1">
+        <button
+          type="button"
+          onClick={onBack}
+          className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="w-5 h-5 text-[#1e1e1e]" />
+        </button>
+        <h1 className="font-bold text-[#1e1e1e] text-[16px] sm:text-[18px]">
+          Reset Password
+        </h1>
       </div>
 
-      {/* New Password */}
-      <div className="relative group">
-        <label className="block text-[10px] font-black uppercase tracking-widest mb-2 px-1" style={{ color: "var(--text-muted)" }}>
-          New Password
+      <p className="text-[clamp(11px,1vw,13px)] text-center text-[#636567] -mt-2 mb-2">
+        please enter a new password below
+      </p>
+
+      {/* Password */}
+      <div className="flex flex-col gap-1">
+        <label className="text-[clamp(12px,1vw,14px)] font-semibold text-[#1e1e1e]">
+          Password
         </label>
-        <div className="relative glow-ring rounded-xl">
+        <div className="relative">
           <input
+            id="reset-password"
             type={showPassword ? "text" : "password"}
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="At least 6 characters"
-            className="input-field pr-14"
+            placeholder="••••••••••••••"
+            className="w-full h-11 border border-[#a2a2a2] rounded-md outline-none px-3 pr-11 text-[clamp(12px,1.1vw,14px)] text-[#1e1e1e] bg-[#fafafa] transition-colors focus:border-[#0014ff] focus:bg-white"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-5 top-1/2 -translate-y-1/2 hover:text-blue-400 transition-colors"
-            style={{ color: "var(--text-muted)" }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9e9e9e] hover:text-[#1e1e1e] transition-colors"
           >
-            {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
       </div>
 
       {/* Confirm Password */}
-      <div className="relative group">
-        <label className="block text-[10px] font-black uppercase tracking-widest mb-2 px-1" style={{ color: "var(--text-muted)" }}>
+      <div className="flex flex-col gap-1">
+        <label className="text-[clamp(12px,1vw,14px)] font-semibold text-[#1e1e1e]">
           Confirm Password
         </label>
-        <div className="relative glow-ring rounded-xl">
+        <div className="relative">
           <input
+            id="reset-confirm-password"
             type={showConfirm ? "text" : "password"}
             required
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Re-enter new password"
-            className="input-field pr-14"
+            placeholder="••••••••••••••"
+            className="w-full h-11 border border-[#a2a2a2] rounded-md outline-none px-3 pr-11 text-[clamp(12px,1.1vw,14px)] text-[#1e1e1e] bg-[#fafafa] transition-colors focus:border-[#0014ff] focus:bg-white"
           />
           <button
             type="button"
             onClick={() => setShowConfirm(!showConfirm)}
-            className="absolute right-5 top-1/2 -translate-y-1/2 hover:text-blue-400 transition-colors"
-            style={{ color: "var(--text-muted)" }}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9e9e9e] hover:text-[#1e1e1e] transition-colors"
           >
-            {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+            {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
       </div>
@@ -339,61 +224,77 @@ const NewPasswordStep = ({ email, token, onDone, loading, setLoading, setToast }
       <button
         type="submit"
         disabled={loading}
-        className="btn-primary w-full py-4 text-base flex items-center justify-center gap-3 group"
+        className="mt-2 block w-full h-12 border-none rounded-full cursor-pointer text-[clamp(13px,1.2vw,15px)] font-semibold text-white bg-linear-to-r from-[#0014FF] to-[#09137F] transition-all hover:opacity-90 hover:-translate-y-px disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
       >
-        {loading ? (
-          <Loader2 className="w-6 h-6 animate-spin" />
-        ) : (
-          <>
-            <span>Update Password</span>
-            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-          </>
-        )}
+        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Continue"}
       </button>
     </form>
   );
 };
 
-// Step 4: Success screen
+/* ─────────────────────────────────────────────
+   STEP 3 — Password Reset Successful
+───────────────────────────────────────────── */
 const SuccessStep = ({ onLogin }) => (
-  <div className="text-center space-y-6 py-4">
-    <div className="flex justify-center">
-      <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center shadow-lg shadow-green-100">
-        <CheckCircle className="w-10 h-10 text-green-500" />
-      </div>
+  <div className="flex flex-col items-center text-center gap-5">
+    {/* Lock icon */}
+    <div className="mt-4 mb-2">
+      <svg width="80" height="90" viewBox="0 0 80 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="lockGrad" x1="0" y1="0" x2="80" y2="90" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#38BDF8" />
+            <stop offset="100%" stopColor="#1D3FC4" />
+          </linearGradient>
+        </defs>
+        {/* Shackle */}
+        <path
+          d="M24 38 V26 C24 13.85 56 13.85 56 26 V38"
+          stroke="url(#lockGrad)"
+          strokeWidth="7"
+          strokeLinecap="round"
+          fill="none"
+        />
+        {/* Body */}
+        <rect x="10" y="36" width="60" height="46" rx="8" fill="url(#lockGrad)" />
+        {/* Keyhole */}
+        <circle cx="40" cy="57" r="7" fill="white" opacity="0.9" />
+        <rect x="37" y="60" width="6" height="10" rx="3" fill="white" opacity="0.9" />
+      </svg>
     </div>
+
     <div>
-      <h2 className="text-2xl font-black tracking-tight mb-2" style={{ color: "var(--text-primary)" }}>
-        Password Updated!
+      <h2 className="text-[20px] font-bold text-[#1e1e1e] mb-2">
+        password reset successful!
       </h2>
-      <p className="text-sm font-medium" style={{ color: "var(--text-muted)" }}>
-        Your password has been changed successfully. You can now sign in with your new password.
+      <p className="text-[13px] text-[#636567]">
+        Your password has been updated. You can now login
       </p>
     </div>
-    <button
-      onClick={onLogin}
-      className="btn-primary w-full py-4 text-base flex items-center justify-center gap-3 group"
-    >
-      <span>Back to Sign In</span>
-      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-    </button>
+
+    <div className="w-full mt-8">
+      <button
+        onClick={onLogin}
+        className="block w-full h-12 border-none rounded-full cursor-pointer text-[clamp(13px,1.2vw,15px)] font-semibold text-white bg-linear-to-r from-[#0014FF] to-[#09137F] transition-all hover:opacity-90 hover:-translate-y-px"
+      >
+        Back to log in
+      </button>
+    </div>
   </div>
 );
 
-// Main ForgotPassword page
+/* ─────────────────────────────────────────────
+   Main component
+───────────────────────────────────────────── */
 const ForgotPassword = () => {
-  const [step, setStep] = useState("email"); // email | otp | password | success
+  const [step, setStep] = useState("email"); // email | password | success
   const [email, setEmail] = useState("");
-  const [token, setToken] = useState("");
+  const [token] = useState(""); // token from OTP if needed later
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
   const navigate = useNavigate();
 
-  const stepIndex = { email: 0, otp: 1, password: 2, success: 3 };
-  const totalSteps = 3;
-
   return (
-    <div className="min-h-screen flex flex-col mesh-gradient slide-in justify-center items-center py-12 px-4 text-center">
+    <Layout>
       {toast && (
         <Toast
           message={toast.message}
@@ -402,97 +303,32 @@ const ForgotPassword = () => {
         />
       )}
 
-      <div className="max-w-md w-full card p-8 sm:p-10 relative overflow-hidden text-left">
-        {/* Back button */}
-        {step !== "success" && (
-          <button
-            onClick={() => (step === "email" ? navigate("/login") : setStep("email"))}
-            className="absolute top-6 left-6 p-2 rounded-xl transition-all group hover:bg-white/5"
-            style={{ color: "var(--text-muted)" }}
-          >
-            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          </button>
-        )}
+      {step === "email" && (
+        <EmailStep
+          onNext={(e) => { setEmail(e); setStep("password"); }}
+          onBack={() => navigate("/login")}
+          loading={loading}
+          setLoading={setLoading}
+          setToast={setToast}
+        />
+      )}
 
-        <div className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl"></div>
+      {step === "password" && (
+        <ResetPasswordStep
+          email={email}
+          token={token}
+          onDone={() => setStep("success")}
+          onBack={() => setStep("email")}
+          loading={loading}
+          setLoading={setLoading}
+          setToast={setToast}
+        />
+      )}
 
-        <div className="relative z-10">
-          <img
-            src={logo}
-            alt="Cheeseball Logo"
-            className="w-full max-w-[180px] mx-auto mb-8"
-          />
-
-          {/* Progress dots */}
-          {step !== "success" && (
-            <div className="flex justify-center gap-2 mb-8">
-              {Array.from({ length: totalSteps }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    i < stepIndex[step]
-                      ? "w-6 bg-blue-600"
-                      : i === stepIndex[step]
-                      ? "w-6 bg-blue-600"
-                      : "w-2 bg-gray-200"
-                  }`}
-                />
-              ))}
-            </div>
-          )}
-
-          {step === "email" && (
-            <EmailStep
-              onNext={(e) => { setEmail(e); setStep("otp"); }}
-              loading={loading}
-              setLoading={setLoading}
-              setToast={setToast}
-            />
-          )}
-
-          {step === "otp" && (
-            <OTPStep
-              email={email}
-              onNext={(t) => { setToken(t); setStep("password"); }}
-              onBack={() => setStep("email")}
-              loading={loading}
-              setLoading={setLoading}
-              setToast={setToast}
-            />
-          )}
-
-          {step === "password" && (
-            <NewPasswordStep
-              email={email}
-              token={token}
-              onDone={() => setStep("success")}
-              loading={loading}
-              setLoading={setLoading}
-              setToast={setToast}
-            />
-          )}
-
-          {step === "success" && (
-            <SuccessStep onLogin={() => navigate("/login")} />
-          )}
-
-          {step !== "success" && (
-            <div
-              className="mt-8 pt-8 text-center"
-              style={{ borderTop: "1px solid var(--border-primary)" }}
-            >
-              <p
-                className="text-[10px] font-black uppercase tracking-widest"
-                style={{ color: "var(--text-muted)" }}
-              >
-                Secured by Cheeseball Infrastructure
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
+      {step === "success" && (
+        <SuccessStep onLogin={() => navigate("/login")} />
+      )}
+    </Layout>
   );
 };
 
