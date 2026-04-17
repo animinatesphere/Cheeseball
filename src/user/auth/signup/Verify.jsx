@@ -6,7 +6,7 @@ import { ArrowLeft, Loader2 } from "lucide-react";
 import authService from "../../../lib/authService";
 
 const RESEND_SECONDS = 60;
-const OTP_LENGTH = 5;
+const OTP_LENGTH = 6;
 
 const Verify = () => {
   const navigate = useNavigate();
