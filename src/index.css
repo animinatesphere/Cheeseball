@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Sora:wght@100..800&display=swap');@import "tailwindcss";
 
 @theme {
-  --font-heading: "Outfit", sans-serif;
-  --font-body: "Inter", sans-serif;
+  --font-heading: "Sora", sans-serif;
+  --font-body: "DM Sans", sans-serif;
 
   --color-brand-50: #f0f4ff;
   --color-brand-100: #e1e9ff;
@@ -21,11 +21,14 @@
   --color-accent-600: #0284c7;
 }
 
-.in{
-   font-family: "Inter", sans-serif;
+.sora {
+   font-family: "Sora", sans-serif;
 }
-.op{
-   font-family: "Open Sans", sans-serif;
+.dm-sans {
+   font-family: "DM Sans", sans-serif;
+}
+.font-numbers {
+   font-family: "Sora", sans-serif;
 }
 /* ============================================================
    THEME VARIABLES — Dark first, light override

@@ -6,6 +6,7 @@ import CurrencyDetail from "../components/CurrencyDetail";
 import SwapCrypto from "../components/SwapCrypto";
 import ConfirmSwap from "../components/ConfirmSwap";
 import AwaitingDeposit from "../components/AwaitingDeposit";
+import BuyFlow from "../components/BuyFlow";
 import BuyCryptocurrency from "../components/BuyCryptocurrency";
 import BuyCryptoAddress from "../components/BuyCryptoAddress";
 import CompleteOrderPage from "../components/CompleteOrderPage";
@@ -176,12 +177,9 @@ const CurrencyPage = () => {
 
       case "buy":
         return (
-          <BuyCryptocurrency
+          <BuyFlow
             onBack={handleBack}
-            onExchange={(data) => {
-              setTransactionData(data);
-              setCurrentPage("buy-address");
-            }}
+            onComplete={(data) => handleContinue(data)}
           />
         );
 
@@ -352,18 +350,20 @@ const CurrencyPage = () => {
     }
   };
 
+  const isDashboard = currentPage === "rates";
+
   return (
-    <div className="min-h-screen" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
-      <div className="pb-24">
+    <div
+      className={isDashboard ? "" : "min-h-screen"}
+      style={isDashboard ? {} : { background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+    >
+      <div className={isDashboard ? "" : "pb-24"}>
         {renderPage()}
       </div>
       {renderModal()}
-      <BottomNav currentPage={currentPage} onNavigate={handleNavigation} />
+      {!isDashboard && <BottomNav currentPage={currentPage} onNavigate={handleNavigation} />}
     </div>
   );
 };
 
 export default CurrencyPage;
-
-
-
