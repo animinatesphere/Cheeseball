@@ -53,9 +53,9 @@ const QuoteStep = ({ formData, setFormData, updateAmount, nextStep }) => (
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {ASSETS.map(a => (
+        {ASSETS.map((a, index) => (
           <button
-            key={a.symbol}
+            key={`${a.symbol}-${index}`}
             onClick={() => setFormData(prev => ({ ...prev, asset: a }))}
             className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${
               formData.asset.symbol === a.symbol 
@@ -528,15 +528,6 @@ const BuyFlow = ({ onBack }) => {
         {step === 5 && <UploadStep formData={formData} setFormData={setFormData} uploading={uploading} setUploading={setUploading} nextStep={nextStep} />}
         {step === 6 && <StatusStep onBack={onBack} />}
       </main>
-
-      {/* FOOTER NAV (Breadcrumbs) */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 p-4 lg:hidden">
-         <div className="flex items-center justify-between max-w-2xl mx-auto">
-            {[1,2,3,4,5,6].map(i => (
-              <div key={i} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${step >= i ? "bg-blue-600 w-8" : "bg-slate-100"}`} />
-            ))}
-         </div>
-      </div>
 
       <style>{`
         @keyframes in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { getCurrencies, getUserPortfolio, createTransaction, createGiftCardTrade } from "../../lib/api";
 import { supabase } from "../../lib/supabaseClient";
 import CurrencyRates from "../components/CurrencyRates";
@@ -21,7 +22,6 @@ import AddressBook from "../components/AddressBook";
 import SupportPage from "../components/SupportPage";
 import HistoryPage from "../components/HistoryPage";
 import AlertRatesPage from "../components/AlertRatesPage";
-import BottomNav from "../components/BottomNav";
 import SellCryptocurrency from "../components/SellCryptocurrency";
 import SwapGiftCard from "../components/SwapGiftCard";
 import CardManagement from "../components/CardManagement";
@@ -30,7 +30,7 @@ import WithdrawalDetails from "../components/WithdrawalDetails";
 import AccountPage from "../components/AccountPage";
 
 const CurrencyPage = () => {
-  const [currentPage, setCurrentPage] = useState("rates");
+  const navigate = useNavigate();
   const [selectedCurrency, setSelectedCurrency] = useState(null);
   const [showModal, setShowModal] = useState(null);
   const [transactionData, setTransactionData] = useState(null);
@@ -44,8 +44,6 @@ const CurrencyPage = () => {
       if (!session) throw new Error("No active session");
 
       const finalData = { ...transactionData, ...extraData, user_id: session.user.id };
-
-      // Harden the check - if it has a cardName, it's a gift card trade
       const isGiftCard = finalData.type === 'giftcard' || !!finalData.cardName;
 
       if (isGiftCard) {
@@ -88,280 +86,107 @@ const CurrencyPage = () => {
         });
         if (error) throw error;
       }
-
       setShowModal("payment-success");
     } catch (err) {
       console.error("Failed to save transaction:", err);
-      if (err.code === 'PGRST204' || err.message?.includes('schema cache') || err.message?.includes('column')) {
-        alert("CRITICAL: Your database schema is out of sync. Please run the provided SQL update script in your Supabase SQL Editor to add the required transaction columns (promo_code, etc.).");
-      } else {
-        alert("An error occurred while saving your transaction: " + (err.message || "Please contact support."));
-      }
+      alert("An error occurred: " + (err.message || "Please contact support."));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSelectCurrency = (currency) => {
-    setSelectedCurrency(currency);
-    setCurrentPage("detail");
-  };
-
-  const handleNavigation = (page) => {
-    setCurrentPage(page);
-    setShowModal(null);
-    if (page === "rates") {
-      setSelectedCurrency(null);
-      setEmail("");
-    }
+  const handleNavigation = (path) => {
+    navigate(`/currency-change/${path}`);
   };
 
   const handleBack = () => {
-    setCurrentPage("rates");
-    setSelectedCurrency(null);
+    navigate("/currency-change/rates");
   };
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case "rates":
-        return (
+  return (
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
+      <Routes>
+        <Route index element={<Navigate to="rates" replace />} />
+        <Route path="rates" element={
           <CurrencyRates
-            onSelectCurrency={handleSelectCurrency}
+            onSelectCurrency={(cur) => { setSelectedCurrency(cur); navigate("/currency-change/detail"); }}
             onNavigate={handleNavigation}
           />
-        );
-
-      case "detail":
-        return (
+        } />
+        <Route path="detail" element={
           <CurrencyDetail
             currency={selectedCurrency}
             onBack={handleBack}
-            onExchange={() => setCurrentPage("swap")}
+            onExchange={() => navigate("/currency-change/swap")}
           />
-        );
-
-      case "swap":
-        return (
+        } />
+        <Route path="swap" element={
           <SwapCrypto
             onBack={handleBack}
-            onSwap={(data) => {
-              setTransactionData(data);
-              setCurrentPage("confirm");
-            }}
+            onSwap={(data) => { setTransactionData(data); navigate("/currency-change/confirm"); }}
             onNavigate={handleNavigation}
           />
-        );
-
-      case "confirm":
-        return (
+        } />
+        <Route path="confirm" element={
           <ConfirmSwap
             transactionData={transactionData}
-            onBack={() => setCurrentPage("swap")}
-            onConfirm={() => setCurrentPage("awaiting")}
+            onBack={() => navigate("/currency-change/swap")}
+            onConfirm={() => navigate("/currency-change/awaiting")}
           />
-        );
-
-      case "awaiting":
-        return (
+        } />
+        <Route path="awaiting" element={
           <AwaitingDeposit 
             transactionData={transactionData} 
             onBack={handleBack} 
             onContinue={(data) => {
               const updatedData = { ...transactionData, ...data };
               setTransactionData(updatedData);
-              if (updatedData.type === 'sell') setCurrentPage("withdrawal-details");
-              else handleContinue(data);
+              if (updatedData.type === 'sell') navigate("/currency-change/withdrawal-details");
+              else handleContinue(updatedData);
             }}
           />
-        );
-
-      case "buy":
-        return (
-          <BuyFlow
-            onBack={handleBack}
-            onComplete={(data) => handleContinue(data)}
-          />
-        );
-
-      case "sell":
-        return (
+        } />
+        <Route path="buy" element={
+          <BuyFlow onBack={handleBack} onComplete={handleContinue} />
+        } />
+        <Route path="sell" element={
           <SellCryptocurrency
             onBack={handleBack}
-            onExchange={(data) => {
-              setTransactionData(data);
-              setCurrentPage("awaiting");
-            }}
             onNavigate={handleNavigation}
           />
-        );
-
-      case "giftcard-swap":
-        return (
+        } />
+        <Route path="giftcard-swap" element={
           <SwapGiftCard 
             onBack={handleBack} 
-            onSwap={(data) => {
-              setTransactionData(data);
-              setCurrentPage("giftcard-upload");
-            }}
+            onSwap={(data) => { setTransactionData(data); navigate("/currency-change/giftcard-upload"); }}
             onNavigate={handleNavigation} 
           />
-        );
-
-      case "giftcard-upload":
-        return (
+        } />
+        <Route path="giftcard-upload" element={
           <GiftCardUpload
             transactionData={transactionData}
-            onBack={() => setCurrentPage("giftcard-swap")}
-            onContinue={(data) => {
-              setTransactionData(prev => ({ ...prev, ...data }));
-              setCurrentPage("withdrawal-details");
-            }}
+            onBack={() => navigate("/currency-change/giftcard-swap")}
+            onContinue={(data) => { setTransactionData(prev => ({ ...prev, ...data })); navigate("/currency-change/withdrawal-details"); }}
           />
-        );
-
-      case "withdrawal-details":
-        return (
+        } />
+        <Route path="withdrawal-details" element={
           <WithdrawalDetails
             transactionData={transactionData}
-            onBack={() => {
-              if (transactionData?.type === 'sell') setCurrentPage("awaiting");
-              else setCurrentPage("giftcard-upload");
-            }}
-            onContinue={(data) => handleContinue(data)}
+            onBack={() => navigate(transactionData?.type === 'sell' ? "/currency-change/awaiting" : "/currency-change/giftcard-upload")}
+            onContinue={handleContinue}
           />
-        );
+        } />
+        <Route path="history" element={<HistoryPage onNavigate={handleNavigation} />} />
+        <Route path="account" element={<AccountPage onNavigate={handleNavigation} />} />
+        <Route path="support" element={<SupportPage onNavigate={handleNavigation} />} />
+        <Route path="address-book" element={<AddressBook onBack={() => navigate("/currency-change/support")} />} />
+      </Routes>
 
-      case "buy-address":
-        return (
-          <BuyCryptoAddress
-            transactionData={transactionData}
-            onBack={() => setCurrentPage("buy")}
-            onCreateExchange={(address) => {
-              setTransactionData(prev => ({ ...prev, wallet_address: address }));
-              setShowModal("exchange-page");
-            }}
-          />
-        );
-
-      case "complete-order":
-        return (
-          <CompleteOrderPage
-            transactionData={transactionData}
-            onBack={() => setCurrentPage("buy-address")}
-            onBuyWithBankTransfer={() => setCurrentPage("bank-transfer")}
-          />
-        );
-
-      case "complete-order-email":
-        return (
-          <CompleteOrderEmail
-            onBack={() => setCurrentPage("complete-order")}
-            onContinue={(emailVal) => {
-              setEmail(emailVal);
-              setCurrentPage("otp");
-            }}
-          />
-        );
-
-      case "otp":
-        return (
-          <OTPPage
-            email={email}
-            onBack={() => setCurrentPage("complete-order-email")}
-            onContinue={() => setCurrentPage("personal-data")}
-          />
-        );
-
-      case "personal-data":
-        return (
-          <PersonalDataPage
-            onBack={() => setCurrentPage("otp")}
-            onContinue={() => setCurrentPage("bank-transfer")}
-          />
-        );
-
-      case "bank-transfer":
-        return (
-          <BankTransferDetails
-            transactionData={transactionData}
-            onBack={() => setCurrentPage("complete-order")}
-            onContinue={(data) => handleContinue(data)}
-          />
-        );
-
-      case "address-book":
-        return <AddressBook onBack={() => setCurrentPage("support")} />;
-
-      case "history":
-        return <HistoryPage onNavigate={handleNavigation} />;
-
-      case "account":
-        return <AccountPage onNavigate={handleNavigation} />;
-
-      case "support":
-        return <SupportPage onNavigate={handleNavigation} />;
-
-      default:
-        return (
-          <CurrencyRates
-            onSelectCurrency={handleSelectCurrency}
-            onNavigate={handleNavigation}
-          />
-        );
-    }
-  };
-
-  const renderModal = () => {
-    switch (showModal) {
-      case "crypto-exchange":
-        return (
-          <CryptoExchangeModal
-            onAccept={() => {
-              setShowModal(null);
-              setCurrentPage("buy-address");
-            }}
-            onClose={() => setShowModal(null)}
-          />
-        );
-
-      case "exchange-page":
-        return (
-          <ExchangePageModal
-            onAccept={() => {
-              setShowModal(null);
-              setCurrentPage("complete-order");
-            }}
-            onClose={() => setShowModal(null)}
-          />
-        );
-
-      case "payment-success":
-        return (
-          <PaymentSuccessModal
-            onClose={() => {
-              setShowModal(null);
-              setCurrentPage("rates");
-            }}
-          />
-        );
-
-      default:
-        return null;
-    }
-  };
-
-  const isDashboard = currentPage === "rates";
-
-  return (
-    <div
-      className={isDashboard ? "" : "min-h-screen"}
-      style={isDashboard ? {} : { background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-    >
-      <div className={isDashboard ? "" : "pb-24"}>
-        {renderPage()}
-      </div>
-      {renderModal()}
-      {!isDashboard && <BottomNav currentPage={currentPage} onNavigate={handleNavigation} />}
+      {showModal === "payment-success" && (
+        <PaymentSuccessModal
+          onClose={() => { setShowModal(null); navigate("/currency-change/rates"); }}
+        />
+      )}
     </div>
   );
 };

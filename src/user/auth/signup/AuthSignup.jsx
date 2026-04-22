@@ -250,12 +250,13 @@ const AuthSignup = () => {
           </div>
 
           {/* Login link */}
-          <p className="text-[clamp(12px,1vw,14px)] text-[#636567] text-center m-0">
             Already have an account?{" "}
-            <a href="/login" className="text-[#0014ff] font-semibold no-underline hover:underline">
+            <button 
+              onClick={() => navigate("/login")}
+              className="text-[#0014ff] font-semibold no-underline hover:underline bg-transparent border-none cursor-pointer"
+            >
               Login
-            </a>
-          </p>
+            </button>
         </div>
       </div>
     </div>

@@ -31,7 +31,7 @@ const Routee = () => {
         <Route path="/buy-crypto" element={<BuyCrypto />} />
         <Route path="/sell-crypto" element={<SellCrypto />} />
         <Route path="/seamless-crypto" element={<SeamCrypto />} />
-        <Route path="/currency-change" element={<CurrencyPage />} />
+        <Route path="/currency-change/*" element={<CurrencyPage />} />
         <Route path="/admin-login" element={<CheeseBallLogin />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/auth" element={<Auth />} />

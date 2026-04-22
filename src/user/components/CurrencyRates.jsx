@@ -90,8 +90,15 @@ const QUICK_ACTIONS = [
   { label: "Earn",        icon: Star,            color: "#D97706", bg: "#FFFBEB", page: "support"   },
 ];
 
+import { useLocation } from "react-router-dom";
+
 /* ── SIDEBAR ─────────────────────────────────────────────────── */
-const Sidebar = ({ currentPage, onNavigate, collapsed, setCollapsed, user, mobileOpen, setMobileOpen }) => {
+const Sidebar = ({ onNavigate, collapsed, setCollapsed, user, mobileOpen, setMobileOpen }) => {
+  const location = useLocation();
+  const pathParts = location.pathname.split("/");
+  // The current page is usually the last part of the path (e.g., /currency-change/rates -> rates)
+  const currentPage = pathParts[pathParts.length - 1] || "rates";
+
   const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : "CB";
 
   return (
@@ -214,7 +221,6 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
     <div className="flex h-screen bg-[#F8FAFC] overflow-hidden dm-sans">
       {/* ── SIDEBAR ─────────────────────────────────────────── */}
       <Sidebar
-        currentPage="rates"
         onNavigate={onNavigate}
         collapsed={sidebarCollapsed}
         setCollapsed={setSidebarCollapsed}
@@ -430,9 +436,9 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
                            </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-50">
-                           {MOCK_ASSETS.map((asset) => (
+                           {MOCK_ASSETS.map((asset, index) => (
                               <tr 
-                                key={asset.symbol} 
+                                key={`${asset.symbol}-${index}`} 
                                 className="group cursor-pointer hover:bg-slate-50/70 transition-colors"
                                 onClick={() => onSelectCurrency({ symbol: asset.symbol, name: asset.name })}
                               >
