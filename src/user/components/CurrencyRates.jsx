@@ -82,12 +82,12 @@ const NAV_ITEMS = [
 ];
 
 const QUICK_ACTIONS = [
-  { label: "Buy Crypto",  icon: ShoppingCart,    color: "#2563EB", bg: "#EFF6FF", page: "buy"       },
-  { label: "Sell Crypto", icon: CircleDollarSign,color: "#7C3AED", bg: "#F5F3FF", page: "sell"      },
+  { label: "Deposit",     icon: ArrowDownLeft,   color: "#2563EB", bg: "#EFF6FF", page: "deposit"   },
+  { label: "Buy Crypto",  icon: ShoppingCart,    color: "#7C3AED", bg: "#F5F3FF", page: "buy"       },
+  { label: "Sell Crypto", icon: CircleDollarSign,color: "#DC2626", bg: "#FEF2F2", page: "sell"      },
   { label: "Swap",        icon: ArrowRightLeft,  color: "#0891B2", bg: "#ECFEFF", page: "swap"      },
   { label: "Withdraw",    icon: Wallet,          color: "#059669", bg: "#ECFDF5", page: "withdrawal-details" },
-  { label: "Gift Cards",  icon: Gift,            color: "#DC2626", bg: "#FEF2F2", page: "giftcard-swap" },
-  { label: "Earn",        icon: Star,            color: "#D97706", bg: "#FFFBEB", page: "support"   },
+  { label: "Gift Cards",  icon: Gift,            color: "#D97706", bg: "#FFFBEB", page: "giftcard-swap" },
 ];
 
 import { useLocation } from "react-router-dom";
@@ -346,7 +346,7 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
                       { label: "Buy",     icon: ShoppingCart,    page: "buy",      primary: true  },
                       { label: "Sell",    icon: CircleDollarSign,page: "sell",     primary: false },
                       { label: "Swap",    icon: ArrowRightLeft,  page: "swap",     primary: false },
-                      { label: "Receive", icon: ArrowDownLeft,   page: "buy-address", primary: false },
+                      { label: "Receive", icon: ArrowDownLeft,   page: "deposit",  primary: false },
                     ].map((a) => {
                       const Icon = a.icon;
                       return (

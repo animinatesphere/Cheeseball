@@ -290,3 +290,159 @@ export const deletePromoCode = async (id) => {
     .eq('id', id);
   return { error };
 };
+
+// --- Conversion / Swap (Custom Backend) ---
+const API_BASE_URL = '/api'; // Adjusted to relative path for standard deployment
+
+export const previewConversion = async (fromAsset, toAsset, fromAmount) => {
+  const { data: { session } } = await supabase.auth.getSession();
+  const response = await fetch(`${API_BASE_URL}/wallets/convert/preview`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${session?.access_token}`
+    },
+    body: JSON.stringify({ from_asset: fromAsset, to_asset: toAsset, from_amount: fromAmount })
+  });
+
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    throw new Error(`Server Error: Received non-JSON response (${response.status}). Ensure backend is active.`);
+  }
+
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.detail || 'Failed to preview conversion');
+  return result;
+};
+
+export const executeConversion = async (rateLockId) => {
+  const { data: { session } } = await supabase.auth.getSession();
+  const response = await fetch(`${API_BASE_URL}/wallets/convert`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${session?.access_token}`
+    },
+    body: JSON.stringify({ rate_lock_id: rateLockId })
+  });
+
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    throw new Error(`Server Error: Received non-JSON response (${response.status}). Ensure backend is active.`);
+  }
+
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.detail || 'Conversion failed');
+  return result;
+};
+
+export const getWallets = async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  const response = await fetch(`${API_BASE_URL}/wallets`, {
+    headers: {
+      'Authorization': `Bearer ${session?.access_token}`
+    }
+  });
+
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    const text = await response.text();
+    console.error("API returned non-JSON response:", text.slice(0, 200));
+    throw new Error(`API Error: Received ${response.status} ${response.statusText}. Please ensure the backend is running.`);
+  }
+
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.detail || 'Failed to fetch wallets');
+  return result;
+};
+
+export const createDeposit = async (asset, amount) => {
+  const { data: { session } } = await supabase.auth.getSession();
+  const response = await fetch(`${API_BASE_URL}/wallets/deposits/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${session?.access_token}`
+    },
+    body: JSON.stringify({ asset, expected_amount: amount })
+  });
+
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    throw new Error(`Server Error: Received non-JSON response (${response.status}).`);
+  }
+
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.detail || 'Failed to create deposit');
+  return result;
+};
+
+export const getDepositStatus = async (depositId) => {
+  const { data: { session } } = await supabase.auth.getSession();
+  const response = await fetch(`${API_BASE_URL}/wallets/deposits/${depositId}`, {
+    headers: {
+      'Authorization': `Bearer ${session?.access_token}`
+    }
+  });
+
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    throw new Error(`Server Error: Received non-JSON response (${response.status}).`);
+  }
+
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.detail || 'Failed to fetch deposit status');
+  return result;
+};
+
+export const getBeneficiaries = async () => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return { data: [], error: new Error("No session") };
+
+  const { data, error } = await supabase
+    .from('beneficiaries')
+    .select('*')
+    .eq('user_id', session.user.id)
+    .order('created_at', { ascending: false });
+  
+  return { data, error };
+};
+
+export const createWithdrawal = async (withdrawalData) => {
+  const { data: { session } } = await supabase.auth.getSession();
+  const response = await fetch(`${API_BASE_URL}/wallets/withdrawals`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${session?.access_token}`
+    },
+    body: JSON.stringify(withdrawalData)
+  });
+
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    throw new Error(`Server Error: Received non-JSON response (${response.status}).`);
+  }
+
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.detail || 'Withdrawal request failed');
+  return result;
+};
+
+export const getWithdrawalStatus = async (withdrawalId) => {
+  const { data: { session } } = await supabase.auth.getSession();
+  const response = await fetch(`${API_BASE_URL}/wallets/withdrawals/${withdrawalId}`, {
+    headers: {
+      'Authorization': `Bearer ${session?.access_token}`
+    }
+  });
+
+  const contentType = response.headers.get("content-type");
+  if (!contentType || !contentType.includes("application/json")) {
+    throw new Error(`Server Error: Received non-JSON response (${response.status}).`);
+  }
+
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.detail || 'Failed to fetch withdrawal status');
+  return result;
+};

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { 
   ArrowLeft, 
   ChevronRight, 
-  Copy, 
+  Copy,  
   CheckCircle2, 
   Upload, 
   Clock, 
@@ -16,7 +16,6 @@ import {
   Globe,
   Zap
 } from "lucide-react";
-
 /* ── MOCK DATA ─────────────────────────────────────────────── */
 const ASSETS = [
   { symbol: "BTC",  name: "Bitcoin",  icon: "₿", color: "#F7931A", bg: "#FEF3E2", rate: 145000000 },

@@ -4,8 +4,7 @@ import { getCurrencies, getUserPortfolio, createTransaction, createGiftCardTrade
 import { supabase } from "../../lib/supabaseClient";
 import CurrencyRates from "../components/CurrencyRates";
 import CurrencyDetail from "../components/CurrencyDetail";
-import SwapCrypto from "../components/SwapCrypto";
-import ConfirmSwap from "../components/ConfirmSwap";
+import ConvertFlow from "../components/ConvertFlow";
 import AwaitingDeposit from "../components/AwaitingDeposit";
 import BuyFlow from "../components/BuyFlow";
 import BuyCryptocurrency from "../components/BuyCryptocurrency";
@@ -28,6 +27,8 @@ import CardManagement from "../components/CardManagement";
 import GiftCardUpload from "../components/GiftCardUpload";
 import WithdrawalDetails from "../components/WithdrawalDetails";
 import AccountPage from "../components/AccountPage";
+import DepositFlow from "../components/DepositFlow";
+import WithdrawalFlow from "../components/WithdrawalFlow";
 
 const CurrencyPage = () => {
   const navigate = useNavigate();
@@ -121,19 +122,12 @@ const CurrencyPage = () => {
           />
         } />
         <Route path="swap" element={
-          <SwapCrypto
+          <ConvertFlow
             onBack={handleBack}
-            onSwap={(data) => { setTransactionData(data); navigate("/currency-change/confirm"); }}
             onNavigate={handleNavigation}
           />
         } />
-        <Route path="confirm" element={
-          <ConfirmSwap
-            transactionData={transactionData}
-            onBack={() => navigate("/currency-change/swap")}
-            onConfirm={() => navigate("/currency-change/awaiting")}
-          />
-        } />
+        <Route path="confirm" element={<Navigate to="/currency-change/swap" replace />} />
         <Route path="awaiting" element={
           <AwaitingDeposit 
             transactionData={transactionData} 
@@ -148,6 +142,9 @@ const CurrencyPage = () => {
         } />
         <Route path="buy" element={
           <BuyFlow onBack={handleBack} onComplete={handleContinue} />
+        } />
+        <Route path="deposit" element={
+          <DepositFlow onBack={handleBack} onNavigate={handleNavigation} />
         } />
         <Route path="sell" element={
           <SellCryptocurrency
@@ -170,10 +167,9 @@ const CurrencyPage = () => {
           />
         } />
         <Route path="withdrawal-details" element={
-          <WithdrawalDetails
-            transactionData={transactionData}
-            onBack={() => navigate(transactionData?.type === 'sell' ? "/currency-change/awaiting" : "/currency-change/giftcard-upload")}
-            onContinue={handleContinue}
+          <WithdrawalFlow
+            onBack={handleBack}
+            onNavigate={handleNavigation}
           />
         } />
         <Route path="history" element={<HistoryPage onNavigate={handleNavigation} />} />

@@ -20,7 +20,7 @@ import {
   Wallet,
   BarChart3,
 } from "lucide-react";
-import logo from "../../assets/CHEESEBALL 1.png";
+import logo from "../../assets/cheese.jpeg";
 import btcIcon from "../../assets/bitcoin_3d.png";
 import ethIcon from "../../assets/ethereum_3d.png";
 import usdtIcon from "../../assets/usdt_3d.png";
