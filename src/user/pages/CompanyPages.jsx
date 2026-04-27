@@ -13,7 +13,7 @@ export const Careers = () => (
       <p className="text-gray-500 font-bold uppercase text-xs tracking-widest">
         Check back soon or send your CV to careers@cheeseball.ng
       </p>
-    </div>
+    </div>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
   </SharedFooterLayout>
 );
 

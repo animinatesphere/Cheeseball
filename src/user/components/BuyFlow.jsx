@@ -16,8 +16,10 @@ import {
   Globe,
   Zap
 } from "lucide-react";
+import { getCurrencies } from "../../lib/api";
+
 /* ── MOCK DATA ─────────────────────────────────────────────── */
-const ASSETS = [
+const ASSETS_UI = [
   { symbol: "BTC",  name: "Bitcoin",  icon: "₿", color: "#F7931A", bg: "#FEF3E2", rate: 145000000 },
   { symbol: "ETH",  name: "Ethereum", icon: "Ξ", color: "#627EEA", bg: "#EEEFFE", rate: 5800000 },
   { symbol: "USDT", name: "Tether",   icon: "₮", color: "#26A17B", bg: "#E6F7F2", rate: 1650 },
@@ -40,7 +42,7 @@ const BANK_DETAILS = {
 /* ── SUB-COMPONENTS (Moved outside to prevent focus loss) ─────── */
 
 // 1. QUOTE STEP
-const QuoteStep = ({ formData, setFormData, updateAmount, nextStep }) => (
+const QuoteStep = ({ formData, setFormData, updateAmount, nextStep, currencies }) => (
   <div className="animate-in fade-in slide-in-from-right-4 duration-300">
     <div className="bg-white rounded-[2rem] p-6 lg:p-8 border border-slate-100 shadow-xl shadow-slate-200/50 space-y-6">
       <div className="flex justify-between items-center px-1">
@@ -52,7 +54,7 @@ const QuoteStep = ({ formData, setFormData, updateAmount, nextStep }) => (
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {ASSETS.map((a, index) => (
+        {currencies.map((a, index) => (
           <button
             key={`${a.symbol}-${index}`}
             onClick={() => setFormData(prev => ({ ...prev, asset: a }))}
@@ -449,8 +451,12 @@ const StatusStep = ({ onBack }) => (
 
 const BuyFlow = ({ onBack }) => {
   const [step, setStep] = useState(1);
+  const [currencies, setCurrencies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [formData, setFormData] = useState({
-    asset: ASSETS[0],
+    asset: null,
     amountNGN: "",
     amountCrypto: "",
     walletAddress: "",
@@ -462,6 +468,38 @@ const BuyFlow = ({ onBack }) => {
 
   const [copied, setCopied] = useState(null);
   const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const { data: currData } = await getCurrencies();
+        if (currData) {
+          const activeAssets = currData.filter(c => c.is_active && c.symbol !== "NGN");
+          const mergedAssets = activeAssets.map(c => {
+             const mock = ASSETS_UI.find(a => a.symbol === c.symbol) || {};
+             return {
+                ...c,
+                name: c.name || mock.name,
+                icon: c.icon_url ? <img src={c.icon_url} alt={c.symbol} className="w-full h-full object-contain p-2" /> : (mock.icon || c.symbol[0]),
+                color: mock.color || "#0F172A",
+                bg: mock.bg || "#F8FAFC",
+                rate: c.buy_rate || mock.rate || 0,
+             };
+          });
+          setCurrencies(mergedAssets);
+          if (mergedAssets.length > 0) {
+            setFormData(prev => ({ ...prev, asset: mergedAssets[0] }));
+          }
+        }
+      } catch (err) {
+        console.error("Init error:", err);
+        setError("Failed to load supported assets.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    init();
+  }, []);
 
   /* ── Handlers ─────────────────────────────────────────────── */
   const handleCopy = (text, key) => {
@@ -520,12 +558,26 @@ const BuyFlow = ({ onBack }) => {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 mt-8 lg:mt-12">
-        {step === 1 && <QuoteStep formData={formData} setFormData={setFormData} updateAmount={updateAmount} nextStep={nextStep} />}
-        {step === 2 && <DestinationStep formData={formData} setFormData={setFormData} nextStep={nextStep} prevStep={prevStep} />}
-        {step === 3 && <PaymentStep formData={formData} setFormData={setFormData} nextStep={nextStep} prevStep={prevStep} />}
-        {step === 4 && <InstructionsStep formData={formData} handleCopy={handleCopy} copied={copied} nextStep={nextStep} />}
-        {step === 5 && <UploadStep formData={formData} setFormData={setFormData} uploading={uploading} setUploading={setUploading} nextStep={nextStep} />}
-        {step === 6 && <StatusStep onBack={onBack} />}
+        {loading ? (
+           <div className="min-h-[60vh] flex flex-col items-center justify-center gap-8">
+             <div className="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin" />
+             <p className="sora font-black text-slate-400 uppercase tracking-widest text-xs">Loading Assets...</p>
+           </div>
+        ) : error ? (
+           <div className="max-w-2xl mx-auto mb-10 bg-red-50 border border-red-100 rounded-[2rem] p-6 flex items-start gap-4">
+             <AlertCircle className="w-6 h-6 text-red-500 shrink-0" />
+             <p className="text-red-700 text-xs font-bold leading-relaxed">{error}</p>
+           </div>
+        ) : (
+          <>
+            {step === 1 && formData.asset && <QuoteStep formData={formData} setFormData={setFormData} updateAmount={updateAmount} nextStep={nextStep} currencies={currencies} />}
+            {step === 2 && formData.asset && <DestinationStep formData={formData} setFormData={setFormData} nextStep={nextStep} prevStep={prevStep} />}
+            {step === 3 && formData.asset && <PaymentStep formData={formData} setFormData={setFormData} nextStep={nextStep} prevStep={prevStep} />}
+            {step === 4 && formData.asset && <InstructionsStep formData={formData} handleCopy={handleCopy} copied={copied} nextStep={nextStep} />}
+            {step === 5 && formData.asset && <UploadStep formData={formData} setFormData={setFormData} uploading={uploading} setUploading={setUploading} nextStep={nextStep} />}
+            {step === 6 && <StatusStep onBack={onBack} />}
+          </>
+        )}
       </main>
 
       <style>{`

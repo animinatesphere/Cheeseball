@@ -75,10 +75,12 @@ const NAV_ITEMS = [
   { id: "buy",      icon: ShoppingCart,    label: "Buy Crypto" },
   { id: "sell",     icon: CircleDollarSign,label: "Sell Crypto" },
   { id: "swap",     icon: ArrowRightLeft,  label: "Swap" },
+  { id: "deposit",  icon: ArrowDownLeft,   label: "Deposit" },
   { id: "giftcard-swap", icon: Gift,       label: "Gift Cards" },
   { id: "history",  icon: History,         label: "History" },
   { id: "support",  icon: HelpCircle,      label: "Support" },
   { id: "account",  icon: Settings,        label: "Settings" },
+  
 ];
 
 const QUICK_ACTIONS = [
@@ -321,11 +323,11 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
                         </button>
                       </div>
                       
-                      <div className={`inline-flex items-center gap-1.5 mt-5 px-3 py-1.5 rounded-xl text-xs font-black sora ${totalChange >= 0 ? "bg-emerald-400/20 text-emerald-300" : "bg-red-400/20 text-red-300"}`}>
+                      {/* <div className={`inline-flex items-center gap-1.5 mt-5 px-3 py-1.5 rounded-xl text-xs font-black sora ${totalChange >= 0 ? "bg-emerald-400/20 text-emerald-300" : "bg-red-400/20 text-red-300"}`}>
                         {totalChange >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                         {totalChange >= 0 ? "+" : ""}{totalChange}% 
                         <span className="text-white/40 ml-1 font-bold">vs last month</span>
-                      </div>
+                      </div> */}
                     </div>
 
                     <div className="flex gap-3">
@@ -333,10 +335,7 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
                           <p className="text-blue-100/40 text-[10px] font-bold uppercase tracking-widest mb-1">Active Assets</p>
                           <p className="text-white sora font-black text-lg font-numbers">{MOCK_ASSETS.length}</p>
                        </div>
-                       <div className="bg-white/10 rounded-2xl px-5 py-3 border border-white/10 backdrop-blur-sm">
-                          <p className="text-blue-100/40 text-[10px] font-bold uppercase tracking-widest mb-1">Monthly Gain</p>
-                          <p className="text-emerald-400 sora font-black text-lg font-numbers">+₦82.4K</p>
-                       </div>
+                     
                     </div>
                   </div>
 
@@ -376,7 +375,7 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate }) => {
                     </div>
                     <h2 className="sora text-white font-black text-2xl lg:text-3xl leading-tight mb-2 tracking-tight">
                        Invite & <br />
-                       <span className="text-blue-400">Earn ₦5,000</span>
+                       <span className="text-blue-400">Earn ₦1,000</span>
                     </h2>
                     <p className="text-slate-400 text-sm font-bold leading-relaxed mb-8">
                        Help your friends join CheeseBall and get rewarded instantly.
