@@ -1,589 +1,476 @@
-import React, { useState, useEffect } from "react";
-import { 
-  ArrowLeft, 
-  ChevronRight, 
-  Copy,  
-  CheckCircle2, 
-  Upload, 
-  Clock, 
-  ShieldCheck, 
-  Info, 
-  CreditCard, 
-  Building2, 
-  AlertCircle,
-  Loader2,
+import React, { useState } from "react";
+import {
+  Bell,
+  Search,
+  ChevronRight,
+  ChevronDown,
+  Info,
   Wallet,
-  Globe,
-  Zap
+  Building2,
+  CreditCard,
+  Plus,
+  X,
 } from "lucide-react";
-import { getCurrencies } from "../../lib/api";
 
-/* ── MOCK DATA ─────────────────────────────────────────────── */
-const ASSETS_UI = [
-  { symbol: "BTC",  name: "Bitcoin",  icon: "₿", color: "#F7931A", bg: "#FEF3E2", rate: 145000000 },
-  { symbol: "ETH",  name: "Ethereum", icon: "Ξ", color: "#627EEA", bg: "#EEEFFE", rate: 5800000 },
-  { symbol: "USDT", name: "Tether",   icon: "₮", color: "#26A17B", bg: "#E6F7F2", rate: 1650 },
-  { symbol: "SOL",  name: "Solana",   icon: "◎", color: "#9945FF", bg: "#F1E9FF", rate: 245000 },
+/* ── Mock Data ─────────────────────────────────────────────── */
+const ASSETS = [
+  { symbol: "BTC",  name: "Bitcoin",  price: "$64,280",  change: "+2.14%", color: "#F7931A", bg: "#FEF3E2", icon: "₿", selected: true  },
+  { symbol: "ETH",  name: "Ethereum", price: "$3,140",   change: "-0.87%", color: "#627EEA", bg: "#EEEFFE", icon: "Ξ", selected: false },
+  { symbol: "USDT", name: "Tether",   price: "$1.001",   change: "+0.01%", color: "#26A17B", bg: "#E6F7F2", icon: "₮", selected: false },
+  { symbol: "SOL",  name: "Solana",   price: "$148.20",  change: "+4.56%", color: "#9945FF", bg: "#F1E9FF", icon: "◎", selected: false },
+  { symbol: "BNB",  name: "BNB",      price: "$572.40",  change: "+1.33%", color: "#F0B90B", bg: "#FEF8E6", icon: "⬡", selected: false },
+  { symbol: "XRP",  name: "XRP",      price: "$0.621",   change: "-1.08%", color: "#000000", bg: "#E6E6E6", icon: "✕", selected: false },
 ];
 
-const NETWORKS = [
-  { symbol: "BTC",  networks: ["Bitcoin (Legacy)", "SegWit", "Lightning"] },
-  { symbol: "ETH",  networks: ["ERC-20", "Arbitrum", "Optimism", "Polygon"] },
-  { symbol: "USDT", networks: ["TRC-20", "ERC-20", "BEP-20", "Solana"] },
-  { symbol: "SOL",  networks: ["Solana Mainnet"] },
+const RECENT = [
+  { id: 1, symbol: "BTC",  name: "Bitcoin",  amount: "₦80,000",  date: "Apr 11 • Market", crypto: "+0.00124 BTC", color: "#F7931A", bg: "#FEF3E2" },
+  { id: 2, symbol: "ETH",  name: "Ethereum", amount: "₦120,000", date: "Apr 8 • Market",  crypto: "+0.038 ETH",   color: "#627EEA", bg: "#EEEFFE" },
+  { id: 3, symbol: "USDT", name: "Tether",   amount: "₦50,000",  date: "Apr 5 • Market",  crypto: "+33.2 USDT",   color: "#26A17B", bg: "#E6F7F2" },
 ];
 
-const BANK_DETAILS = {
-  bankName: "Opay Digital Bank",
-  accountName: "Cheeseball Global Enterprise",
-  accountNumber: "8123456789",
-};
+/* ── Solid Check SVG ─────────────────────────────────────── */
+const SolidCheck = () => (
+  <svg className="w-5 h-5 text-[#0066FF]" viewBox="0 0 24 24" fill="currentColor">
+    <path fillRule="evenodd" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" clipRule="evenodd" />
+  </svg>
+);
 
-/* ── SUB-COMPONENTS (Moved outside to prevent focus loss) ─────── */
+/* ── Price Chart ─────────────────────────────────────────── */
+const CHART_POINTS = [
+  62100, 61800, 62400, 62000, 61500, 62800, 63100, 62700,
+  63500, 63200, 64000, 63800, 64200, 63900, 64500, 64100,
+  64800, 64400, 64900, 64600, 65200, 64800, 65000, 64280,
+];
+const TIME_TABS = ["1H", "24H", "7D", "1M", "1Y"];
 
-// 1. QUOTE STEP
-const QuoteStep = ({ formData, setFormData, updateAmount, nextStep, currencies }) => (
-  <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-    <div className="bg-white rounded-[2rem] p-6 lg:p-8 border border-slate-100 shadow-xl shadow-slate-200/50 space-y-6">
-      <div className="flex justify-between items-center px-1">
-        <label className="text-[11px] font-black uppercase text-slate-400 tracking-widest">Select Asset</label>
-        <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 rounded-full">
-          <Zap className="w-3" size={12} />
-          <span className="text-[10px] font-black text-emerald-600 uppercase">Best Price Active</span>
-        </div>
-      </div>
+const PriceChart = () => {
+  const [activeTab, setActiveTab] = useState("24H");
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        {currencies.map((a, index) => (
+  const W = 500, H = 90, pad = 8;
+  const min = Math.min(...CHART_POINTS);
+  const max = Math.max(...CHART_POINTS);
+  const rng = max - min || 1;
+
+  const pts = CHART_POINTS.map((v, i) => {
+    const x = (i / (CHART_POINTS.length - 1)) * W;
+    const y = pad + ((max - v) / rng) * (H - pad * 2);
+    return `${x},${y}`;
+  });
+  const poly = pts.join(" ");
+  const lastPt = pts[pts.length - 1];
+  const [lx, ly] = lastPt.split(",").map(parseFloat);
+  const area = `M0,${H} L${pts.map(p => `L${p}`).join(" ").slice(1)} L${W},${H} Z`;
+
+  return (
+    <div className="mb-5">
+      <div className="flex items-center gap-1 mb-3">
+        {TIME_TABS.map(tab => (
           <button
-            key={`${a.symbol}-${index}`}
-            onClick={() => setFormData(prev => ({ ...prev, asset: a }))}
-            className={`p-4 rounded-2xl border-2 transition-all flex flex-col items-center gap-2 ${
-              formData.asset.symbol === a.symbol 
-                ? "border-blue-600 bg-blue-50/50 shadow-lg shadow-blue-900/10" 
-                : "border-slate-50 bg-white hover:border-slate-200"
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-3 py-1 rounded-md text-[11px] font-bold transition-all ${
+              activeTab === tab ? "bg-[#0066FF] text-white" : "text-slate-500 hover:bg-slate-100"
             }`}
           >
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg border shadow-sm" style={{ background: a.bg, color: a.color }}>
-              {a.icon}
-            </div>
-            <span className="sora font-black text-sm text-slate-900">{a.symbol}</span>
+            {tab}
           </button>
         ))}
       </div>
-
-      <div className="space-y-4 pt-4">
-         {/* NGN Input */}
-         <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6 transition-all focus-within:border-blue-300 focus-within:ring-4 focus-within:ring-blue-50">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">You Pay (NGN)</span>
-              <span className="text-[10px] font-bold text-slate-400">Min: ₦10,000</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="sora font-black text-2xl text-slate-400">₦</span>
-              <input 
-                type="number"
-                placeholder="0.00"
-                value={formData.amountNGN}
-                onChange={(e) => updateAmount(e.target.value, "NGN")}
-                className="bg-transparent text-right text-3xl font-black sora text-slate-900 placeholder-slate-200 outline-none w-full"
-                autoFocus
-              />
-            </div>
-         </div>
-
-         {/* Crypto Result */}
-         <div className="bg-slate-50 border border-slate-100 rounded-3xl p-6">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">You Receive ({formData.asset.symbol})</span>
-              <span className="text-[10px] font-bold text-slate-400">Rate: ₦{formData.asset.rate.toLocaleString()} / {formData.asset.symbol}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="w-8 h-8 rounded-lg flex items-center justify-center font-black text-sm border shadow-sm bg-white" style={{ color: formData.asset.color }}>
-                 {formData.asset.icon}
-              </div>
-              <input 
-                type="number"
-                placeholder="0.000000"
-                value={formData.amountCrypto}
-                onChange={(e) => updateAmount(e.target.value, "Crypto")}
-                className="bg-transparent text-right text-3xl font-black sora text-slate-900 placeholder-slate-200 outline-none w-full"
-              />
-            </div>
-         </div>
-      </div>
-
-      <button 
-        onClick={nextStep}
-        disabled={!formData.amountNGN || parseFloat(formData.amountNGN) < 1000}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white sora font-black py-5 rounded-3xl shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-2 group disabled:opacity-30 disabled:pointer-events-none"
-      >
-        Next Step <ChevronRight className="w-5 group-hover:translate-x-1 transition-transform" />
-      </button>
-    </div>
-  </div>
-);
-
-// 2. DESTINATION STEP
-const DestinationStep = ({ formData, setFormData, nextStep, prevStep }) => (
-  <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-    <div className="bg-white rounded-[2rem] p-6 lg:p-8 border border-slate-100 shadow-xl shadow-slate-200/50 space-y-6">
-      <h2 className="sora font-black text-slate-900 text-xl">Wallet Details</h2>
-      <p className="text-slate-500 text-sm font-bold">Enter your {formData.asset.name} destination address correctly.</p>
-
-      <div className="space-y-4 pt-2">
-         <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Choose Network</label>
-            <div className="grid grid-cols-1 gap-2">
-               {NETWORKS.find(n => n.symbol === formData.asset.symbol)?.networks.map(net => (
-                 <button
-                   key={net}
-                   onClick={() => setFormData(prev => ({ ...prev, network: net }))}
-                   className={`flex items-center justify-between p-4 rounded-xl border transition-all ${
-                     formData.network === net 
-                      ? "border-blue-600 bg-blue-50 text-blue-700 shadow-sm" 
-                      : "border-slate-100 bg-white hover:border-slate-200"
-                   }`}
-                 >
-                   <div className="flex items-center gap-3">
-                      <Globe className={`w-4 ${formData.network === net ? "text-blue-600" : "text-slate-400"}`} />
-                      <span className="text-sm font-black">{net}</span>
-                   </div>
-                   {formData.network === net && <CheckCircle2 className="w-4 h-4" />}
-                 </button>
-               ))}
-            </div>
-         </div>
-
-         <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 transition-all focus-within:border-blue-300">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Recipient Wallet Address</label>
-            <div className="flex items-center gap-3">
-               <Wallet className="text-slate-300 w-6 h-6" />
-               <input 
-                  type="text"
-                  placeholder={`Paste ${formData.asset.symbol} address here...`}
-                  value={formData.walletAddress}
-                  onChange={(e) => setFormData(prev => ({ ...prev, walletAddress: e.target.value }))}
-                  className="bg-transparent w-full sora font-bold text-sm text-slate-900 placeholder-slate-300 outline-none"
-                  autoFocus
-               />
-            </div>
-         </div>
-
-         <div className="bg-amber-50 rounded-2xl p-5 flex items-start gap-4 border border-amber-100">
-            <AlertCircle className="w-6 h-6 text-amber-500 shrink-0" />
-            <p className="text-amber-800 text-[11px] font-bold leading-relaxed">
-               Sending {formData.asset.symbol} to a different network or the wrong address will result in permanent loss of funds. Triple check before proceeding.
-            </p>
-         </div>
-      </div>
-
-      <div className="flex gap-4">
-        <button onClick={prevStep} className="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-900 sora font-black py-5 rounded-3xl transition-all">Back</button>
-        <button 
-          disabled={!formData.walletAddress || !formData.network}
-          onClick={nextStep}
-          className="flex-[2] bg-slate-900 hover:bg-black text-white sora font-black py-5 rounded-3xl shadow-xl transition-all flex items-center justify-center gap-2 group disabled:opacity-30"
-        >
-          Choose Payment <ChevronRight className="w-5 group-hover:translate-x-1 transition-transform" />
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-// 3. PAYMENT METHOD SELECTION
-const PaymentStep = ({ formData, setFormData, nextStep, prevStep }) => (
-  <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-    <div className="bg-white rounded-[2rem] p-6 lg:p-8 border border-slate-100 shadow-xl shadow-slate-200/50 space-y-6">
-      <h2 className="sora font-black text-slate-900 text-xl">Payment Method</h2>
-      
-      <div className="space-y-4 pt-2">
-         <button
-           onClick={() => setFormData(prev => ({ ...prev, paymentMethod: "bank_transfer" }))}
-           className={`w-full flex items-center gap-5 p-6 rounded-3xl border-2 transition-all text-left ${
-             formData.paymentMethod === "bank_transfer" 
-               ? "border-blue-600 bg-blue-50 shadow-lg shadow-blue-900/5" 
-               : "border-slate-50 bg-white"
-           }`}
-         >
-            <div className="w-14 h-14 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center justify-center text-blue-600 transition-colors">
-               <Building2 className="w-7 h-7" />
-            </div>
-            <div className="flex-1">
-               <h3 className="sora font-black text-slate-900 text-sm">Direct Bank Transfer</h3>
-               <p className="text-slate-500 text-[11px] font-bold mt-1">Transfer manually to our bank account. Instant review.</p>
-            </div>
-            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${formData.paymentMethod === "bank_transfer" ? "border-blue-600 bg-blue-600" : "border-slate-200"}`}>
-               {formData.paymentMethod === "bank_transfer" && <div className="w-2.5 h-2.5 rounded-full bg-white" />}
-            </div>
-         </button>
-
-         <div className="w-full flex items-center gap-5 p-6 rounded-3xl border-2 border-slate-50 bg-slate-50/50 opacity-60 cursor-not-allowed">
-            <div className="w-14 h-14 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center justify-center text-slate-400">
-               <CreditCard className="w-7 h-7" />
-            </div>
-            <div className="flex-1">
-               <h3 className="sora font-black text-slate-400 text-sm">Debit Card (Paystack)</h3>
-               <p className="text-slate-400 text-[11px] font-bold mt-1 uppercase tracking-widest">Available Soon</p>
-            </div>
-         </div>
-      </div>
-
-      <div className="flex gap-4 pt-4">
-        <button onClick={prevStep} className="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-900 sora font-black py-5 rounded-3xl transition-all">Back</button>
-        <button 
-          onClick={nextStep}
-          className="flex-[2] bg-blue-600 hover:bg-blue-700 text-white sora font-black py-5 rounded-3xl shadow-xl transition-all flex items-center justify-center gap-2 group"
-        >
-          Review Order <ChevronRight className="w-5 group-hover:translate-x-1 transition-transform" />
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-// 4. REVIEW & INSTRUCTIONS
-const InstructionsStep = ({ formData, handleCopy, copied, nextStep }) => (
-  <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-    <div className="bg-white rounded-[2rem] p-6 lg:p-8 border border-slate-100 shadow-xl shadow-slate-200/50 space-y-6">
-      <div className="text-center pb-2">
-         <h2 className="sora font-black text-slate-900 text-xl mb-2">Order Summary</h2>
-         <p className="text-slate-400 text-sm font-bold">Transfer the target amount to receive your crypto.</p>
-      </div>
-
-      <div className="bg-slate-50 rounded-3xl p-6 border border-slate-100 divide-y divide-slate-200/50">
-         <div className="flex justify-between py-4">
-            <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Amount to Pay</span>
-            <span className="sora font-black text-lg text-slate-900">₦{parseFloat(formData.amountNGN).toLocaleString()}</span>
-         </div>
-         <div className="flex justify-between py-4">
-            <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Buying</span>
-            <div className="flex items-center gap-2">
-               <span className="sora font-black text-blue-600 text-lg">{formData.amountCrypto} {formData.asset.symbol}</span>
-            </div>
-         </div>
-         <div className="flex justify-between py-4">
-            <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Asset Network</span>
-            <span className="text-xs font-black text-slate-700 uppercase tracking-widest px-3 py-1 bg-white rounded-lg border border-slate-100">{formData.network}</span>
-         </div>
-      </div>
-
-      {/* BANK INSTRUCTIONS */}
-      <div className="bg-blue-600 rounded-[2rem] p-8 text-white relative overflow-hidden shadow-2xl shadow-blue-500/30">
-         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10" />
-         <div className="relative z-10 space-y-6">
-            <div className="flex items-center gap-3">
-               <Building2 className="w-5 h-5 text-blue-200" />
-               <h3 className="sora font-black uppercase text-[10px] tracking-widest text-blue-200">Bank Transfer Details</h3>
-            </div>
-            
-            <div className="grid grid-cols-1 gap-6">
-               <div>
-                  <label className="text-[9px] font-black text-blue-200/60 uppercase tracking-[0.2em] block mb-1">Bank Name</label>
-                  <p className="sora font-black text-lg">{BANK_DETAILS.bankName}</p>
-               </div>
-               <div className="flex items-center justify-between group">
-                  <div>
-                     <label className="text-[9px] font-black text-blue-200/60 uppercase tracking-[0.2em] block mb-1">Account Number</label>
-                     <p className="sora font-black text-2xl tracking-widest">{BANK_DETAILS.accountNumber}</p>
-                  </div>
-                  <button 
-                    onClick={() => handleCopy(BANK_DETAILS.accountNumber, 'acc')}
-                    className="w-12 h-12 bg-white/10 hover:bg-white/20 rounded-2xl flex items-center justify-center transition-all border border-white/10 backdrop-blur-md"
-                  >
-                     {copied === 'acc' ? <CheckCircle2 className="text-emerald-400" size={20} /> : <Copy size={20} />}
-                  </button>
-               </div>
-               <div>
-                  <label className="text-[9px] font-black text-blue-200/60 uppercase tracking-[0.2em] block mb-1">Account Name</label>
-                  <p className="sora font-black text-lg">{BANK_DETAILS.accountName}</p>
-               </div>
-            </div>
-         </div>
-      </div>
-
-      <button 
-        onClick={nextStep}
-        className="w-full bg-slate-900 hover:bg-black text-white sora font-black py-5 rounded-3xl shadow-xl transition-all flex items-center justify-center gap-2 group"
-      >
-        I have made the transfer <ChevronRight className="w-5 group-hover:translate-x-1 transition-transform" />
-      </button>
-    </div>
-  </div>
-);
-
-// 5. UPLOAD PROOF
-const UploadStep = ({ formData, setFormData, uploading, setUploading, nextStep }) => (
-  <div className="animate-in fade-in slide-in-from-right-4 duration-300">
-    <div className="bg-white rounded-[2rem] p-6 lg:p-8 border border-slate-100 shadow-xl shadow-slate-200/50 space-y-6">
-      <h2 className="sora font-black text-slate-900 text-xl">Proof of Payment</h2>
-      <p className="text-slate-500 text-sm font-bold leading-relaxed">
-         Upload a screenshot of your successful transfer receipt. This speeds up your verification.
-      </p>
-
-      <div className="pt-2">
-         <div 
-           className={`relative border-2 border-dashed rounded-[2rem] p-10 text-center transition-all cursor-pointer ${
-             formData.receiptUrl ? "border-emerald-200 bg-emerald-50/30" : "border-slate-200 bg-slate-50 hover:border-blue-400 hover:bg-blue-50/30"
-           }`}
-           onClick={() => !uploading && setUploading(true)}
-         >
-            {uploading ? (
-               <div className="flex flex-col items-center gap-4 py-4">
-                  <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
-                  <span className="sora font-black text-sm text-blue-700 uppercase tracking-widest">Uploading to secure server...</span>
-               </div>
-            ) : formData.receiptUrl ? (
-               <div className="flex flex-col items-center gap-4 py-4">
-                  <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center">
-                     <CheckCircle2 size={32} />
-                  </div>
-                  <div>
-                     <span className="sora font-black text-sm text-emerald-700 block mb-1">Receipt Received</span>
-                     <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">File: transfer_receipt_001.png</span>
-                  </div>
-               </div>
-            ) : (
-               <div className="flex flex-col items-center gap-4">
-                  <div className="w-16 h-16 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center justify-center text-slate-400">
-                     <Upload size={32} />
-                  </div>
-                  <div>
-                     <span className="sora font-black text-sm text-slate-900 block mb-1">Choose Screenshot</span>
-                     <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">JPG, PNG, max 10MB</span>
-                  </div>
-               </div>
-            )}
-            {/* Simulation trigger */}
-            {uploading && setTimeout(() => {
-              setUploading(false);
-              setFormData(prev => ({ ...prev, receiptUrl: "mock_url" }));
-            }, 2000)}
-         </div>
-      </div>
-
-      <div className="space-y-4 pt-2">
-         <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 transition-all focus-within:border-blue-300">
-            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block">Reference / Memo (Optional)</label>
-            <input 
-               type="text"
-               placeholder="Enter bank reference number..."
-               value={formData.receiptReference}
-               onChange={(e) => setFormData(prev => ({ ...prev, receiptReference: e.target.value }))}
-               className="bg-transparent w-full sora font-bold text-sm text-slate-900 placeholder-slate-300 outline-none"
-            />
-         </div>
-      </div>
-
-      <button 
-         onClick={nextStep}
-         disabled={!formData.receiptUrl}
-         className="w-full bg-blue-600 hover:bg-blue-700 text-white sora font-black py-5 rounded-3xl shadow-xl shadow-blue-500/20 transition-all flex items-center justify-center gap-2 group disabled:opacity-30"
-      >
-        Submit for Review <ChevronRight className="w-5 group-hover:translate-x-1 transition-transform" />
-      </button>
-    </div>
-  </div>
-);
-
-// 6. FINAL STATUS TRACKER
-const StatusStep = ({ onBack }) => (
-  <div className="animate-in fade-in zoom-in-95 duration-500">
-     <div className="bg-white rounded-[2.5rem] p-8 lg:p-12 border border-slate-100 shadow-2xl shadow-slate-300/50 text-center space-y-8 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -mr-32 -mt-32" />
-        
-        <div className="relative z-10 flex flex-col items-center">
-           <div className="w-24 h-24 bg-blue-50 text-blue-600 rounded-[2rem] flex items-center justify-center mb-6 shadow-lg shadow-blue-100 border border-blue-100">
-              <Clock className="w-12 h-12" />
-           </div>
-           <h2 className="sora font-black text-slate-900 text-2xl lg:text-3xl mb-3 tracking-tight">Processing Payment</h2>
-           <p className="text-slate-500 text-sm font-bold leading-relaxed max-w-sm mx-auto">
-              Your transfer proof has been submitted. Our team is manually verifying the transaction. This usually takes 5-15 minutes.
-           </p>
+      <div className="w-full">
+        <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="w-full" style={{ height: 80 }}>
+          <defs>
+            <linearGradient id="btcG" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#0066FF" stopOpacity="0.12" />
+              <stop offset="100%" stopColor="#0066FF" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d={area} fill="url(#btcG)" />
+          <polyline points={poly} fill="none" stroke="#0066FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx={lx} cy={ly} r="5" fill="#0066FF" />
+          <circle cx={lx} cy={ly} r="9" fill="#0066FF" fillOpacity="0.15" />
+        </svg>
+        <div className="flex justify-between mt-1">
+          {["12:00", "06:00", "12:00", "18:00", "Now"].map((l, i) => (
+            <span key={i} className="text-[9px] text-slate-400 font-medium">{l}</span>
+          ))}
         </div>
+      </div>
+    </div>
+  );
+};
 
-        <div className="relative z-10 w-full bg-slate-50 rounded-3xl p-6 space-y-6">
-           {/* Timeline */}
-           {[
-             { icon: CheckCircle2, label: "Proof Uploaded", status: "completed", time: "Just now" },
-             { icon: Loader2,      label: "Awaiting Bank Confirmation", status: "active", time: "Estimated 5m" },
-             { icon: Wallet,       label: "Crypto Disbursement", status: "pending", time: "Pending" }
-           ].map((item, idx) => {
-             const Icon = item.icon;
-             return (
-                <div key={item.label} className="flex items-start gap-4 text-left">
-                   <div className="flex flex-col items-center gap-1">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        item.status === 'completed' ? "bg-emerald-500 text-white" : 
-                        item.status === 'active' ? "bg-blue-600 text-white animate-pulse" : 
-                        "bg-slate-200 text-slate-400"
-                      }`}>
-                         <Icon size={14} className={item.status === 'active' ? "animate-spin" : ""} />
-                      </div>
-                      {idx !== 2 && <div className={`w-0.5 h-6 rounded-full ${item.status === 'completed' ? "bg-emerald-500" : "bg-slate-200"}`} />}
-                   </div>
-                   <div className="flex-1 pt-1">
-                      <p className={`sora font-black text-xs ${item.status === 'pending' ? "text-slate-400" : "text-slate-900"}`}>{item.label}</p>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.time}</p>
-                   </div>
-                </div>
-             );
-           })}
-        </div>
-
-        <button 
-           onClick={onBack}
-           className="w-full bg-slate-900 hover:bg-black text-white sora font-black py-5 rounded-3xl transition-all shadow-lg"
-        >
-           Return to Dashboard
+/* ── Asset List Panel ────────────────────────────────────── */
+const AssetList = ({ onClose }) => (
+  <div className="flex flex-col h-full">
+    <div className="flex items-center justify-between mb-4">
+      <h2 className="font-bold text-slate-900 text-base">Choose Asset</h2>
+      {onClose && (
+        <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100 text-slate-500 lg:hidden">
+          <X className="w-4 h-4" />
         </button>
-
-        <div className="flex items-center justify-center gap-2">
-           <ShieldCheck size={14} className="text-blue-600" />
-           <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Insured by CheeseBall Guarantee</span>
-        </div>
-     </div>
-  </div>
-);
-
-/* ── MAIN FLOW COMPONENT ─────────────────────────────────────── */
-
-const BuyFlow = ({ onBack }) => {
-  const [step, setStep] = useState(1);
-  const [currencies, setCurrencies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const [formData, setFormData] = useState({
-    asset: null,
-    amountNGN: "",
-    amountCrypto: "",
-    walletAddress: "",
-    network: "",
-    paymentMethod: "bank_transfer",
-    receiptUrl: "",
-    receiptReference: "",
-  });
-
-  const [copied, setCopied] = useState(null);
-  const [uploading, setUploading] = useState(false);
-
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const { data: currData } = await getCurrencies();
-        if (currData) {
-          const activeAssets = currData.filter(c => c.is_active && c.symbol !== "NGN");
-          const mergedAssets = activeAssets.map(c => {
-             const mock = ASSETS_UI.find(a => a.symbol === c.symbol) || {};
-             return {
-                ...c,
-                name: c.name || mock.name,
-                icon: c.icon_url ? <img src={c.icon_url} alt={c.symbol} className="w-full h-full object-contain p-2" /> : (mock.icon || c.symbol[0]),
-                color: mock.color || "#0F172A",
-                bg: mock.bg || "#F8FAFC",
-                rate: c.buy_rate || mock.rate || 0,
-             };
-          });
-          setCurrencies(mergedAssets);
-          if (mergedAssets.length > 0) {
-            setFormData(prev => ({ ...prev, asset: mergedAssets[0] }));
-          }
-        }
-      } catch (err) {
-        console.error("Init error:", err);
-        setError("Failed to load supported assets.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    init();
-  }, []);
-
-  /* ── Handlers ─────────────────────────────────────────────── */
-  const handleCopy = (text, key) => {
-    navigator.clipboard.writeText(text);
-    setCopied(key);
-    setTimeout(() => setCopied(null), 2000);
-  };
-
-  const updateAmount = (val, type) => {
-    if (type === "NGN") {
-      setFormData(prev => ({
-        ...prev,
-        amountNGN: val,
-        amountCrypto: val ? (parseFloat(val) / prev.asset.rate).toFixed(6) : ""
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        amountCrypto: val,
-        amountNGN: val ? (parseFloat(val) * prev.asset.rate).toFixed(2) : ""
-      }));
-    }
-  };
-
-  const nextStep = () => setStep(s => s + 1);
-  const prevStep = () => setStep(s => s - 1);
-
-  return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-24">
-      {/* HEADER */}
-      <header className="bg-white border-b border-slate-100 px-6 lg:px-12 py-6 flex items-center justify-between sticky top-0 z-[100]">
-        <div className="flex items-center gap-4">
-          <button onClick={onBack} className="w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:bg-slate-50 transition-colors">
-            <ArrowLeft size={18} />
-          </button>
-          <div>
-            <h1 className="sora font-black text-slate-900 text-lg uppercase tracking-tight">Buy Crypto</h1>
-            <div className="flex items-center gap-1.5">
-               <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />
-               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Step {step} of 6</p>
+      )}
+    </div>
+    <div className="relative mb-4">
+      <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+      <input
+        type="text"
+        placeholder="Search coins..."
+        className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-sm outline-none focus:border-[#0066FF] transition-colors placeholder:text-slate-400 font-medium shadow-sm"
+      />
+    </div>
+    <div className="flex-1 overflow-y-auto space-y-1 pr-0.5">
+      {ASSETS.map((asset) => (
+        <div
+          key={asset.symbol}
+          className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${
+            asset.selected ? "bg-[#F0F6FF] border-[#0066FF]" : "border-transparent hover:bg-slate-50"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <div
+              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shadow-sm shrink-0"
+              style={{ backgroundColor: asset.bg, color: asset.color }}
+            >
+              {asset.icon}
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-bold text-slate-900">{asset.name}</span>
+              <span className="text-[11px] text-slate-500 font-medium">{asset.symbol}</span>
             </div>
           </div>
+          <div className="flex flex-col items-end">
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-bold text-slate-900">{asset.price}</span>
+              {asset.selected && <SolidCheck />}
+            </div>
+            <span className={`text-[11px] font-semibold mt-0.5 ${asset.change.startsWith("+") ? "text-green-500" : "text-red-500"}`}>
+              {asset.change}
+            </span>
+          </div>
         </div>
-        
+      ))}
+    </div>
+    <div className="pt-3 border-t border-slate-100 mt-3">
+      <button className="flex items-center justify-between w-full py-2 text-sm font-bold text-slate-700 hover:text-[#0066FF] transition-colors">
+        View all assets <ChevronRight className="w-4 h-4 text-slate-400" />
+      </button>
+    </div>
+  </div>
+);
+
+/* ── Main Component ──────────────────────────────────────── */
+const BuyFlow = ({ onBack }) => {
+  const [payAmount, setPayAmount]       = useState("150,000");
+  const [paymentMethod, setPaymentMethod] = useState("wallet");
+  const [showAssetDrawer, setShowAssetDrawer] = useState(false);
+
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-16">
+
+      {/* ── Top Header ── */}
+      <header className="bg-white border-b border-slate-100 px-4 sm:px-6 py-3.5 flex items-center justify-between sticky top-0 z-50 shadow-sm">
+        {/* Back + Breadcrumb */}
         <div className="flex items-center gap-3">
-           <div className="hidden lg:flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-2xl border border-slate-100">
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Safe Mode</span>
-              <div className="w-8 h-4 bg-blue-600 rounded-full relative">
-                 <div className="absolute right-0.5 top-0.5 w-3 h-3 bg-white rounded-full" />
-              </div>
-           </div>
-           <button className="w-10 h-10 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400">
-              <Info size={18} />
-           </button>
+          <button
+            onClick={onBack}
+            className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+          <div className="hidden sm:flex items-center gap-2 text-sm font-medium">
+            <span className="text-slate-500 cursor-pointer hover:text-slate-800 transition-colors" onClick={onBack}>
+              Dashboard
+            </span>
+            <ChevronRight className="w-4 h-4 text-slate-400" />
+            <span className="text-slate-900 font-bold">Buy Crypto</span>
+          </div>
+          <span className="sm:hidden text-slate-900 font-bold text-base">Buy Crypto</span>
+        </div>
+
+        {/* Right actions */}
+        <div className="flex items-center gap-3">
+          {/* Mobile: Choose Asset trigger */}
+          <button
+            onClick={() => setShowAssetDrawer(true)}
+            className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#0066FF] text-[#0066FF] text-xs font-bold hover:bg-[#F0F6FF] transition-colors"
+          >
+            <span className="w-4 h-4 rounded-full bg-[#FEF3E2] flex items-center justify-center text-[#F7931A] text-[10px] font-bold">₿</span>
+            BTC
+            <ChevronDown className="w-3 h-3" />
+          </button>
+
+          <div className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center relative cursor-pointer hover:bg-slate-50">
+            <Bell className="w-4 h-4 text-slate-600" />
+            <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red-500 rounded-full" />
+          </div>
+          <div className="w-8 h-8 rounded-full bg-[#0066FF] flex items-center justify-center text-white font-bold text-xs shadow-sm cursor-pointer">
+            AK
+          </div>
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 mt-8 lg:mt-12">
-        {loading ? (
-           <div className="min-h-[60vh] flex flex-col items-center justify-center gap-8">
-             <div className="w-16 h-16 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin" />
-             <p className="sora font-black text-slate-400 uppercase tracking-widest text-xs">Loading Assets...</p>
-           </div>
-        ) : error ? (
-           <div className="max-w-2xl mx-auto mb-10 bg-red-50 border border-red-100 rounded-[2rem] p-6 flex items-start gap-4">
-             <AlertCircle className="w-6 h-6 text-red-500 shrink-0" />
-             <p className="text-red-700 text-xs font-bold leading-relaxed">{error}</p>
-           </div>
-        ) : (
-          <>
-            {step === 1 && formData.asset && <QuoteStep formData={formData} setFormData={setFormData} updateAmount={updateAmount} nextStep={nextStep} currencies={currencies} />}
-            {step === 2 && formData.asset && <DestinationStep formData={formData} setFormData={setFormData} nextStep={nextStep} prevStep={prevStep} />}
-            {step === 3 && formData.asset && <PaymentStep formData={formData} setFormData={setFormData} nextStep={nextStep} prevStep={prevStep} />}
-            {step === 4 && formData.asset && <InstructionsStep formData={formData} handleCopy={handleCopy} copied={copied} nextStep={nextStep} />}
-            {step === 5 && formData.asset && <UploadStep formData={formData} setFormData={setFormData} uploading={uploading} setUploading={setUploading} nextStep={nextStep} />}
-            {step === 6 && <StatusStep onBack={onBack} />}
-          </>
-        )}
-      </main>
+      {/* ── Mobile Asset Drawer ── */}
+      {showAssetDrawer && (
+        <div className="fixed inset-0 z-[200] flex flex-col lg:hidden">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setShowAssetDrawer(false)} />
+          <div className="relative mt-auto bg-white rounded-t-2xl p-5 max-h-[85vh] flex flex-col shadow-2xl">
+            <AssetList onClose={() => setShowAssetDrawer(false)} />
+          </div>
+        </div>
+      )}
 
-      <style>{`
-        @keyframes in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-in { animation: in 0.4s ease-out forwards; }
-      `}</style>
+      {/* ── Page Content ── */}
+      <div className="w-full px-4 sm:px-6 lg:px-8 mt-6">
+
+        {/* Page Title */}
+        <div className="mb-5">
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-900 mb-0.5">Buy Crypto</h1>
+          <p className="text-sm text-slate-500 font-medium">Select an asset and enter the amount you'd like to purchase.</p>
+        </div>
+
+        {/* 3-Column Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+          {/* 1. Left Panel — hidden on mobile (shown via drawer) */}
+          <div className="hidden lg:flex lg:col-span-3 flex-col">
+            <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.06)] flex flex-col sticky top-20" style={{ maxHeight: "calc(100vh - 90px)" }}>
+              <AssetList />
+            </div>
+          </div>
+
+          {/* 2. Center Panel — Main Buy Form */}
+          <div className="lg:col-span-6 flex flex-col gap-5 w-full">
+            <div className="bg-white rounded-xl p-4 sm:p-6 border border-slate-200 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.06)] w-full">
+
+              {/* Asset Info Header */}
+              <div className="flex items-center justify-between mb-5 pb-5 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 bg-[#FEF3E2] rounded-full flex items-center justify-center text-[#F7931A] text-xl font-bold shrink-0">
+                    ₿
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-slate-900 tracking-tight leading-tight">Bitcoin</h2>
+                    <p className="text-[11px] text-slate-500 font-medium mt-0.5">BTC • Bitcoin Network</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">$64,280.00</p>
+                  <div className="inline-flex items-center justify-center px-2 py-0.5 bg-green-50 text-green-600 rounded text-[10px] font-bold mt-1">
+                    ▲ +2.14%
+                  </div>
+                </div>
+              </div>
+
+              {/* Price Chart */}
+              <PriceChart />
+
+              {/* You Pay */}
+              <div className="mb-5">
+                <div className="flex justify-between items-end mb-2">
+                  <label className="text-sm font-bold text-slate-900">You Pay</label>
+                  <span className="text-xs font-semibold text-slate-500">
+                    Balance: <span className="text-[#0066FF]">₦341,830</span>
+                  </span>
+                </div>
+
+                <div className="flex items-center border border-slate-200 rounded-lg px-3 py-2.5 transition-all focus-within:border-[#0066FF] focus-within:ring-1 focus-within:ring-[#0066FF] mb-2 shadow-sm bg-white">
+                  {/* Nigeria flag */}
+                  <div className="w-6 h-6 rounded-full overflow-hidden flex shrink-0 mr-3 border border-slate-100 shadow-sm">
+                    <div className="w-1/3 h-full bg-green-600" />
+                    <div className="w-1/3 h-full bg-white" />
+                    <div className="w-1/3 h-full bg-green-600" />
+                  </div>
+                  <input
+                    type="text"
+                    value={payAmount}
+                    onChange={(e) => setPayAmount(e.target.value)}
+                    className="flex-1 bg-transparent text-xl sm:text-2xl font-bold text-slate-900 outline-none min-w-0"
+                  />
+                  <div className="flex items-center gap-1 pl-3 border-l border-slate-200 cursor-pointer shrink-0">
+                    <span className="text-sm font-bold text-slate-900">NGN</span>
+                    <ChevronDown className="w-4 h-4 text-slate-500" />
+                  </div>
+                </div>
+
+                <div className="flex justify-between items-center px-0.5 mb-4">
+                  <span className="text-[11px] font-medium text-slate-500">1 BTC = ₦96,420,000</span>
+                  <div className="flex items-center gap-1 text-[11px] font-medium text-slate-500">
+                    <span>Updated just now</span>
+                    <Info className="w-3 h-3 text-slate-400" />
+                  </div>
+                </div>
+
+                {/* Quick Select */}
+                <div className="flex items-center gap-2 overflow-x-auto pb-0.5 no-scrollbar">
+                  {["N5K", "N20K", "N150K", "N500K", "Max"].map((amt) => (
+                    <button
+                      key={amt}
+                      className={`px-3 sm:px-4 py-1.5 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all shrink-0 ${
+                        amt === "N150K"
+                          ? "bg-[#0066FF] text-white border border-[#0066FF]"
+                          : "bg-slate-50 border border-slate-200 text-slate-700 hover:bg-slate-100"
+                      }`}
+                    >
+                      {amt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* You Receive */}
+              <div className="mb-6">
+                <div className="flex justify-between items-end mb-2">
+                  <label className="text-sm font-bold text-slate-900">You Receive</label>
+                  <span className="text-[11px] font-medium text-slate-500">Est. at market price</span>
+                </div>
+                <div className="flex items-center border border-slate-200 rounded-lg px-3 py-2.5 bg-white shadow-sm">
+                  <div className="w-8 h-8 rounded-full bg-[#FEF3E2] flex items-center justify-center text-[#F7931A] font-bold text-sm shrink-0 mr-3">
+                    ₿
+                  </div>
+                  <div className="flex items-baseline gap-2 min-w-0">
+                    <span className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight truncate">0.00155</span>
+                    <span className="text-sm font-bold text-slate-500 shrink-0">BTC</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment Method */}
+              <div className="mb-6">
+                <label className="text-sm font-bold text-slate-900 block mb-3">Payment Method</label>
+                {/* Stacks on mobile, 3 cols on sm+ */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
+                  {[
+                    {
+                      id: "wallet",
+                      label: "Naira Wallet",
+                      sub: "Balance: ₦341,830",
+                      tag: "Instant",
+                      icon: <Wallet className="w-4 h-4" />,
+                      iconBg: "bg-blue-100 text-blue-600",
+                      iconActive: "bg-[#0066FF] text-white",
+                    },
+                    {
+                      id: "bank",
+                      label: "Bank Transfer",
+                      sub: "GTBank •••• 4421",
+                      tag: "1-2 hrs",
+                      icon: <Building2 className="w-4 h-4" />,
+                      iconBg: "bg-green-100 text-green-600",
+                      iconActive: "bg-green-100 text-green-600",
+                    },
+                    {
+                      id: "card",
+                      label: "Debit Card",
+                      sub: "Visa •••• 8812",
+                      tag: "Instant",
+                      icon: <CreditCard className="w-4 h-4" />,
+                      iconBg: "bg-orange-100 text-orange-600",
+                      iconActive: "bg-orange-100 text-orange-600",
+                    },
+                  ].map((m) => (
+                    <div
+                      key={m.id}
+                      onClick={() => setPaymentMethod(m.id)}
+                      className={`flex items-center sm:items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all ${
+                        paymentMethod === m.id
+                          ? "border-[#0066FF] bg-[#F0F6FF]"
+                          : "border-slate-200 bg-white hover:border-slate-300"
+                      }`}
+                    >
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                          paymentMethod === m.id && m.id === "wallet" ? m.iconActive : m.iconBg
+                        }`}
+                      >
+                        {m.icon}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-xs font-bold text-slate-900 mb-0.5">{m.label}</span>
+                        <span className="text-[10px] text-slate-500 truncate">{m.sub}</span>
+                        <span className="text-[10px] text-slate-500">{m.tag}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* CTA Button */}
+              <div>
+                <button className="w-full py-3.5 rounded-xl bg-[#0066FF] hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm sm:text-base transition-colors shadow-[0_4px_14px_0_rgba(0,102,255,0.35)] flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 rounded-full border border-white flex items-center justify-center">
+                    <Plus className="w-3 h-3" strokeWidth={3} />
+                  </div>
+                  Buy ₦150,000 of BTC
+                </button>
+                <p className="text-[11px] text-center text-slate-500 mt-3 font-medium leading-relaxed">
+                  By confirming, you agree to Cheeseball's{" "}
+                  <span className="text-[#0066FF] cursor-pointer hover:underline">terms</span>. Prices may vary slightly at execution.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 3. Right Sidebar */}
+          <div className="lg:col-span-3 flex flex-col gap-5 w-full">
+
+            {/* Price Alert */}
+            <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.06)]">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-slate-900 text-sm">Price Alert</h3>
+                <div className="w-10 h-6 bg-[#0066FF] rounded-full relative cursor-pointer shrink-0">
+                  <div className="w-5 h-5 bg-white rounded-full absolute top-0.5 right-0.5 shadow-sm" />
+                </div>
+              </div>
+              <div className="relative mb-3">
+                <Bell className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Set target price (e.g. $60,000)"
+                  className="w-full bg-white border border-slate-200 rounded-lg pl-9 pr-3 py-2 text-xs outline-none focus:border-[#0066FF] transition-colors placeholder:text-slate-400 font-medium shadow-sm"
+                />
+              </div>
+              <p className="text-[11px] text-slate-500 font-medium leading-relaxed">
+                Get notified when BTC hits your target price.
+              </p>
+            </div>
+
+            {/* Recent Purchases */}
+            <div className="bg-white rounded-xl p-4 sm:p-5 border border-slate-200 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.06)]">
+              <h3 className="font-bold text-slate-900 mb-4 text-sm">Recent Purchases</h3>
+              <div className="space-y-4">
+                {RECENT.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-sm shrink-0"
+                        style={{ backgroundColor: item.bg, color: item.color }}
+                      >
+                        {item.symbol === "BTC" ? "₿" : item.symbol === "ETH" ? "Ξ" : "₮"}
+                      </div>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-[13px] font-bold text-slate-900 truncate">{item.name}</span>
+                        <span className="text-[11px] text-slate-500 font-medium truncate">{item.date}</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end shrink-0">
+                      <span className="text-[13px] font-bold text-slate-900">{item.amount}</span>
+                      <span className="text-[11px] font-semibold text-green-500 mt-0.5">{item.crypto}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="pt-4 mt-4 border-t border-slate-100 flex justify-center">
+                <button className="text-xs font-bold text-[#0066FF] hover:text-blue-800 transition-colors flex items-center gap-1">
+                  View all purchases <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
