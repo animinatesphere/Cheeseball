@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { fetchTopCurrencies } from "../../utils/cryptoApi";
 import {
   Bell,
   Search,
@@ -100,7 +101,7 @@ const PriceChart = () => {
 };
 
 /* ── Asset List Panel ────────────────────────────────────── */
-const AssetList = ({ onClose }) => (
+const AssetList = ({ assets, selectedSymbol, onSelect, onClose }) => (
   <div className="flex flex-col h-full">
     <div className="flex items-center justify-between mb-4">
       <h2 className="font-bold text-slate-900 text-base">Choose Asset</h2>
@@ -119,36 +120,44 @@ const AssetList = ({ onClose }) => (
       />
     </div>
     <div className="flex-1 overflow-y-auto space-y-1 pr-0.5">
-      {ASSETS.map((asset) => (
-        <div
-          key={asset.symbol}
-          className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${
-            asset.selected ? "bg-[#F0F6FF] border-[#0066FF]" : "border-transparent hover:bg-slate-50"
-          }`}
-        >
-          <div className="flex items-center gap-3">
-            <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shadow-sm shrink-0"
-              style={{ backgroundColor: asset.bg, color: asset.color }}
-            >
-              {asset.icon}
+      {assets.map((asset) => {
+        const isSelected = asset.symbol.toUpperCase() === selectedSymbol?.toUpperCase();
+        return (
+          <div
+            key={asset.id || asset.symbol}
+            onClick={() => onSelect(asset)}
+            className={`flex items-center justify-between p-3 rounded-lg border cursor-pointer transition-all ${
+              isSelected ? "bg-[#F0F6FF] border-[#0066FF]" : "border-transparent hover:bg-slate-50"
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div
+                className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shadow-sm shrink-0 overflow-hidden"
+                style={{ backgroundColor: asset.bg || "#F8FAFC", color: asset.color || "#0066FF" }}
+              >
+                {asset.image ? <img src={asset.image} alt={asset.name} className="w-full h-full object-cover" /> : (asset.icon || asset.symbol[0])}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-slate-900">{asset.name}</span>
+                <span className="text-[11px] text-slate-500 font-medium">{asset.symbol.toUpperCase()}</span>
+              </div>
             </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-bold text-slate-900">{asset.name}</span>
-              <span className="text-[11px] text-slate-500 font-medium">{asset.symbol}</span>
+            <div className="flex flex-col items-end">
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm font-bold text-slate-900">
+                  {asset.current_price ? `₦${asset.current_price.toLocaleString()}` : asset.price}
+                </span>
+                {isSelected && <SolidCheck />}
+              </div>
+              <span className={`text-[11px] font-semibold mt-0.5 ${
+                (asset.price_change_percentage_24h || 0) >= 0 ? "text-green-500" : "text-red-500"
+              }`}>
+                {asset.price_change_percentage_24h ? `${asset.price_change_percentage_24h.toFixed(2)}%` : asset.change}
+              </span>
             </div>
           </div>
-          <div className="flex flex-col items-end">
-            <div className="flex items-center gap-1.5">
-              <span className="text-sm font-bold text-slate-900">{asset.price}</span>
-              {asset.selected && <SolidCheck />}
-            </div>
-            <span className={`text-[11px] font-semibold mt-0.5 ${asset.change.startsWith("+") ? "text-green-500" : "text-red-500"}`}>
-              {asset.change}
-            </span>
-          </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
     <div className="pt-3 border-t border-slate-100 mt-3">
       <button className="flex items-center justify-between w-full py-2 text-sm font-bold text-slate-700 hover:text-[#0066FF] transition-colors">
@@ -163,6 +172,41 @@ const BuyFlow = ({ onBack }) => {
   const [payAmount, setPayAmount]       = useState("150,000");
   const [paymentMethod, setPaymentMethod] = useState("wallet");
   const [showAssetDrawer, setShowAssetDrawer] = useState(false);
+  const [assets, setAssets] = useState(ASSETS);
+  const [selectedAsset, setSelectedAsset] = useState(ASSETS[0]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadAssets = async () => {
+      try {
+        const data = await fetchTopCurrencies();
+        if (data && data.length > 0) {
+          setAssets(data);
+          // Auto-select BTC or first asset
+          const btc = data.find(a => a.symbol.toUpperCase() === "BTC");
+          setSelectedAsset(btc || data[0]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch assets:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadAssets();
+  }, []);
+
+  const handleAssetSelect = (asset) => {
+    setSelectedAsset(asset);
+    setShowAssetDrawer(false);
+  };
+
+  const getNumericAmount = (str) => {
+    return parseFloat(str.replace(/,/g, "")) || 0;
+  };
+
+  const receiveAmount = selectedAsset?.current_price 
+    ? (getNumericAmount(payAmount) / selectedAsset.current_price).toFixed(8)
+    : "0.00000000";
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-16">
@@ -196,8 +240,10 @@ const BuyFlow = ({ onBack }) => {
             onClick={() => setShowAssetDrawer(true)}
             className="lg:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#0066FF] text-[#0066FF] text-xs font-bold hover:bg-[#F0F6FF] transition-colors"
           >
-            <span className="w-4 h-4 rounded-full bg-[#FEF3E2] flex items-center justify-center text-[#F7931A] text-[10px] font-bold">₿</span>
-            BTC
+            <div className="w-4 h-4 rounded-full overflow-hidden flex items-center justify-center shrink-0">
+              {selectedAsset?.image ? <img src={selectedAsset.image} alt="" className="w-full h-full object-cover" /> : <span className="text-[10px] font-bold">₿</span>}
+            </div>
+            {selectedAsset?.symbol?.toUpperCase() || "BTC"}
             <ChevronDown className="w-3 h-3" />
           </button>
 
@@ -216,7 +262,12 @@ const BuyFlow = ({ onBack }) => {
         <div className="fixed inset-0 z-[200] flex flex-col lg:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setShowAssetDrawer(false)} />
           <div className="relative mt-auto bg-white rounded-t-2xl p-5 max-h-[85vh] flex flex-col shadow-2xl">
-            <AssetList onClose={() => setShowAssetDrawer(false)} />
+            <AssetList 
+              assets={assets} 
+              selectedSymbol={selectedAsset?.symbol} 
+              onSelect={handleAssetSelect} 
+              onClose={() => setShowAssetDrawer(false)} 
+            />
           </div>
         </div>
       )}
@@ -236,7 +287,11 @@ const BuyFlow = ({ onBack }) => {
           {/* 1. Left Panel — hidden on mobile (shown via drawer) */}
           <div className="hidden lg:flex lg:col-span-3 flex-col">
             <div className="bg-white rounded-xl p-4 border border-slate-200 shadow-[0_2px_8px_-4px_rgba(0,0,0,0.06)] flex flex-col sticky top-20" style={{ maxHeight: "calc(100vh - 90px)" }}>
-              <AssetList />
+              <AssetList 
+                assets={assets} 
+                selectedSymbol={selectedAsset?.symbol} 
+                onSelect={handleAssetSelect} 
+              />
             </div>
           </div>
 
@@ -247,20 +302,15 @@ const BuyFlow = ({ onBack }) => {
               {/* Asset Info Header */}
               <div className="flex items-center justify-between mb-5 pb-5 border-b border-slate-100">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 bg-[#FEF3E2] rounded-full flex items-center justify-center text-[#F7931A] text-xl font-bold shrink-0">
-                    ₿
+                  <div className="w-11 h-11 bg-slate-50 rounded-full flex items-center justify-center overflow-hidden shrink-0">
+                    {selectedAsset?.image ? <img src={selectedAsset.image} alt="" className="w-full h-full object-cover" /> : <span className="text-xl font-bold">₿</span>}
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-slate-900 tracking-tight leading-tight">Bitcoin</h2>
-                    <p className="text-[11px] text-slate-500 font-medium mt-0.5">BTC • Bitcoin Network</p>
+                    <h2 className="text-lg font-bold text-slate-900 tracking-tight leading-tight">{selectedAsset?.name || "Bitcoin"}</h2>
+                    <p className="text-[11px] text-slate-500 font-medium mt-0.5">{selectedAsset?.symbol?.toUpperCase() || "BTC"} • {selectedAsset?.name || "Bitcoin"} Network</p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">$64,280.00</p>
-                  <div className="inline-flex items-center justify-center px-2 py-0.5 bg-green-50 text-green-600 rounded text-[10px] font-bold mt-1">
-                    ▲ +2.14%
-                  </div>
-                </div>
+               
               </div>
 
               {/* Price Chart */}
@@ -295,7 +345,7 @@ const BuyFlow = ({ onBack }) => {
                 </div>
 
                 <div className="flex justify-between items-center px-0.5 mb-4">
-                  <span className="text-[11px] font-medium text-slate-500">1 BTC = ₦96,420,000</span>
+                  <span className="text-[11px] font-medium text-slate-500">1 {selectedAsset?.symbol?.toUpperCase() || "BTC"} = ₦{selectedAsset?.current_price?.toLocaleString() || "96,420,000"}</span>
                   <div className="flex items-center gap-1 text-[11px] font-medium text-slate-500">
                     <span>Updated just now</span>
                     <Info className="w-3 h-3 text-slate-400" />
@@ -326,12 +376,12 @@ const BuyFlow = ({ onBack }) => {
                   <span className="text-[11px] font-medium text-slate-500">Est. at market price</span>
                 </div>
                 <div className="flex items-center border border-slate-200 rounded-lg px-3 py-2.5 bg-white shadow-sm">
-                  <div className="w-8 h-8 rounded-full bg-[#FEF3E2] flex items-center justify-center text-[#F7931A] font-bold text-sm shrink-0 mr-3">
-                    ₿
+                  <div className="w-8 h-8 rounded-full overflow-hidden flex items-center justify-center shrink-0 mr-3">
+                    {selectedAsset?.image ? <img src={selectedAsset.image} alt="" className="w-full h-full object-cover" /> : <span className="font-bold text-sm">₿</span>}
                   </div>
                   <div className="flex items-baseline gap-2 min-w-0">
-                    <span className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight truncate">0.00155</span>
-                    <span className="text-sm font-bold text-slate-500 shrink-0">BTC</span>
+                    <span className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight truncate">{receiveAmount}</span>
+                    <span className="text-sm font-bold text-slate-500 shrink-0">{selectedAsset?.symbol?.toUpperCase() || "BTC"}</span>
                   </div>
                 </div>
               </div>
@@ -362,7 +412,7 @@ const BuyFlow = ({ onBack }) => {
                     },
                     {
                       id: "card",
-                      label: "Debit Card",
+                      label: "Paystack",
                       sub: "Visa •••• 8812",
                       tag: "Instant",
                       icon: <CreditCard className="w-4 h-4" />,
@@ -402,7 +452,7 @@ const BuyFlow = ({ onBack }) => {
                   <div className="w-4 h-4 rounded-full border border-white flex items-center justify-center">
                     <Plus className="w-3 h-3" strokeWidth={3} />
                   </div>
-                  Buy ₦150,000 of BTC
+                  Buy ₦{payAmount} of {selectedAsset?.symbol?.toUpperCase() || "BTC"}
                 </button>
                 <p className="text-[11px] text-center text-slate-500 mt-3 font-medium leading-relaxed">
                   By confirming, you agree to Cheeseball's{" "}
@@ -432,7 +482,7 @@ const BuyFlow = ({ onBack }) => {
                 />
               </div>
               <p className="text-[11px] text-slate-500 font-medium leading-relaxed">
-                Get notified when BTC hits your target price.
+                Get notified when {selectedAsset?.symbol?.toUpperCase() || "BTC"} hits your target price.
               </p>
             </div>
 
