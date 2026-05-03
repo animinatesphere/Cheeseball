@@ -39,6 +39,9 @@ const NETWORKS = {
   XRP: ["Ripple Network"],
 };
 
+const PRICE_EXPIRY_TIME = 900; // 15 minutes in seconds
+
+
 /* ── UTILS ─────────────────────────────────────────────────── */
 const formatNGN = (val) => {
   return new Intl.NumberFormat('en-NG', {
@@ -491,7 +494,7 @@ const Step3 = ({ selectedAsset, receiveAmount, selectedNetwork, setSelectedNetwo
             )}
           </div>
 
-          {/* WALLET LABEL (OPTIONAL) */}
+          {/* WALLET LABEL (OPTIONAL)
           <div className="space-y-3">
             <label className="text-sm font-bold text-slate-900">Wallet label (optional)</label>
             <input 
@@ -502,7 +505,7 @@ const Step3 = ({ selectedAsset, receiveAmount, selectedNetwork, setSelectedNetwo
               className="w-full bg-white border-2 border-slate-100 focus:border-blue-500 rounded-2xl px-5 py-4 text-base font-medium outline-none transition-all shadow-sm"
             />
             <p className="text-xs font-medium text-slate-400">Add a label to easily identify this wallet.</p>
-          </div>
+          </div> */}
 
           {/* SAFETY NOTICE BOX */}
           <div className="flex items-start gap-4 p-5 bg-[#F9FAFB] rounded-2xl border border-[#F1F3F5] text-sm font-medium text-slate-600 leading-relaxed">
@@ -786,7 +789,7 @@ const BuyFlow = ({ onBack }) => {
   const [walletLabel, setWalletLabel] = useState("");
   const [selectedNetwork, setSelectedNetwork] = useState(NETWORKS[ASSETS[0].symbol][0]);
   const [paymentMethod, setPaymentMethod] = useState("wallet");
-  const [expiryTime, setExpiryTime] = useState(300);
+  const [expiryTime, setExpiryTime] = useState(PRICE_EXPIRY_TIME);
   const [isExpired, setIsExpired] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [proofFile, setProofFile] = useState(null);
@@ -801,7 +804,7 @@ const BuyFlow = ({ onBack }) => {
     }
   }, [step, expiryTime, isExpired]);
 
-  const resetExpiry = () => { setExpiryTime(300); setIsExpired(false); };
+  const resetExpiry = () => { setExpiryTime(PRICE_EXPIRY_TIME); setIsExpired(false); };
   const nextStep = () => setStep(prev => Math.min(prev + 1, 6));
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
 
