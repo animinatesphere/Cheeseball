@@ -123,7 +123,7 @@ const TransactionSummary = ({ payAmount, receiveAmount, selectedAsset, walletAdd
   </div>
 );
 
-const Step1 = ({ selectedAsset, setSelectedAsset, setSelectedNetwork, payAmount, setPayAmount, searchQuery, setSearchQuery, nextStep }) => (
+const Step1 = ({ selectedAsset, setSelectedAsset, setSelectedNetwork, payAmount, setPayAmount, searchQuery, setSearchQuery, nextStep, onViewAll }) => (
   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
     <div className="lg:col-span-5 bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-auto lg:h-[500px]">
       <div className="p-5 border-b border-slate-100">
@@ -171,6 +171,15 @@ const Step1 = ({ selectedAsset, setSelectedAsset, setSelectedNetwork, payAmount,
             </div>
           </div>
         ))}
+      </div>
+      <div className="p-4 border-t border-slate-50 bg-slate-50/30">
+        <button 
+          onClick={onViewAll}
+          className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white text-blue-600 transition-all group border border-transparent hover:border-blue-100 hover:shadow-sm"
+        >
+          <span className="text-sm font-bold">View All Assets</span>
+          <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+        </button>
       </div>
     </div>
     <div className="lg:col-span-7 space-y-6">
@@ -822,7 +831,7 @@ const BuyFlow = ({ onBack }) => {
       <div className="max-w-7xl mx-auto">
         <Header step={step} onBack={onBack} />
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-           {step === 1 && <Step1 selectedAsset={selectedAsset} setSelectedAsset={setSelectedAsset} setSelectedNetwork={setSelectedNetwork} payAmount={payAmount} setPayAmount={setPayAmount} searchQuery={searchQuery} setSearchQuery={setSearchQuery} nextStep={nextStep} />}
+           {step === 1 && <Step1 selectedAsset={selectedAsset} setSelectedAsset={setSelectedAsset} setSelectedNetwork={setSelectedNetwork} payAmount={payAmount} setPayAmount={setPayAmount} searchQuery={searchQuery} setSearchQuery={setSearchQuery} nextStep={nextStep} onViewAll={onBack} />}
            {step === 2 && <Step2 payAmount={payAmount} receiveAmount={receiveAmount} selectedAsset={selectedAsset} selectedNetwork={selectedNetwork} nextStep={nextStep} prevStep={prevStep} expiryTime={expiryTime} isExpired={isExpired} resetExpiry={resetExpiry} onBack={onBack} />}
            {step === 3 && <Step3 selectedAsset={selectedAsset} receiveAmount={receiveAmount} selectedNetwork={selectedNetwork} setSelectedNetwork={setSelectedNetwork} walletAddress={walletAddress} setWalletAddress={setWalletAddress} walletLabel={walletLabel} setWalletLabel={setWalletLabel} nextStep={nextStep} prevStep={prevStep} payAmount={payAmount} expiryTime={expiryTime} isExpired={isExpired} resetExpiry={resetExpiry} onBack={onBack} />}
            {step === 4 && <Step4 payAmount={payAmount} paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod} nextStep={nextStep} prevStep={prevStep} receiveAmount={receiveAmount} selectedAsset={selectedAsset} walletAddress={walletAddress} expiryTime={expiryTime} isExpired={isExpired} />}
