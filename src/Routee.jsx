@@ -17,6 +17,9 @@ import PrivacyPolicy from "./user/pages/PrivacyPolicy";
 import AMLPolicy from "./user/pages/AMLPolicy";
 import { Careers, Press } from "./user/pages/CompanyPages";
 import ForgotPassword from "./user/pages/ForgotPassword";
+import AuthSignup from "./user/auth/signup/AuthSignup";
+import Verify from "./user/auth/signup/Verify";
+import EmailVerified from "./user/auth/signup/EmailVerified";
 
 const Routee = () => {
   return (
@@ -28,12 +31,15 @@ const Routee = () => {
         <Route path="/buy-crypto" element={<BuyCrypto />} />
         <Route path="/sell-crypto" element={<SellCrypto />} />
         <Route path="/seamless-crypto" element={<SeamCrypto />} />
-        <Route path="/currency-change" element={<CurrencyPage />} />
+        <Route path="/currency-change/*" element={<CurrencyPage />} />
         <Route path="/admin-login" element={<CheeseBallLogin />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/login" element={<Auth />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/verify-account" element={<Verify />} />
+        <Route path="/email-verified" element={<EmailVerified />} />
+        {/* <Route path="/signup" element={<Signup />} /> */}
+        <Route path="/signup" element={<AuthSignup />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
