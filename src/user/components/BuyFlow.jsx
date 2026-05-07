@@ -637,7 +637,7 @@ const Step3 = ({ selectedAsset, receiveAmount, selectedNetwork, setSelectedNetwo
 const Step4 = ({ payAmount, paymentMethod, setPaymentMethod, nextStep, prevStep, receiveAmount, selectedAsset, expiryTime }) => (
   <div className="min-h-screen bg-white text-[#0F172A]">
     <div className="w-full border-b border-[#E5E7EB] bg-white">
-      <div className="max-w-[1450px] mx-auto px-8 h-[78px] flex items-center justify-between">
+      <div className="w-full px-8 h-[78px] flex items-center justify-between">
         <div className="flex items-center gap-5">
           <button onClick={prevStep} className="w-11 h-11 rounded-xl border border-[#E5E7EB] flex items-center justify-center bg-white hover:bg-[#F8FAFC] transition">
             <ArrowLeft size={20} />
@@ -663,7 +663,7 @@ const Step4 = ({ payAmount, paymentMethod, setPaymentMethod, nextStep, prevStep,
         </div>
       </div>
     </div>
-    <div className="max-w-[1450px] mx-auto px-8 py-10">
+    <div className="w-full px-8 py-10">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-[22px] leading-none font-bold tracking-[-0.5px] text-[#0F172A]">Payment Method</h1>
@@ -807,7 +807,7 @@ const Step5 = ({ paymentMethod, payAmount, receiveAmount, selectedAsset, walletA
     return (
       <div className="min-h-screen bg-white text-[#0F172A]">
         <div className="h-[78px] bg-white border-b border-[#E5E7EB]">
-          <div className="max-w-[1450px] mx-auto px-8 h-full flex items-center justify-between">
+          <div className="w-full px-8 h-full flex items-center justify-between">
             <div className="flex items-center gap-5">
               <button onClick={prevStep} className="w-12 h-12 rounded-2xl border border-[#E5E7EB] bg-white flex items-center justify-center hover:bg-[#F8FAFC] transition">
                 <ArrowLeft size={21} />
@@ -833,7 +833,7 @@ const Step5 = ({ paymentMethod, payAmount, receiveAmount, selectedAsset, walletA
             </div>
           </div>
         </div>
-        <div className="max-w-[1450px] mx-auto px-8 py-10">
+        <div className="w-full px-8 py-10">
           <div className="flex items-start justify-between mb-8">
             <div>
               <h1 className="text-[22px] leading-none tracking-[-0.5px] font-bold text-[#0F172A]">Pay with NGN Wallet</h1>
@@ -1074,7 +1074,7 @@ const Step6 = ({ paymentMethod, receiveAmount, selectedAsset, payAmount, walletA
     </div>
     {/* PAGE */}
     <div className="px-8 py-10 flex justify-center">
-      <div className="w-full max-w-[1120px]">
+      <div className="w-full px-8">
         <div className="bg-white border border-[#E6EBF2] rounded-[32px] px-8 py-14 shadow-[0_10px_30px_rgba(15,23,42,0.03)]">
           {/* ICON */}
           <div className="flex justify-center">
@@ -1188,7 +1188,7 @@ const BuyFlow = ({ onBack }) => {
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
       `}</style>
-      <div className="max-w-7xl mx-auto">
+      <div className={`${step >= 4 ? "w-full" : "max-w-7xl mx-auto"}`}>
         <Header step={step} onBack={onBack} />
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
            {step === 1 && <Step1 selectedAsset={selectedAsset} setSelectedAsset={setSelectedAsset} setSelectedNetwork={setSelectedNetwork} payAmount={payAmount} setPayAmount={setPayAmount} searchQuery={searchQuery} setSearchQuery={setSearchQuery} nextStep={nextStep} onViewAll={onBack} />}
