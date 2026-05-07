@@ -115,7 +115,7 @@ const TransactionSummary = ({ payAmount, receiveAmount, selectedAsset, walletAdd
       </div>
     </div>
     {expiryTime > 0 && !isExpired && (
-      <div className="mt-4 flex items-center justify-between p-3 bg-blue-50 rounded-xl border border-blue-100">
+      <div className="mt-4 flex items-center justify-between p-3 bg-white rounded-xl border border-blue-100">
         <div className="flex items-center gap-2">
           <Clock className="w-4 h-4 text-blue-600" />
           <span className="text-xs font-bold text-blue-600 uppercase tracking-tight">Price expires in</span>
@@ -136,7 +136,7 @@ const Step1 = ({ selectedAsset, setSelectedAsset, setSelectedNetwork, payAmount,
           <input 
             type="text" 
             placeholder="Search coins..." 
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:border-blue-500 transition-colors"
+            className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm outline-none focus:border-blue-500 transition-colors"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -187,7 +187,7 @@ const Step1 = ({ selectedAsset, setSelectedAsset, setSelectedNetwork, payAmount,
     </div>
     <div className="lg:col-span-7 space-y-6">
       <div className="bg-white rounded-2xl p-6 lg:p-8 border border-slate-200 shadow-sm space-y-8">
-        <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+        <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-100">
            <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold" style={{ backgroundColor: selectedAsset.bg, color: selectedAsset.color }}>
              {selectedAsset.icon}
            </div>
@@ -505,8 +505,8 @@ const Step3 = ({ selectedAsset, receiveAmount, selectedNetwork, setSelectedNetwo
               </p>
             )}
           </div>
-{/* the commented place */}
-          {/* WALLET LABEL (OPTIONAL)
+{/* the commented placenhhhh */}
+          {/* WALLET LABEL (OPTIONAL)rffffffffffffffffffffffffffffffggg
           <div className="space-y-3">
             <label className="text-sm font-bold text-slate-900">Wallet label (optional)</label>
             <input 
@@ -589,13 +589,13 @@ const Step3 = ({ selectedAsset, receiveAmount, selectedNetwork, setSelectedNetwo
             <div className="pt-6 border-t border-slate-100">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium text-slate-500">Price expires in</span>
-                <span className="text-sm font-bold text-orange-600 bg-orange-50 px-3 py-1 rounded-full">{formatTime(expiryTime)}</span>
+                <span className="text-sm font-bold text-orange-600 border border-orange-100 px-3 py-1 rounded-full">{formatTime(expiryTime)}</span>
               </div>
             </div>
 
             {/* SECURITY NOTE */}
             <div className="pt-6 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+              <div className="w-10 h-10 rounded-xl bg-white border border-blue-100 flex items-center justify-center text-blue-600">
                 <Lock className="w-5 h-5" />
               </div>
               <div>
@@ -635,7 +635,7 @@ const Step3 = ({ selectedAsset, receiveAmount, selectedNetwork, setSelectedNetwo
 
 
 const Step4 = ({ payAmount, paymentMethod, setPaymentMethod, nextStep, prevStep, receiveAmount, selectedAsset, expiryTime }) => (
-  <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
+  <div className="min-h-screen bg-white text-[#0F172A]">
     <div className="w-full border-b border-[#E5E7EB] bg-white">
       <div className="max-w-[1450px] mx-auto px-8 h-[78px] flex items-center justify-between">
         <div className="flex items-center gap-5">
@@ -785,7 +785,7 @@ const Step4 = ({ payAmount, paymentMethod, setPaymentMethod, nextStep, prevStep,
             <span className="text-[#64748B] text-[16px]">Price expires in</span>
             <span className="font-bold text-[#EA580C] text-[13px]">{formatTime(expiryTime)}</span>
           </div>
-          <div className="mt-8 bg-[#F8FAFC] border border-[#E5E7EB] rounded-2xl p-5 flex items-start gap-4">
+          <div className="mt-8 bg-white border border-[#E5E7EB] rounded-2xl p-5 flex items-start gap-4">
             <div className="w-11 h-11 rounded-xl bg-white border border-[#E5E7EB] flex items-center justify-center">
               <ShieldCheck size={22} className="text-[#2563EB]" />
             </div>
@@ -805,7 +805,7 @@ const Step5 = ({ paymentMethod, payAmount, receiveAmount, selectedAsset, walletA
 
   if (paymentMethod === "wallet") {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] text-[#0F172A]">
+      <div className="min-h-screen bg-white text-[#0F172A]">
         <div className="h-[78px] bg-white border-b border-[#E5E7EB]">
           <div className="max-w-[1450px] mx-auto px-8 h-full flex items-center justify-between">
             <div className="flex items-center gap-5">
@@ -900,7 +900,7 @@ const Step5 = ({ paymentMethod, payAmount, receiveAmount, selectedAsset, walletA
                   </div>
                 </div>
               </div>
-              <div className="mt-6 bg-[#F8FAFC] border border-[#E2E8F0] rounded-[20px] p-5 flex items-start gap-4">
+              <div className="mt-6 bg-white border border-[#E2E8F0] rounded-[20px] p-5 flex items-start gap-4">
                 <div className="w-10 h-10 rounded-xl bg-white border border-[#DBEAFE] flex items-center justify-center flex-shrink-0">
                   <Info size={20} className="text-[#2563EB]" />
                 </div>
@@ -967,7 +967,7 @@ const Step5 = ({ paymentMethod, payAmount, receiveAmount, selectedAsset, walletA
                 <span className="text-[#64748B] text-[16px]">Price expires in</span>
                 <span className="font-bold text-[#EA580C] text-[13px]">{formatTime(expiryTime)}</span>
               </div>
-              <div className="mt-8 bg-[#F8FAFC] border border-[#E5E7EB] rounded-[22px] p-5 flex items-start gap-4">
+              <div className="mt-8 bg-white border border-[#E5E7EB] rounded-[22px] p-5 flex items-start gap-4">
                 <div className="w-11 h-11 rounded-xl bg-white border border-[#E5E7EB] flex items-center justify-center">
                   <ShieldCheck size={22} className="text-[#2563EB]" />
                 </div>
@@ -987,14 +987,14 @@ const Step5 = ({ paymentMethod, payAmount, receiveAmount, selectedAsset, walletA
     return (
       <div className="max-w-3xl mx-auto space-y-8">
          <div className="bg-white rounded-[2.5rem] p-10 lg:p-12 border border-slate-200 shadow-sm space-y-10 text-center">
-            <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto"><CreditCard className="w-10 h-10" /></div>
+            <div className="w-20 h-20 bg-white border border-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto"><CreditCard className="w-10 h-10" /></div>
             <div className="space-y-2"><h2 className="text-[18px] font-bold text-slate-900 sora">Pay with Paystack</h2><p className="text-slate-500 text-[13px] font-medium max-w-sm mx-auto">You will be redirected to Paystack to complete your payment securely.</p></div>
-            <div className="max-w-xs mx-auto p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-4">
+            <div className="max-w-xs mx-auto p-6 bg-white rounded-3xl border border-slate-100 space-y-4">
                <div className="space-y-1"><span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Amount</span><div className="text-[20px] font-black text-slate-900 sora">{formatNGN(payAmount)}</div></div>
                <div className="pt-3 border-t border-slate-200"><span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">You receive</span><div className="text-sm font-bold text-slate-900">{receiveAmount} {selectedAsset.symbol}</div></div>
                <div className="pt-2"><span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Wallet</span><div className="text-xs font-mono font-medium text-slate-900">{truncateAddress(walletAddress)}</div></div>
             </div>
-            <div className="flex items-center gap-2 justify-center py-2 px-4 bg-orange-50 text-orange-600 rounded-full w-fit mx-auto border border-orange-100"><Clock className="w-4 h-4" /><span className="text-xs font-bold uppercase tracking-tight">Quote expires in: {formatTime(expiryTime)}</span></div>
+            <div className="flex items-center gap-2 justify-center py-2 px-4 bg-white text-orange-600 rounded-full w-fit mx-auto border border-orange-100"><Clock className="w-4 h-4" /><span className="text-xs font-bold uppercase tracking-tight">Quote expires in: {formatTime(expiryTime)}</span></div>
             <div className="flex items-center gap-4 pt-4">
                <button onClick={prevStep} className="flex-1 text-slate-500 font-bold hover:text-slate-900 py-3 text-[14px] transition-all">Back</button>
                <button onClick={() => setStep(6)} className="flex-[2] bg-emerald-600 hover:bg-emerald-700 text-white py-3 rounded-xl font-bold shadow-xl shadow-emerald-500/30 flex items-center justify-center gap-2 group text-[14px]">Proceed to Paystack <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-all" /></button>
@@ -1012,7 +1012,7 @@ const Step5 = ({ paymentMethod, payAmount, receiveAmount, selectedAsset, walletA
             <h2 className="text-[18px] font-bold text-slate-900 sora text-center">{hasPaid ? "Upload Payment Proof" : "Bank Transfer Details"}</h2>
             {!hasPaid ? (
               <>
-                <div className="p-6 bg-slate-900 rounded-[1.5rem] text-center space-y-1"><span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Transfer exactly</span><div className="text-[24px] font-black text-white sora">{formatNGN(payAmount)}</div></div>
+                <div className="p-6 bg-[#F8FAFC] border border-[#E5E7EB] rounded-[1.5rem] text-center space-y-1"><span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Transfer exactly</span><div className="text-[24px] font-black text-[#0F172A] sora">{formatNGN(payAmount)}</div></div>
                 <div className="space-y-4">
                   <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Bank Details</h3>
                   <div className="space-y-3">
@@ -1042,7 +1042,7 @@ const Step5 = ({ paymentMethod, payAmount, receiveAmount, selectedAsset, walletA
 };
 
 const Step6 = ({ paymentMethod, receiveAmount, selectedAsset, payAmount, walletAddress, onBack, setStep, resetExpiry, setHasPaid, setProofFile }) => (
-  <div className="min-h-screen bg-[#F7F9FC] text-[#0F172A]">
+  <div className="min-h-screen bg-white text-[#0F172A]">
     {/* TOP NAV */}
     <div className="h-[82px] border-b border-[#E6EBF2] bg-white px-8 flex items-center justify-between">
       <div className="flex items-center gap-6">
@@ -1094,7 +1094,7 @@ const Step6 = ({ paymentMethod, receiveAmount, selectedAsset, payAmount, walletA
           </div>
           {/* TITLE */}
           <div className="text-center mt-8">
-            <h1 className="text-[28px] leading-none font-bold tracking-[-0.5px] text-[#0B0F3B]">Payment Successful!</h1>
+            <h1 className="text-[28px] leading-none font-bold tracking-[-0.5px] text-[#0F172A]">Payment Successful!</h1>
             <p className="mt-4 text-[18px] text-[#64748B] font-medium">
               Your payment of <span className="font-bold text-[#0F172A]">{formatNGN(payAmount)}</span> was successful.
             </p>
@@ -1178,7 +1178,7 @@ const BuyFlow = ({ onBack }) => {
   const prevStep = () => setStep(prev => Math.max(prev - 1, 1));
 
   return (
-    <div className={`min-h-screen ${step >= 4 ? "" : step === 2 || step === 3 ? "bg-white" : "bg-slate-50"} ${step >= 4 ? "" : "p-4 lg:p-8"} font-sans antialiased text-slate-900 overflow-x-hidden ${step === 1 ? "lg:aspect-[16/9]" : ""}`}>
+    <div className={`min-h-screen ${step >= 4 ? "" : step === 2 || step === 3 ? "bg-white" : "bg-white"} ${step >= 4 ? "" : "p-4 lg:p-8"} font-sans antialiased text-slate-900 overflow-x-hidden ${step === 1 ? "lg:aspect-[16/9]" : ""}`}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Sora:wght@100..800&display=swap');
         .sora { font-family: 'Sora', sans-serif; }
