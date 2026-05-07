@@ -505,7 +505,7 @@ const Step3 = ({ selectedAsset, receiveAmount, selectedNetwork, setSelectedNetwo
               </p>
             )}
           </div>
-{/* the commented place */}
+{/* the commented placenhhhh */}
           {/* WALLET LABEL (OPTIONAL)
           <div className="space-y-3">
             <label className="text-sm font-bold text-slate-900">Wallet label (optional)</label>
