@@ -663,7 +663,7 @@ const Step4 = ({ payAmount, paymentMethod, setPaymentMethod, nextStep, prevStep,
         </div>
       </div>
     </div>
-    <div className="w-full px-8 py-10">
+    <div className="max-w-[1200px] mx-auto px-8 py-10">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-[22px] leading-none font-bold tracking-[-0.5px] text-[#0F172A]">Payment Method</h1>
@@ -833,7 +833,7 @@ const Step5 = ({ paymentMethod, payAmount, receiveAmount, selectedAsset, walletA
             </div>
           </div>
         </div>
-        <div className="w-full px-8 py-10">
+        <div className="max-w-[1200px] mx-auto px-8 py-10">
           <div className="flex items-start justify-between mb-8">
             <div>
               <h1 className="text-[22px] leading-none tracking-[-0.5px] font-bold text-[#0F172A]">Pay with NGN Wallet</h1>
@@ -985,7 +985,7 @@ const Step5 = ({ paymentMethod, payAmount, receiveAmount, selectedAsset, walletA
 
   if (paymentMethod === "paystack") {
     return (
-      <div className="max-w-3xl mx-auto space-y-8">
+      <div className="max-w-[1100px] mx-auto space-y-8">
          <div className="bg-white rounded-[2.5rem] p-10 lg:p-12 border border-slate-200 shadow-sm space-y-10 text-center">
             <div className="w-20 h-20 bg-white border border-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto"><CreditCard className="w-10 h-10" /></div>
             <div className="space-y-2"><h2 className="text-[18px] font-bold text-slate-900 sora">Pay with Paystack</h2><p className="text-slate-500 text-[13px] font-medium max-w-sm mx-auto">You will be redirected to Paystack to complete your payment securely.</p></div>
@@ -1007,7 +1007,7 @@ const Step5 = ({ paymentMethod, payAmount, receiveAmount, selectedAsset, walletA
 
   if (paymentMethod === "bank") {
     return (
-      <div className="max-w-3xl mx-auto space-y-8">
+      <div className="max-w-[1100px] mx-auto space-y-8">
          <div className="bg-white rounded-[2.5rem] p-8 lg:p-10 border border-slate-200 shadow-sm space-y-8">
             <h2 className="text-[18px] font-bold text-slate-900 sora text-center">{hasPaid ? "Upload Payment Proof" : "Bank Transfer Details"}</h2>
             {!hasPaid ? (
@@ -1074,7 +1074,7 @@ const Step6 = ({ paymentMethod, receiveAmount, selectedAsset, payAmount, walletA
     </div>
     {/* PAGE */}
     <div className="px-8 py-10 flex justify-center">
-      <div className="w-full px-8">
+      <div className="max-w-[1000px] w-full px-8">
         <div className="bg-white border border-[#E6EBF2] rounded-[32px] px-8 py-14 shadow-[0_10px_30px_rgba(15,23,42,0.03)]">
           {/* ICON */}
           <div className="flex justify-center">
