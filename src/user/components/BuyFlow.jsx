@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   CheckCircle2,
 } from "lucide-react";
+import BuyCryptoBreadcrumbs from "./BuyCryptoBreadcrumbs";
 
 /* ── CONSTANTS & MOCK DATA ─────────────────────────────────── */
 const ASSETS = [
@@ -257,30 +258,7 @@ const Step2 = ({ payAmount, receiveAmount, selectedAsset, selectedNetwork, nextS
   <div className="max-w-[900px] mx-auto space-y-8 pb-12">
     {/* TOP SECTION */}
     <div className="flex flex-col space-y-6">
-      {/* Breadcrumb + Header Row */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-6">
-          <button onClick={prevStep} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-            <ArrowLeft className="w-5 h-5 text-slate-600" />
-          </button>
-          <div className="flex items-center gap-2 text-sm font-medium text-slate-400">
-            <span className="hover:text-blue-600 cursor-pointer" onClick={onBack}>Dashboard</span>
-            <ChevronRight className="w-4 h-4" />
-            <span className="hover:text-blue-600 cursor-pointer" onClick={prevStep}>Buy Crypto</span>
-            <ChevronRight className="w-4 h-4" />
-            <span className="text-slate-900 font-semibold">Price Preview</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <button className="p-2 hover:bg-slate-100 rounded-full transition-colors relative">
-            <Bell className="w-5 h-5 text-slate-600" />
-            <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></div>
-          </button>
-          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm border-2 border-white shadow-sm">
-            JD
-          </div>
-        </div>
-      </div>
+      {/* Removed old breadcrumb row */}
 
       {/* Page Title + Subtext + Timer */}
       <div className="flex items-end justify-between">
@@ -408,32 +386,7 @@ const Step3 = ({ selectedAsset, receiveAmount, selectedNetwork, setSelectedNetwo
     <div className="max-w-[1100px] mx-auto space-y-8 pb-12">
       {/* TOP SECTION */}
       <div className="flex flex-col space-y-6">
-        {/* Header Row */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <button onClick={prevStep} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-              <ArrowLeft className="w-5 h-5 text-slate-600" />
-            </button>
-            <div className="flex items-center gap-2 text-sm font-medium text-slate-400">
-              <span className="hover:text-blue-600 cursor-pointer" onClick={onBack}>Dashboard</span>
-              <ChevronRight className="w-4 h-4" />
-              <span className="hover:text-blue-600 cursor-pointer" onClick={() => {/* Navigate to Step 1 */}}>Buy Crypto</span>
-              <ChevronRight className="w-4 h-4" />
-              <span className="hover:text-blue-600 cursor-pointer" onClick={prevStep}>Price Preview</span>
-              <ChevronRight className="w-4 h-4" />
-              <span className="text-slate-900 font-semibold">Wallet Address</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-slate-100 rounded-full transition-colors relative">
-              <Bell className="w-5 h-5 text-slate-600" />
-              <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></div>
-            </button>
-            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm border-2 border-white shadow-sm">
-              JD
-            </div>
-          </div>
-        </div>
+        {/* Header Row Removed */}
 
         {/* Page Title + Subtitle + Expiry Badge */}
         <div className="flex items-end justify-between">
@@ -634,35 +587,17 @@ const Step3 = ({ selectedAsset, receiveAmount, selectedNetwork, setSelectedNetwo
 };
 
 
-const Step4 = ({ payAmount, paymentMethod, setPaymentMethod, nextStep, prevStep, receiveAmount, selectedAsset, expiryTime }) => (
+const Step4 = ({ 
+  payAmount, 
+  paymentMethod, 
+  setPaymentMethod, 
+  nextStep, 
+  prevStep, 
+  receiveAmount, 
+  selectedAsset, 
+  expiryTime 
+}) => (
   <div className="min-h-screen bg-white text-[#0F172A]">
-    <div className="w-full border-b border-[#E5E7EB] bg-white">
-      <div className="w-full px-8 h-[78px] flex items-center justify-between">
-        <div className="flex items-center gap-5">
-          <button onClick={prevStep} className="w-11 h-11 rounded-xl border border-[#E5E7EB] flex items-center justify-center bg-white hover:bg-[#F8FAFC] transition">
-            <ArrowLeft size={20} />
-          </button>
-          <div className="flex items-center gap-3 text-[15px]">
-            <span className="text-[#64748B] font-medium">Dashboard</span>
-            <ChevronRight size={16} className="text-[#CBD5E1]" />
-            <span className="text-[#64748B] font-medium">Buy Crypto</span>
-            <ChevronRight size={16} className="text-[#CBD5E1]" />
-            <span className="text-[#64748B] font-medium">Price Preview</span>
-            <ChevronRight size={16} className="text-[#CBD5E1]" />
-            <span className="text-[#64748B] font-medium">Wallet Address</span>
-            <ChevronRight size={16} className="text-[#CBD5E1]" />
-            <span className="font-semibold text-[#0F172A]">Payment</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <button className="relative w-11 h-11 rounded-xl border border-[#E5E7EB] bg-white flex items-center justify-center">
-            <div className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-red-500" />
-            🔔
-          </button>
-          <div className="w-11 h-11 rounded-xl bg-[#2563EB] text-white flex items-center justify-center font-semibold">AK</div>
-        </div>
-      </div>
-    </div>
     <div className="max-w-[1200px] mx-auto px-8 py-10">
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -800,39 +735,25 @@ const Step4 = ({ payAmount, paymentMethod, setPaymentMethod, nextStep, prevStep,
   </div>
 );
 
-const Step5 = ({ paymentMethod, payAmount, receiveAmount, selectedAsset, walletAddress, expiryTime, prevStep, setStep, hasPaid, setHasPaid, proofFile, setProofFile }) => {
+const Step5 = ({ 
+  paymentMethod, 
+  payAmount, 
+  receiveAmount, 
+  selectedAsset, 
+  walletAddress, 
+  expiryTime, 
+  prevStep, 
+  setStep, 
+  hasPaid, 
+  setHasPaid, 
+  proofFile, 
+  setProofFile 
+}) => {
   const [uploading, setUploading] = useState(false);
 
   if (paymentMethod === "wallet") {
     return (
       <div className="min-h-screen bg-white text-[#0F172A]">
-        <div className="h-[78px] bg-white border-b border-[#E5E7EB]">
-          <div className="w-full px-8 h-full flex items-center justify-between">
-            <div className="flex items-center gap-5">
-              <button onClick={prevStep} className="w-12 h-12 rounded-2xl border border-[#E5E7EB] bg-white flex items-center justify-center hover:bg-[#F8FAFC] transition">
-                <ArrowLeft size={21} />
-              </button>
-              <div className="flex items-center gap-3 text-[15px]">
-                <span className="text-[#64748B] font-medium">Dashboard</span>
-                <ChevronRight size={16} className="text-[#CBD5E1]" />
-                <span className="text-[#64748B] font-medium">Buy Crypto</span>
-                <ChevronRight size={16} className="text-[#CBD5E1]" />
-                <span className="text-[#64748B] font-medium">Price Preview</span>
-                <ChevronRight size={16} className="text-[#CBD5E1]" />
-                <span className="text-[#64748B] font-medium">Wallet Address</span>
-                <ChevronRight size={16} className="text-[#CBD5E1]" />
-                <span className="font-semibold text-[#0F172A]">Payment</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <button className="relative w-12 h-12 rounded-2xl border border-[#E5E7EB] bg-white flex items-center justify-center">
-                🔔
-                <div className="absolute top-3 right-3 w-2 h-2 rounded-full bg-red-500" />
-              </button>
-              <div className="w-12 h-12 rounded-2xl bg-[#2563EB] text-white font-semibold flex items-center justify-center text-[17px]">AK</div>
-            </div>
-          </div>
-        </div>
         <div className="max-w-[1200px] mx-auto px-8 py-10">
           <div className="flex items-start justify-between mb-8">
             <div>
@@ -1041,38 +962,19 @@ const Step5 = ({ paymentMethod, payAmount, receiveAmount, selectedAsset, walletA
   }
 };
 
-const Step6 = ({ paymentMethod, receiveAmount, selectedAsset, payAmount, walletAddress, onBack, setStep, resetExpiry, setHasPaid, setProofFile }) => (
+const Step6 = ({ 
+  paymentMethod, 
+  receiveAmount, 
+  selectedAsset, 
+  payAmount, 
+  walletAddress, 
+  onBack, 
+  setStep, 
+  resetExpiry, 
+  setHasPaid, 
+  setProofFile 
+}) => (
   <div className="min-h-screen bg-white text-[#0F172A]">
-    {/* TOP NAV */}
-    <div className="h-[82px] border-b border-[#E6EBF2] bg-white px-8 flex items-center justify-between">
-      <div className="flex items-center gap-6">
-        <button onClick={onBack} className="w-12 h-12 rounded-2xl border border-[#E6EBF2] bg-white flex items-center justify-center hover:border-[#0063C0] transition">
-          <ArrowLeft size={20} className="text-[#0F172A]" />
-        </button>
-        <div className="flex items-center gap-3 text-[15px]">
-          <span className="text-[#64748B] font-medium">Dashboard</span>
-          <ChevronRight size={16} className="text-[#CBD5E1]" />
-          <span className="text-[#64748B] font-medium">Buy Crypto</span>
-          <ChevronRight size={16} className="text-[#CBD5E1]" />
-          <span className="text-[#64748B] font-medium">Price Preview</span>
-          <ChevronRight size={16} className="text-[#CBD5E1]" />
-          <span className="text-[#64748B] font-medium">Wallet Address</span>
-          <ChevronRight size={16} className="text-[#CBD5E1]" />
-          <span className="text-[#0F172A] font-semibold">Payment</span>
-        </div>
-      </div>
-      <div className="flex items-center gap-4">
-        <button className="relative w-12 h-12 rounded-2xl border border-[#E6EBF2] bg-white flex items-center justify-center">
-          <Bell size={19} className="text-[#0F172A]" />
-          <span className="absolute top-3 right-3 w-2 h-2 rounded-full bg-[#FF5A5F]" />
-        </button>
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-[#0063C0] text-white flex items-center justify-center font-bold text-[16px]">AK</div>
-          <ChevronDown size={18} className="text-[#64748B]" />
-        </div>
-      </div>
-    </div>
-    {/* PAGE */}
     <div className="px-8 py-10 flex justify-center">
       <div className="max-w-[1000px] w-full px-8">
         <div className="bg-white border border-[#E6EBF2] rounded-[32px] px-8 py-14 shadow-[0_10px_30px_rgba(15,23,42,0.03)]">
@@ -1189,7 +1091,11 @@ const BuyFlow = ({ onBack }) => {
         input[type=number] { -moz-appearance: textfield; }
       `}</style>
       <div className={`${step >= 4 ? "w-full" : "max-w-7xl mx-auto"}`}>
-        <Header step={step} onBack={onBack} />
+        <BuyCryptoBreadcrumbs 
+          currentStep={step} 
+          onStepClick={(s) => setStep(s)} 
+          onBackToDashboard={onBack} 
+        />
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
            {step === 1 && <Step1 selectedAsset={selectedAsset} setSelectedAsset={setSelectedAsset} setSelectedNetwork={setSelectedNetwork} payAmount={payAmount} setPayAmount={setPayAmount} searchQuery={searchQuery} setSearchQuery={setSearchQuery} nextStep={nextStep} onViewAll={onBack} />}
            {step === 2 && <Step2 payAmount={payAmount} receiveAmount={receiveAmount} selectedAsset={selectedAsset} selectedNetwork={selectedNetwork} nextStep={nextStep} prevStep={prevStep} expiryTime={expiryTime} isExpired={isExpired} resetExpiry={resetExpiry} onBack={onBack} />}
