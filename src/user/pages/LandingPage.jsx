@@ -206,7 +206,7 @@ const LandingPage = () => {
                   onClick={() => navigate("/signup")}
                   className="bg-[#2563eb] hover:bg-[#2563eb]/90 text-white px-8 py-5 rounded-2xl font-black text-lg transition-all hover:shadow-2xl hover:shadow-blue-500/20 active:scale-95 flex items-center justify-center gap-3 group uppercase tracking-tighter"
                 >
-                  Start Trading
+                  Trade Now
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button className="bg-gray-100 hover:bg-gray-200 text-slate-900 border border-black/5 px-8 py-5 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-3 active:scale-95">
@@ -353,7 +353,7 @@ const LandingPage = () => {
               <Zap className="w-3 h-3" /> Quick Startup
             </div>
             <h2 className="fluid-h2 font-black text-slate-900 tracking-tight mb-4">
-              Start Trading in{" "}
+              Join Cheeseball in{" "}
               <span className="text-blue-600 italic">3 Steps</span>
             </h2>
             <p className="text-gray-500 font-medium text-base sm:text-lg uppercase tracking-tight">
@@ -533,7 +533,7 @@ const LandingPage = () => {
                 onClick={() => navigate("/signup")}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl font-black text-base transition-all hover:shadow-lg hover:shadow-blue-500/20 active:scale-95 flex items-center gap-3 group uppercase tracking-tighter"
               >
-                Start Trading
+                Trade Now
                 <ArrowUpRight className="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
               </button>
             </div>
