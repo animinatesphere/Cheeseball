@@ -105,11 +105,11 @@ const AdminHistory = ({ onBack }) => {
                          <Calendar className="w-4 h-4 text-slate-500" />
                          <span className="text-[10px] font-black uppercase text-gray-500 tracking-[0.4em]">{transaction.date}</span>
                        </div>
-                       <div className="h-px bg-gradient-to-r from-gray-200 dark:from-gray-800 to-transparent flex-1"></div>
+                       <div className="h-px bg-gradient-to-r from-gray-200 to-transparent flex-1"></div>
                    </div>
                 )}
 
-                <div className="card p-6 sm:p-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-8 group animate-fade-in relative overflow-hidden transition-all hover:bg-gray-50/50 dark:hover:bg-gray-900/10">
+                <div className="card p-6 sm:p-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-8 group animate-fade-in relative overflow-hidden transition-all hover:bg-gray-50/50">
                   <div className="flex-1 flex items-center justify-between sm:justify-start gap-10">
                     <div className="flex items-center gap-6">
                       <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center text-slate-900 font-black text-xl shadow-xl transition-transform group-hover:scale-110 group-hover:rotate-6 overflow-hidden">
@@ -144,7 +144,7 @@ const AdminHistory = ({ onBack }) => {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between sm:justify-end gap-10 sm:pl-10 sm:border-l border-gray-100 dark:border-gray-800">
+                  <div className="flex items-center justify-between sm:justify-end gap-10 sm:pl-10 sm:border-l border-gray-100">
                     <div className="flex flex-col items-end">
                        <span className={`px-5 py-2 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${statusInfo.color}`}>
                         {statusInfo.label}

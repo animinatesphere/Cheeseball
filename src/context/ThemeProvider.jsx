@@ -1,65 +1,22 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "../lib/supabaseClient";
 
-const ThemeContext = createContext({ theme: "dark", toggleTheme: () => {} });
+const ThemeContext = createContext({ theme: "light", toggleTheme: () => {} });
 
 export const useTheme = () => useContext(ThemeContext);
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("cheeseball_theme") || "light";
-  });
+  const [theme] = useState("light");
 
-  // Apply theme class to <html>
+  // Always ensure light mode on <html>
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
-    localStorage.setItem("cheeseball_theme", theme);
-  }, [theme]);
-
-  // Sync with Supabase for logged-in users
-  useEffect(() => {
-    const syncTheme = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
-
-        const { data } = await supabase
-          .from("user_preferences")
-          .select("theme")
-          .eq("user_id", session.user.id)
-          .single();
-
-        if (data?.theme) {
-          setTheme(data.theme);
-        }
-      } catch (err) {
-        // Table may not exist yet — silently use localStorage fallback
-      }
-    };
-    syncTheme();
+    root.classList.remove("dark");
+    localStorage.setItem("cheeseball_theme", "light");
   }, []);
 
-  const toggleTheme = async () => {
-    const newTheme = theme === "dark" ? "light" : "dark";
-    setTheme(newTheme);
-
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        await supabase.from("user_preferences").upsert({
-          user_id: session.user.id,
-          theme: newTheme,
-          updated_at: new Date().toISOString(),
-        }, { onConflict: "user_id" });
-      }
-    } catch (err) {
-      console.error("Failed to save theme preference:", err);
-    }
+  const toggleTheme = () => {
+    // Theme switching is disabled
+    console.log("Theme switching is disabled. Standardizing on light mode.");
   };
 
   return (

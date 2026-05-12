@@ -188,16 +188,16 @@ const AdminOrders = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between py-8 sm:py-10 gap-6">
             <div>
               <h1 className="text-4xl font-black tracking-tighter" style={{ color: 'var(--text-primary)' }}>Orders</h1>
-              <div className="flex bg-gray-100/50 dark:bg-gray-800/30 p-1 rounded-xl mt-4 w-fit">
+              <div className="flex bg-gray-100/50 p-1 rounded-xl mt-4 w-fit">
                 <button 
                   onClick={() => setViewTab("crypto")}
-                  className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${viewTab === 'crypto' ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-md' : 'text-slate-500 hover:text-gray-600'}`}
+                  className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${viewTab === 'crypto' ? 'bg-white text-blue-600 shadow-md' : 'text-slate-500 hover:text-gray-600'}`}
                 >
                   Crypto
                 </button>
                 <button 
                   onClick={() => setViewTab("giftcard")}
-                  className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${viewTab === 'giftcard' ? 'bg-white dark:bg-gray-700 text-blue-600 shadow-md' : 'text-slate-500 hover:text-gray-600'}`}
+                  className={`px-6 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${viewTab === 'giftcard' ? 'bg-white text-blue-600 shadow-md' : 'text-slate-500 hover:text-gray-600'}`}
                 >
                   Gift Cards
                 </button>
@@ -257,7 +257,7 @@ const AdminOrders = () => {
                            <Calendar className="w-4 h-4 text-blue-500" />
                            <span className="text-[10px] font-black uppercase text-gray-500 tracking-[0.4em]">{order.date}</span>
                          </div>
-                         <div className="h-px bg-gradient-to-r from-gray-200 dark:from-gray-800 to-transparent flex-1"></div>
+                         <div className="h-px bg-gradient-to-r from-gray-200 to-transparent flex-1"></div>
                       </div>
                    )}
 
@@ -269,10 +269,10 @@ const AdminOrders = () => {
                       
                       <div className="flex-1 flex items-center gap-8">
                          <div className="flex items-center -space-x-4 flex-shrink-0">
-                            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center text-slate-900 font-black text-xs sm:text-xl shadow-xl border-2 sm:border-4 border-white dark:border-gray-800 relative z-10 overflow-hidden transform group-hover:-rotate-6 transition-transform">
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center text-slate-900 font-black text-xs sm:text-xl shadow-xl border-2 sm:border-4 border-white relative z-10 overflow-hidden transform group-hover:-rotate-6 transition-transform">
                               {order.fromIcon?.length > 2 ? <img src={order.fromIcon} alt="" className="w-full h-full object-cover"/> : order.fromIcon}
                             </div>
-                            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl flex items-center justify-center text-slate-900 font-black text-xs sm:text-xl shadow-xl border-2 sm:border-4 border-white dark:border-gray-800 relative z-0 transform group-hover:translate-x-4 group-hover:rotate-6 transition-all overflow-hidden">
+                            <div className="w-10 h-10 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl flex items-center justify-center text-slate-900 font-black text-xs sm:text-xl shadow-xl border-2 sm:border-4 border-white relative z-0 transform group-hover:translate-x-4 group-hover:rotate-6 transition-all overflow-hidden">
                               {order.toIcon?.length > 2 ? <img src={order.toIcon} alt="" className="w-full h-full object-cover"/> : order.toIcon}
                             </div>
                          </div>
@@ -291,7 +291,7 @@ const AdminOrders = () => {
                          </div>
                       </div>
 
-                       <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-10 sm:pl-10 sm:border-l border-gray-100 dark:border-gray-800 w-full sm:w-auto mt-4 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-t-0">
+                        <div className="flex items-center justify-between sm:justify-end gap-4 sm:gap-10 sm:pl-10 sm:border-l border-gray-100 w-full sm:w-auto mt-4 sm:mt-0 pt-4 sm:pt-0 border-t sm:border-t-0">
                           <div className="text-left hidden lg:block">
                              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Network</p>
                              <p className="text-sm font-bold mt-1" style={{ color: 'var(--text-primary)' }}>{order.toToken || 'NGN'}</p>
