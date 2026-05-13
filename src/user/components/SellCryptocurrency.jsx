@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import SendCryptoStep from "./SendCryptoStep";
+import PaymentSubmittedStep from "./PaymentSubmittedStep";
 
 /* ─── Constants ───────────────────────────────────────── */
 const RATE_TTL    = 300; // 5 min in seconds
@@ -143,9 +145,9 @@ function SellStep({ onContinue }) {
   const timerTxt   = isUrgent ? "#92400E" : T.greenText;
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 400px", minHeight: "100vh", background: T.white }}>
+    <div className="sell-grid" style={{ display: "grid", gridTemplateColumns: "1fr 400px", minHeight: "100vh", background: T.white, overflowX: "hidden", maxWidth: "100vw" }}>
       <div style={{ padding: "44px 52px 60px", borderRight: `1px solid ${T.border}` }}>
-        <nav style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 36 }}>
+        <nav style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 36, flexWrap: "wrap" }}>
           <span style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer" }}>Dashboard</span>
           <span style={{ color: T.text3, fontSize: 12 }}>›</span>
           <span style={{ fontSize: 13, fontWeight: 600, color: T.blue }}>Sell Crypto</span>
@@ -161,8 +163,8 @@ function SellStep({ onContinue }) {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <div style={{ width: 44, height: 44, borderRadius: "50%", background: coin.color, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{coin.icon}</div>
-                <div>
-                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: T.text }}>{coin.name}</p>
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: T.text, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{coin.name}</p>
                   <p style={{ fontSize: 12, color: T.text2, marginTop: 3 }}>{coin.sym}</p>
                 </div>
               </div>
@@ -199,7 +201,7 @@ function SellStep({ onContinue }) {
           <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 10 }}>Amount to sell</p>
           <div style={{ border: `1.5px solid ${focused ? T.blue : T.border}`, borderRadius: 16, padding: "20px 22px", background: T.white, transition: "border-color 0.18s" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <input
+              <input className="sell-amt-input"
                 style={{ flex: 1, border: "none", outline: "none", minWidth: 0, fontFamily: "'Sora', sans-serif", fontSize: 36, fontWeight: 700, color: v > 0 ? T.text : "#CED6E8", background: "transparent", letterSpacing: "-1.5px" }}
                 type="number" placeholder="0" value={amount} min={0} step={0.0001}
                 onChange={(e) => setAmount(e.target.value)}
@@ -247,8 +249,8 @@ function SellStep({ onContinue }) {
           <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 12 }}>You are selling</p>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: "50%", background: coin.color, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{coin.icon}</div>
-            <div>
-              <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: T.text, letterSpacing: "-0.8px", lineHeight: 1 }}>{v > 0 ? fmtCoin(v, coin.sym) : <span style={{ color: T.text3 }}>0.00 {coin.sym}</span>}</p>
+            <div style={{ minWidth: 0 }}>
+              <p className="sum-amt" style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: T.text, letterSpacing: "-0.8px", lineHeight: 1, wordBreak: "break-all" }}>{v > 0 ? fmtCoin(v, coin.sym) : <span style={{ color: T.text3 }}>0.00 {coin.sym}</span>}</p>
               <p style={{ fontSize: 12, color: T.text2, marginTop: 4 }}>{coin.name}</p>
             </div>
           </div>
@@ -256,7 +258,7 @@ function SellStep({ onContinue }) {
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: T.blueLight, display: "flex", alignItems: "center", justifyContent: "center" }}><Ico.arrowDn /></div></div>
         <div style={{ background: T.blue, borderRadius: 16, padding: "18px 20px", marginBottom: 14 }}>
           <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 12 }}>You will receive</p>
-          {rateStatus === "fetching" ? <div style={{ display: "flex", flexDirection: "column", gap: 6 }}><div className="pulsing" style={{ width: "70%", height: 30, borderRadius: 8, background: "rgba(255,255,255,0.15)" }} /><div className="pulsing" style={{ width: "40%", height: 14, borderRadius: 6, background: "rgba(255,255,255,0.1)" }} /></div> : <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 30, fontWeight: 700, color: v > 0 ? "#fff" : "rgba(255,255,255,0.3)", letterSpacing: "-1px", lineHeight: 1 }}>{v > 0 ? fmtNGN(netNGN) : "₦0.00"}</p>}
+          {rateStatus === "fetching" ? <div style={{ display: "flex", flexDirection: "column", gap: 6 }}><div className="pulsing" style={{ width: "70%", height: 30, borderRadius: 8, background: "rgba(255,255,255,0.15)" }} /><div className="pulsing" style={{ width: "40%", height: 14, borderRadius: 6, background: "rgba(255,255,255,0.1)" }} /></div> : <p className="sum-rcv" style={{ fontFamily: "'Sora', sans-serif", fontSize: 30, fontWeight: 700, color: v > 0 ? "#fff" : "rgba(255,255,255,0.3)", letterSpacing: "-1px", lineHeight: 1, wordBreak: "break-all" }}>{v > 0 ? fmtNGN(netNGN) : "₦0.00"}</p>}
           <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.15)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}><span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>Rate</span>{rateStatus === "fetching" ? <div className="pulsing" style={{ width: 80, height: 12, borderRadius: 4, background: "rgba(255,255,255,0.15)" }} /> : <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: rateStatus === "live" ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.3)" }}>₦{ngnRate.toLocaleString("en-NG")} / $1</span>}</div>
             <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>System fee (1%)</span><span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: rateStatus === "live" && v > 0 ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.3)" }}>{v > 0 && rateStatus === "live" ? fmtNGN(sysFee) : "₦0.00"}</span></div>
@@ -282,9 +284,9 @@ function PayoutStep({ order: s, onContinue }) {
   const ready = method === "wallet" || (method === "bank" && selectedBank !== null);
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 400px", minHeight: "100vh", background: T.white }}>
+    <div className="sell-grid" style={{ display: "grid", gridTemplateColumns: "1fr 400px", minHeight: "100vh", background: T.white, overflowX: "hidden", maxWidth: "100vw" }}>
       <div style={{ padding: "44px 52px 60px", borderRight: `1px solid ${T.border}` }}>
-        <nav style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 36 }}>
+        <nav style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 36, flexWrap: "wrap" }}>
           <span style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer" }}>Dashboard</span>
           <span style={{ color: T.text3, fontSize: 12 }}>›</span>
           <span style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer" }}>Sell Crypto</span>
@@ -294,7 +296,7 @@ function PayoutStep({ order: s, onContinue }) {
         <p style={{ fontSize: 11, fontWeight: 600, color: T.blue, textTransform: "uppercase", letterSpacing: "1px", marginBottom: 6 }}>Step 3 of 4</p>
         <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 28, fontWeight: 700, color: T.text, letterSpacing: "-0.6px", lineHeight: 1.15 }}>Choose Payout Method</h1>
         <p style={{ fontSize: 14, color: T.text2, marginTop: 6, lineHeight: 1.6 }}>How do you want to receive your money?</p>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 32 }}>
+        <div className="method-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginTop: 32 }}>
           {[ { key: "bank", label: "Bank Account", sub: "Send to your registered bank", Icon: Ico.bank }, { key: "wallet", label: "NGN Wallet", sub: "Credit your in-app wallet", Icon: Ico.wallet } ].map(({ key, label, sub, Icon }) => {
             const active = method === key;
             return (
@@ -342,13 +344,13 @@ function PayoutStep({ order: s, onContinue }) {
           <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 12 }}>You are selling</p>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ width: 40, height: 40, borderRadius: "50%", background: s.coin.color, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{s.coin.icon}</div>
-            <div><p style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: T.text, letterSpacing: "-0.8px", lineHeight: 1 }}>{s.amount} <span style={{ fontSize: 15 }}>{s.coin.sym}</span></p><p style={{ fontSize: 12, color: T.text2, marginTop: 4 }}>{s.coin.name}</p></div>
+            <div style={{ minWidth: 0 }}><p className="sum-amt" style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: T.text, letterSpacing: "-0.8px", lineHeight: 1, wordBreak: "break-all" }}>{s.amount} <span style={{ fontSize: 15 }}>{s.coin.sym}</span></p><p style={{ fontSize: 12, color: T.text2, marginTop: 4 }}>{s.coin.name}</p></div>
           </div>
         </div>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 10 }}><div style={{ width: 30, height: 30, borderRadius: "50%", background: T.blueLight, display: "flex", alignItems: "center", justifyContent: "center" }}><Ico.arrowDn /></div></div>
         <div style={{ background: T.blue, borderRadius: 16, padding: "18px 20px", marginBottom: 14 }}>
           <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 12 }}>You will receive</p>
-          <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 30, fontWeight: 700, color: "#fff", letterSpacing: "-1px", lineHeight: 1 }}>{fmtNGN(s.netNGN)}</p>
+          <p className="sum-rcv" style={{ fontFamily: "'Sora', sans-serif", fontSize: 30, fontWeight: 700, color: "#fff", letterSpacing: "-1px", lineHeight: 1, wordBreak: "break-all" }}>{fmtNGN(s.netNGN)}</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 14, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.15)" }}>
             <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>Rate</span><span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.9)" }}>₦{s.ngnRate.toLocaleString("en-NG")} / $1</span></div>
             <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>System fee (1%)</span><span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.9)" }}>{fmtNGN(s.sysFee)}</span></div>
@@ -383,7 +385,7 @@ function ConfirmStep({ order: o, onConfirm }) {
   };
 
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 420px", minHeight: "100vh", background: T.white }}>
+    <div className="sell-grid" style={{ display: "grid", gridTemplateColumns: "1fr 420px", minHeight: "100vh", background: T.white, overflowX: "hidden", maxWidth: "100vw" }}>
       <div style={{ padding: "44px 52px 60px", borderRight: `1px solid ${T.border}` }}>
         <nav style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 36, flexWrap: "wrap" }}>
           {["Dashboard", "Sell Crypto", "Payout Method"].map((c, i) => (<span key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer" }}>{c}</span><span style={{ color: T.text3, fontSize: 12 }}>›</span></span>))}
@@ -396,11 +398,11 @@ function ConfirmStep({ order: o, onConfirm }) {
         <div style={{ marginTop: 32, border: `1.5px solid ${T.border}`, borderRadius: 20, background: T.white, overflow: "hidden" }}>
           <div style={{ background: T.blueLight, padding: "22px 24px", display: "flex", alignItems: "center", gap: 16, borderBottom: `1px solid ${T.border}` }}>
             <div style={{ width: 52, height: 52, borderRadius: "50%", background: o.coin.color, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{o.coin.icon}</div>
-            <div style={{ flex: 1 }}><p style={{ fontSize: 12, color: T.text2, marginBottom: 2 }}>You are selling</p><p style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: T.text, letterSpacing: "-0.8px" }}>{o.amount} <span style={{ fontSize: 17 }}>{o.coin.sym}</span></p></div>
+            <div style={{ flex: 1, minWidth: 0 }}><p style={{ fontSize: 12, color: T.text2, marginBottom: 2 }}>You are selling</p><p className="sum-amt" style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: T.text, letterSpacing: "-0.8px", wordBreak: "break-all" }}>{o.amount} <span style={{ fontSize: 17 }}>{o.coin.sym}</span></p></div>
             <div style={{ textAlign: "right" }}><p style={{ fontSize: 12, color: T.text2, marginBottom: 2 }}>USD value</p><p style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: T.text }}>${o.usdValue.toFixed(2)}</p></div>
           </div>
           <div style={{ padding: "0 24px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 0", borderBottom: `1px solid ${T.border}` }}><span style={{ fontSize: 13, color: T.text, fontWeight: 600 }}>You will receive</span><span style={{ fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 600, color: T.blue }}>{fmtNGN(o.netNGN)}</span></div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 0", borderBottom: `1px solid ${T.border}` }}><span style={{ fontSize: 13, color: T.text, fontWeight: 600 }}>You will receive</span><span style={{ fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 600, color: T.blue, wordBreak: "break-all", textAlign: "right", marginLeft: 16 }}>{fmtNGN(o.netNGN)}</span></div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 0", borderBottom: `1px solid ${T.border}` }}><span style={{ fontSize: 13, color: T.text2 }}>Rate</span><span style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 600, color: T.text }}>₦{o.ngnRate.toLocaleString("en-NG")} / $1</span></div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 0", borderBottom: `1px solid ${T.border}` }}><span style={{ fontSize: 13, color: T.text2 }}>Gross amount</span><span style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 600, color: T.text }}>{fmtNGN(o.amount * o.coin.usd * o.ngnRate)}</span></div>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "13px 0", borderBottom: `1px solid ${T.border}` }}><span style={{ fontSize: 13, color: T.text2 }}>System fee (1%)</span><span style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 600, color: T.text }}>{fmtNGN(o.sysFee)}</span></div>
@@ -418,7 +420,7 @@ function ConfirmStep({ order: o, onConfirm }) {
       <div style={{ padding: "44px 32px 60px", background: T.surface, display: "flex", flexDirection: "column" }}>
         <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 20 }}>Transaction receipt</p>
         <div style={{ background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 20, overflow: "hidden" }}>
-          <div style={{ background: T.blue, padding: "28px 24px" }}><p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 10 }}>You will receive</p><p style={{ fontFamily: "'Sora', sans-serif", fontSize: 36, fontWeight: 700, color: "#fff", letterSpacing: "-1.2px", lineHeight: 1 }}>{fmtNGN(o.netNGN)}</p></div>
+          <div style={{ background: T.blue, padding: "28px 24px" }}><p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 10 }}>You will receive</p><p className="sum-rcv" style={{ fontFamily: "'Sora', sans-serif", fontSize: 36, fontWeight: 700, color: "#fff", letterSpacing: "-1.2px", lineHeight: 1, wordBreak: "break-all" }}>{fmtNGN(o.netNGN)}</p></div>
           <div style={{ padding: "4px 22px" }}>
             {[ { label: "Asset", value: `${o.coin.name} (${o.coin.sym})` }, { label: "Quantity", value: `${o.amount} ${o.coin.sym}` }, { label: "Rate", value: `₦${o.ngnRate.toLocaleString("en-NG")} / $1` }, { label: "System fee", value: fmtNGN(o.sysFee) }, { label: "Net payout", value: fmtNGN(o.netNGN), blue: true } ].map(({ label, value, blue }, i, arr) => (
               <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "11px 0", borderBottom: i === arr.length - 1 ? "none" : `1px solid ${T.border}` }}><span style={{ fontSize: 12, color: T.text2 }}>{label}</span><span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: blue ? T.blue : T.text }}>{value}</span></div>
@@ -438,7 +440,7 @@ function ConfirmStep({ order: o, onConfirm }) {
 }
 
 /* ═══════════════════════════════════════════════════════ */
-export default function SellCryptocurrency() {
+export default function SellCryptocurrency({ onNavigate }) {
   const [step, setStep] = useState(1);
   const [order, setOrder] = useState(null);
 
@@ -460,11 +462,36 @@ export default function SellCryptocurrency() {
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
         .fadein{animation:fadeUp 0.25s ease forwards}
         .pulsing{animation:pulse 1.4s ease-in-out infinite}
+        @media(max-width:900px){
+          .sell-grid{grid-template-columns:1fr!important;}
+          .sell-grid > div { min-width: 0 !important; }
+          .sell-grid>div:first-child{padding:28px 20px 32px!important;border-right:none!important;border-bottom:1px solid ${T.border};}
+          .sell-grid>div:last-child{padding:28px 20px 32px!important;}
+        }
+        @media(max-width:480px){
+          .sell-grid>div:first-child{padding:20px 16px 24px!important;}
+          .sell-grid>div:last-child{padding:20px 16px 24px!important;}
+          .sell-grid h1{font-size:22px!important;}
+          .sell-grid .sell-amt-input{font-size:24px!important;}
+          .sell-grid .sum-amt{font-size:18px!important;}
+          .sell-grid .sum-rcv{font-size:24px!important;}
+          .method-grid{grid-template-columns:1fr!important;}
+          .method-grid > div { min-width: 0 !important; }
+        }
+        @media(max-width:380px){
+          .sell-grid>div:first-child{padding:16px 12px 20px!important;}
+          .sell-grid>div:last-child{padding:16px 12px 20px!important;}
+          .csel > div { padding: 12px 10px !important; }
+          .csel .ddopt { padding: 10px 8px !important; }
+          .bank-row { padding: 14px 12px !important; gap: 10px !important; }
+        }
       `}</style>
 
       {step === 1 && <SellStep onContinue={(data) => { setOrder(data); setStep(2); }} />}
       {step === 2 && <PayoutStep order={order} onContinue={(data) => { setOrder(prev => ({ ...prev, ...data })); setStep(3); }} />}
-      {step === 3 && <ConfirmStep order={order} onConfirm={() => alert("Order submitted!")} />}
+      {step === 3 && <ConfirmStep order={order} onConfirm={() => { setOrder(prev => ({ ...prev, submittedAt: new Date() })); setStep(4); }} />}
+      {step === 4 && <SendCryptoStep order={order} onSent={() => setStep(5)} />}
+      {step === 5 && <PaymentSubmittedStep order={order} onGoHome={() => onNavigate?.("rates")} onContactSupport={() => onNavigate?.("support")} />}
     </>
   );
 }
