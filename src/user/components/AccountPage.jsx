@@ -101,9 +101,6 @@ const AccountPage = ({ onNavigate }) => {
                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Global Node: Active</span>
               </div>
            </div>
-           <button onClick={toggleTheme} className="w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-white hover:bg-white/10 transition-all backdrop-blur-md">
-              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-           </button>
         </div>
       </div>
 

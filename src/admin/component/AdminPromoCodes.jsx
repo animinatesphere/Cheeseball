@@ -163,7 +163,7 @@ const AdminPromoCodes = () => {
             <div className="p-10 pb-0 relative">
               <button 
                 onClick={() => setShowAddModal(false)} 
-                className="absolute top-10 right-10 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                className="absolute top-10 right-10 p-2 hover:bg-gray-100 rounded-xl transition-colors"
                 style={{ color: 'var(--text-muted)' }}
               >
                 <X size={24} />
