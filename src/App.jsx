@@ -1,30 +1,14 @@
-import React, { useEffect, useState } from "react";
-import Routee from "./Routee";
-import { supabase } from "./lib/supabaseClient";
-import { ThemeProvider } from "./context/ThemeProvider";
+import React from "react";
+import AppRoutes from "./routes/AppRoutes";
+import { ThemeProvider } from "@/shared/providers/ThemeProvider";
 
 const App = () => {
-  const [session, setSession] = useState(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
   return (
     <ThemeProvider>
-      <Routee />
+      <AppRoutes />
     </ThemeProvider>
   );
 };
 
 export default App;
+

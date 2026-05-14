@@ -1,0 +1,21 @@
+export const paths = {
+  home: "/",
+  login: "/login",
+  auth: "/auth",
+  signup: "/signup",
+  verifyAccount: "/verify-account",
+  emailVerified: "/email-verified",
+  forgotPassword: "/forgot-password",
+  dashboard: "/currency-change",
+  dashboardHome: "/currency-change/dashboard",
+  dashboardBuy: "/currency-change/buy",
+  dashboardSell: "/currency-change/sell",
+  dashboardSwap: "/currency-change/swap",
+  about: "/about",
+  terms: "/terms",
+  privacy: "/privacy",
+  aml: "/aml",
+  careers: "/careers",
+  press: "/press",
+};
+
