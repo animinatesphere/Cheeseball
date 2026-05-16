@@ -123,7 +123,7 @@ export default function LandingPage() {
   const [rates, setRates] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const onGetStarted = () => navigate(paths.signup);
+  const onGetStarted = () => navigate(paths.login);
   const onLogin = () => navigate(paths.login);
 
   useEffect(() => {
@@ -258,9 +258,8 @@ export default function LandingPage() {
           <div className="nav-links" style={{ display: "flex", alignItems: "center", gap: 36 }}>
             {NAV_LINKS.map(l => <a key={l.id} href={`#${l.id}`} className="nav-link">{l.name}</a>)}
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <button className="btn-ghost" style={{ padding: "10px 20px", fontSize: 13 }} onClick={onLogin}>Log in</button>
-            <button className="btn-primary" style={{ padding: "10px 20px", fontSize: 13 }} onClick={onGetStarted}>Get started</button>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <button className="btn-primary" style={{ padding: "10px 24px", fontSize: 13 }} onClick={onLogin}>Get started</button>
           </div>
         </nav>
 
