@@ -401,11 +401,7 @@ const CurrencyPage = () => {
                   />
                 } />
                 <Route path="giftcard-swap" element={
-                  <SwapGiftCard 
-                    onBack={handleBack} 
-                    onSwap={(data) => { setTransactionData(data); navigate("/currency-change/giftcard-upload"); }}
-                    onNavigate={handleNavigation} 
-                  />
+                  <SwapGiftCard onNavigate={handleNavigation} />
                 } />
                 <Route path="giftcard-upload" element={
                   <GiftCardUpload
