@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
-import { Bell, Menu, Search, LayoutDashboard, ShoppingCart, CircleDollarSign, ArrowRightLeft, ArrowDownLeft, Gift, History, HelpCircle, Settings, ChevronRight, X } from "lucide-react";
+import { Bell, Menu, Search, LayoutDashboard, ShoppingCart, CircleDollarSign, ArrowRightLeft, ArrowDownLeft, Gift, History, HelpCircle, Settings, ChevronRight, X, ShieldCheck } from "lucide-react";
 import { createTransaction, createGiftCardTrade, getCurrentUser } from "@/services/api";
 
 import CurrencyRates from "../components/CurrencyRates";
@@ -15,9 +15,10 @@ import HistoryPage from "../components/HistoryPage";
 import SellCryptocurrency from "../flows/sell/SellCryptocurrency";
 import SwapGiftCard from "../flows/swap/SwapGiftCard";
 import GiftCardUpload from "../flows/gift-card/GiftCardUpload";
-import AccountPage from "../components/AccountPage";
+import SettingsPage from "../components/SettingsPage";
 import DepositFlow from "../flows/deposit/DepositFlow";
 import WithdrawalFlow from "../flows/withdrawal/WithdrawalFlow";
+import KYCVerification from "../components/KYCVerification";
 
 /* ─── Design tokens ─── */
 const T = {
@@ -51,6 +52,7 @@ const NAV_ITEMS = [
   { id: "deposit",       icon: ArrowDownLeft,    label: "Deposit"    },
   { id: "giftcard-swap", icon: Gift,             label: "Gift Cards" },
   { id: "history",       icon: History,          label: "History"    },
+  { id: "kyc",           icon: ShieldCheck,      label: "KYC Verify" },
   { id: "support",       icon: HelpCircle,       label: "Support"    },
   { id: "account",       icon: Settings,         label: "Settings"   },
 ];
@@ -258,6 +260,11 @@ const CurrencyPage = () => {
         @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
         .fadein{animation:fadeUp 0.3s ease forwards}
         .blink{animation:blink 1.8s ease-in-out infinite}
+        @media (max-width: 768px) {
+          .dash-header { padding: 0 16px !important; }
+          .dash-main { padding: 20px 16px 40px !important; }
+          .dash-header-welcome { display: none !important; }
+        }
       `}</style>
 
       <div style={{ display: "flex", height: "100vh", background: T.surface, fontFamily: "'DM Sans', sans-serif", overflow: "hidden" }}>
@@ -294,7 +301,7 @@ const CurrencyPage = () => {
 
           <div className="main-layout flex-1 flex flex-col overflow-hidden transition-all duration-300">
             {/* TOP BAR */}
-            <header style={{ background: T.white, borderBottom: `1px solid ${T.border}`, height: 64, padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, zIndex: 50 }}>
+            <header className="dash-header" style={{ background: T.white, borderBottom: `1px solid ${T.border}`, height: 64, padding: "0 32px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, zIndex: 50 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                 <button className="lg:hidden" onClick={() => setMobileOpen(true)} style={{ background: "none", border: "none", cursor: "pointer", color: T.text2, padding: 4 }}>
                   <Menu size={20} />
@@ -310,7 +317,7 @@ const CurrencyPage = () => {
                 </button>
                 <div>
                   <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 700, color: T.text, letterSpacing: "-0.4px", lineHeight: 1 }}>{currentPageTitle}</h1>
-                  <p style={{ fontSize: 12, color: T.text2, marginTop: 3, fontWeight: 500 }}>Welcome back, {username} 👋</p>
+                  <p className="dash-header-welcome" style={{ fontSize: 12, color: T.text2, marginTop: 3, fontWeight: 500 }}>Welcome back, {username} 👋</p>
                 </div>
               </div>
 
@@ -345,7 +352,7 @@ const CurrencyPage = () => {
               <Routes>
                 <Route index element={<Navigate to="dashboard" replace />} />
                 <Route path="dashboard" element={
-                  <div style={{ padding: "28px 32px 48px" }}>
+                  <div className="dash-main" style={{ padding: "28px 32px 48px" }}>
                     <CurrencyRates
                       searchQuery={searchQuery}
                       onSelectCurrency={(cur) => { setSelectedCurrency(cur); navigate("/currency-change/detail"); }}
@@ -354,7 +361,7 @@ const CurrencyPage = () => {
                   </div>
                 } />
                 <Route path="detail" element={
-                  <div style={{ padding: "28px 32px 48px" }}>
+                  <div className="dash-main" style={{ padding: "28px 32px 48px" }}>
                     <CurrencyDetail
                       currency={selectedCurrency}
                       onBack={handleBack}
@@ -414,9 +421,10 @@ const CurrencyPage = () => {
                   />
                 } />
                 <Route path="history" element={<HistoryPage onNavigate={handleNavigation} />} />
-                <Route path="account" element={<AccountPage onNavigate={handleNavigation} />} />
+                <Route path="kyc" element={<KYCVerification onNavigate={handleNavigation} />} />
+                <Route path="account" element={<SettingsPage onNavigate={handleNavigation} />} />
                 <Route path="support" element={<SupportPage onNavigate={handleNavigation} />} />
-                <Route path="address-book" element={<div style={{ padding: "28px 32px 48px" }}><AddressBook onBack={() => navigate("/currency-change/support")} /></div>} />
+                <Route path="address-book" element={<div className="dash-main" style={{ padding: "28px 32px 48px" }}><AddressBook onBack={() => navigate("/currency-change/support")} /></div>} />
               </Routes>
             </main>
 

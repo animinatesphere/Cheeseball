@@ -5,11 +5,11 @@ export default function BuyFlowStep2({payAmount,receiveAmount,selectedAsset,sele
   const isUrgent = expiryTime<=60;
   return(
     <div style={{background:T.white,minHeight:"100vh",width:"100%"}}>
-      <div style={{padding:"44px 52px 0"}}>{breadcrumbs}</div>
-      <div style={{padding:"0 52px 60px",background:T.white,maxWidth:860,margin:"0 auto",width:"100%"}}>
-        <div style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",marginBottom:32,flexWrap:"wrap",gap:12}}>
+      <div className="step-content" style={{padding:"44px 52px 0"}}>{breadcrumbs}</div>
+      <div className="step-content" style={{padding:"0 52px 60px",background:T.white,maxWidth:860,margin:"0 auto",width:"100%"}}>
+        <div className="preview-header" style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",marginBottom:32,flexWrap:"wrap",gap:12}}>
           <div>
-            <h1 style={{fontFamily:"'Sora',sans-serif",fontSize:28,fontWeight:700,color:T.text,letterSpacing:"-0.6px"}}>Price Preview</h1>
+            <h1 className="responsive-title" style={{fontFamily:"'Sora',sans-serif",fontSize:28,fontWeight:700,color:T.text,letterSpacing:"-0.6px"}}>Price Preview</h1>
             <p style={{fontSize:14,color:T.text2,marginTop:6,fontFamily:"'DM Sans',sans-serif"}}>Review the details below. This price is locked for a short time.</p>
           </div>
           <div style={{display:"flex",alignItems:"center",gap:7,background:isUrgent?T.orangeLight:T.greenLight,border:`1px solid ${isUrgent?"#FDE68A":"#A7F3D0"}`,borderRadius:999,padding:"8px 16px"}}>
@@ -21,23 +21,23 @@ export default function BuyFlowStep2({payAmount,receiveAmount,selectedAsset,sele
         {/* Main preview card */}
         <div style={{background:T.white,border:`1.5px solid ${T.border}`,borderRadius:20,overflow:"hidden",marginBottom:24}}>
           {/* You pay → You receive */}
-          <div style={{padding:"28px 32px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:16,borderBottom:`1px solid ${T.border}`,flexWrap:"wrap"}}>
-          <div style={{textAlign:"left"}}>
+          <div className="preview-amount-wrap" style={{padding:"28px 32px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:16,borderBottom:`1px solid ${T.border}`,flexWrap:"wrap"}}>
+          <div className="preview-amount-item" style={{textAlign:"left"}}>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}><span style={{fontSize:18}}>🇳🇬</span><span style={{fontSize:12,fontWeight:700,color:T.text3,textTransform:"uppercase",letterSpacing:"0.7px",fontFamily:"'DM Sans',sans-serif"}}>You pay</span></div>
-            <p style={{fontFamily:"'Sora',sans-serif",fontSize:36,fontWeight:700,color:T.text,letterSpacing:"-1.5px",lineHeight:1}}>{formatNGN(payAmount)}</p>
+            <p className="preview-amount-val" style={{fontFamily:"'Sora',sans-serif",fontSize:36,fontWeight:700,color:T.text,letterSpacing:"-1.5px",lineHeight:1}}>{formatNGN(payAmount)}</p>
           </div>
-          <div style={{width:44,height:44,borderRadius:"50%",border:`1.5px solid ${T.border}`,background:T.blueLight,display:"flex",alignItems:"center",justifyContent:"center",color:T.blue,flexShrink:0}}><Ico.arrow/></div>
-          <div style={{textAlign:"right"}}>
+          <div className="preview-arrow" style={{width:44,height:44,borderRadius:"50%",border:`1.5px solid ${T.border}`,background:T.blueLight,display:"flex",alignItems:"center",justifyContent:"center",color:T.blue,flexShrink:0}}><Ico.arrow/></div>
+          <div className="preview-amount-item" style={{textAlign:"right"}}>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:8,justifyContent:"flex-end"}}>
               <span style={{fontSize:12,fontWeight:700,color:T.text3,textTransform:"uppercase",letterSpacing:"0.7px",fontFamily:"'DM Sans',sans-serif"}}>You receive</span>
               <div style={{width:24,height:24,borderRadius:"50%",background:selectedAsset.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:700,color:"#fff"}}>{selectedAsset.icon}</div>
             </div>
-            <p style={{fontFamily:"'Sora',sans-serif",fontSize:36,fontWeight:700,color:T.blue,letterSpacing:"-1.5px",lineHeight:1}}>{receiveAmount} {selectedAsset.symbol}</p>
+            <p className="preview-amount-val" style={{fontFamily:"'Sora',sans-serif",fontSize:36,fontWeight:700,color:T.blue,letterSpacing:"-1.5px",lineHeight:1}}>{receiveAmount} {selectedAsset.symbol}</p>
           </div>
         </div>
 
         {/* Asset + Network */}
-        <div style={{padding:"18px 32px",display:"grid",gridTemplateColumns:"1fr 1fr",gap:24,borderBottom:`1px solid ${T.border}`}}>
+        <div style={{padding:"18px 32px",display:"grid",gridTemplateColumns:"repeat(auto-fit, minmax(140px, 1fr))",gap:24,borderBottom:`1px solid ${T.border}`}}>
           <div>
             <p style={{fontSize:10,fontWeight:700,color:T.text3,textTransform:"uppercase",letterSpacing:"1px",marginBottom:4,fontFamily:"'DM Sans',sans-serif"}}>Asset</p>
             <p style={{fontFamily:"'Sora',sans-serif",fontSize:14,fontWeight:700,color:T.text}}>{selectedAsset.name} ({selectedAsset.symbol})</p>
@@ -65,7 +65,7 @@ export default function BuyFlowStep2({payAmount,receiveAmount,selectedAsset,sele
       </div>
 
       {/* Actions */}
-      <div style={{display:"flex",gap:12,alignItems:"center"}}>
+      <div className="actions-wrap" style={{display:"flex",gap:12,alignItems:"center"}}>
         <GhostBtn onClick={prevStep} style={{flex:1}}>← Edit Amount</GhostBtn>
         <CTA onClick={nextStep} style={{flex:2}}>Continue <Ico.arrow/></CTA>
       </div>

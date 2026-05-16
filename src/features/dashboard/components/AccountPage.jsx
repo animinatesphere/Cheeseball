@@ -110,6 +110,13 @@ export default function AccountPage({ onBack }) {
         .notify-btn:hover{background:#1259D9!important;}
         .notify-btn:active{transform:scale(0.97)!important;}
         .input-wrap:focus-within{border-color:#1A6FFF!important;}
+        @media (max-width: 640px) {
+          .headline { font-size: 32px !important; }
+          .countdown-container { gap: 10px !important; margin: 24px 0 !important; flex-wrap: wrap !important; justify-content: center !important; }
+          .input-wrap { flex-direction: column !important; border: none !important; gap: 10px !important; background: transparent !important; }
+          .input-wrap input { border: 1.5px solid ${T.border} !important; border-radius: 12px !important; background: ${T.white} !important; }
+          .input-wrap button { border-radius: 12px !important; width: 100% !important; }
+        }
       `}</style>
 
       <div style={{ minHeight: "100vh", background: T.white, fontFamily: "'DM Sans', sans-serif", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 24px", position: "relative", overflow: "hidden" }}>
@@ -144,7 +151,7 @@ export default function AccountPage({ onBack }) {
           </div>
 
           {/* Headline */}
-          <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 52, fontWeight: 700, color: T.text, letterSpacing: "-2px", lineHeight: 1.08, marginBottom: 18 }}>
+          <h1 className="headline" style={{ fontFamily: "'Sora', sans-serif", fontSize: 52, fontWeight: 700, color: T.text, letterSpacing: "-2px", lineHeight: 1.08, marginBottom: 18 }}>
             Something big<br />is coming.
           </h1>
           <p style={{ fontSize: 16, color: T.text2, lineHeight: 1.7, maxWidth: 400, marginBottom: 0 }}>
@@ -152,7 +159,7 @@ export default function AccountPage({ onBack }) {
           </p>
 
           {/* Countdown */}
-          <div style={{ display: "flex", alignItems: "center", gap: 0, margin: "40px 0" }}>
+          <div className="countdown-container" style={{ display: "flex", alignItems: "center", gap: 0, margin: "40px 0" }}>
             <CounterBlock value={d} label="Days"  sep />
             <CounterBlock value={h} label="Hours" sep />
             <CounterBlock value={m} label="Mins"  sep />

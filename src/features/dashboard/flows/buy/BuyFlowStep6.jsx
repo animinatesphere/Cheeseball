@@ -3,7 +3,7 @@ import { T, Ico, formatNGN, truncateAddress, SecureFooter } from "./BuyFlowShare
 
 export default function BuyFlowStep6({paymentMethod,receiveAmount,selectedAsset,payAmount,walletAddress,onBack,setStep,breadcrumbs}){
   return(
-    <div style={{maxWidth:960,margin:"0 auto",padding:"44px 24px 80px"}}>
+    <div className="step-content" style={{maxWidth:960,margin:"0 auto",padding:"44px 24px 80px"}}>
       {breadcrumbs}
       {/* Animated success icon */}
       <div style={{textAlign:"center",marginBottom:40}}>
@@ -13,7 +13,7 @@ export default function BuyFlowStep6({paymentMethod,receiveAmount,selectedAsset,
             {Ico.check("#fff")}
           </div>
         </div>
-        <h1 style={{fontFamily:"'Sora',sans-serif",fontSize:30,fontWeight:700,color:T.text,letterSpacing:"-0.8px"}}>Payment Successful!</h1>
+        <h1 className="responsive-title" style={{fontFamily:"'Sora',sans-serif",fontSize:30,fontWeight:700,color:T.text,letterSpacing:"-0.8px"}}>Payment Successful!</h1>
         <p style={{fontSize:15,color:T.text2,marginTop:8,fontFamily:"'DM Sans',sans-serif"}}>Your crypto purchase has been processed successfully.</p>
       </div>
 
@@ -27,7 +27,7 @@ export default function BuyFlowStep6({paymentMethod,receiveAmount,selectedAsset,
             {/* Green top band */}
             <div style={{background:T.green,padding:"20px 24px"}}>
               <p style={{fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.7)",textTransform:"uppercase",letterSpacing:"0.7px",marginBottom:8,fontFamily:"'DM Sans',sans-serif"}}>You receive</p>
-              <p style={{fontFamily:"'Sora',sans-serif",fontSize:32,fontWeight:700,color:"#fff",letterSpacing:"-1px",lineHeight:1}}>{receiveAmount} {selectedAsset.symbol}</p>
+              <p className="responsive-amount" style={{fontFamily:"'Sora',sans-serif",fontSize:32,fontWeight:700,color:"#fff",letterSpacing:"-1px",lineHeight:1}}>{receiveAmount} {selectedAsset.symbol}</p>
             </div>
             {/* Receipt rows */}
             <div style={{padding:"4px 24px"}}>

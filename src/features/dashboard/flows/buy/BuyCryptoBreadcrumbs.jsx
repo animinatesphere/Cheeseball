@@ -26,6 +26,7 @@ const BuyCryptoBreadcrumbs = ({ currentStep, onStepClick, onBackToDashboard }) =
 
   return (
     <nav
+      className="breadcrumb-nav"
       style={{
         display: "flex",
         alignItems: "center",
@@ -37,6 +38,7 @@ const BuyCryptoBreadcrumbs = ({ currentStep, onStepClick, onBackToDashboard }) =
       {/* Dashboard link */}
       <span
         onClick={onBackToDashboard}
+        className="breadcrumb-item"
         style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer" }}
       >
         Dashboard
@@ -49,11 +51,12 @@ const BuyCryptoBreadcrumbs = ({ currentStep, onStepClick, onBackToDashboard }) =
         return (
           <React.Fragment key={step.id}>
             {/* Separator */}
-            <span style={{ color: T.text3, fontSize: 12, userSelect: "none" }}>›</span>
+            <span className="breadcrumb-item" style={{ color: T.text3, fontSize: 12, userSelect: "none" }}>›</span>
 
             {/* Step label */}
             <span
               onClick={() => isCompleted && onStepClick?.(step.id)}
+              className="breadcrumb-item"
               style={{
                 fontSize: 13,
                 fontWeight: isLast ? 600 : 500,

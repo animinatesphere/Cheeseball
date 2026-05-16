@@ -77,35 +77,42 @@ export const RightPanel = ({payAmount,receiveAmount,selectedAsset,expiryTime,wal
   if(step>=3&&walletAddress) rows.push(["Wallet",truncateAddress(walletAddress)]);
   if(step>=3&&selectedNetwork) rows.push(["Network",`${selectedAsset.symbol} · ${selectedNetwork}`]);
   return(
-    <div style={{padding:"44px 28px 60px",background:T.surface,display:"flex",flexDirection:"column",minHeight:"100vh"}}>
+    <div className="rightpanel" style={{padding:"44px 28px 60px",background:T.surface,display:"flex",flexDirection:"column",minHeight:"100vh"}}>
       <p style={{fontSize:11,fontWeight:600,color:T.text3,textTransform:"uppercase",letterSpacing:"0.8px",marginBottom:16,fontFamily:"'DM Sans',sans-serif"}}>Order Summary</p>
-      <div style={{background:T.white,border:`1.5px solid ${T.border}`,borderRadius:16,padding:"18px 20px",marginBottom:10}}>
-        <p style={{fontSize:11,fontWeight:600,color:T.text3,textTransform:"uppercase",letterSpacing:"0.7px",marginBottom:12,fontFamily:"'DM Sans',sans-serif"}}>You are buying</p>
-        <div style={{display:"flex",alignItems:"center",gap:12}}>
-          <div style={{width:40,height:40,borderRadius:"50%",background:selectedAsset.color,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Sora',sans-serif",fontSize:14,fontWeight:700,color:"#fff",flexShrink:0}}>{selectedAsset.icon}</div>
-          <div>
-            <p style={{fontFamily:"'Sora',sans-serif",fontSize:20,fontWeight:700,color:receiveAmount>0?T.text:T.text3,letterSpacing:"-0.8px",lineHeight:1}}>{receiveAmount>0?`${receiveAmount} ${selectedAsset.symbol}`:`0.00 ${selectedAsset.symbol}`}</p>
-            <p style={{fontSize:12,color:T.text2,marginTop:4,fontFamily:"'DM Sans',sans-serif"}}>{selectedAsset.name}</p>
+      
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
+        <div style={{background:T.white,border:`1.5px solid ${T.border}`,borderRadius:16,padding:"18px 20px"}}>
+          <p style={{fontSize:11,fontWeight:600,color:T.text3,textTransform:"uppercase",letterSpacing:"0.7px",marginBottom:12,fontFamily:"'DM Sans',sans-serif"}}>You are buying</p>
+          <div style={{display:"flex",alignItems:"center",gap:12}}>
+            <div style={{width:40,height:40,borderRadius:"50%",background:selectedAsset.color,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Sora',sans-serif",fontSize:14,fontWeight:700,color:"#fff",flexShrink:0}}>{selectedAsset.icon}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 700, color: receiveAmount > 0 ? T.text : T.text3, letterSpacing: "-0.8px", lineHeight: 1, overflowWrap: "break-word" }}>{receiveAmount > 0 ? `${receiveAmount} ${selectedAsset.symbol}` : `0.00 ${selectedAsset.symbol}`}</p>
+              <p style={{ fontSize: 11, color: T.text2, marginTop: 4, fontFamily: "'DM Sans', sans-serif" }}>{selectedAsset.name}</p>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "center", margin: "-15px 0" }}><div style={{ width: 24, height: 24, borderRadius: "50%", background: T.blueLight, display: "flex", alignItems: "center", justifyContent: "center", border: `2px solid ${T.surface}`, zIndex: 2 }}><Ico.arrowDn /></div></div>
+
+        <div style={{ background: T.blue, borderRadius: 16, padding: "18px 20px" }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>You will pay</p>
+          <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 24, fontWeight: 700, color: payAmount > 0 ? "#fff" : "rgba(255,255,255,0.3)", letterSpacing: "-1px", lineHeight: 1, overflowWrap: "break-word" }}>{payAmount > 0 ? formatNGN(payAmount) : "₦0.00"}</p>
+          <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,0.15)"}}>
+            <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:"rgba(255,255,255,0.55)"}}>Rate</span><span style={{fontFamily:"'Sora',sans-serif",fontSize:11,fontWeight:700,color:"rgba(255,255,255,0.9)"}}>₦1,648 / $1</span></div>
+            <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:"rgba(255,255,255,0.55)"}}>Markup</span><span style={{fontFamily:"'Sora',sans-serif",fontSize:11,fontWeight:700,color:"rgba(255,255,255,0.9)"}}>3%</span></div>
           </div>
         </div>
       </div>
-      <div style={{display:"flex",justifyContent:"center",marginBottom:10}}><div style={{width:30,height:30,borderRadius:"50%",background:T.blueLight,display:"flex",alignItems:"center",justifyContent:"center"}}><Ico.arrowDn/></div></div>
-      <div style={{background:T.blue,borderRadius:16,padding:"18px 20px",marginBottom:14}}>
-        <p style={{fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.6)",textTransform:"uppercase",letterSpacing:"0.7px",marginBottom:12,fontFamily:"'DM Sans',sans-serif"}}>You will pay</p>
-        <p style={{fontFamily:"'Sora',sans-serif",fontSize:28,fontWeight:700,color:payAmount>0?"#fff":"rgba(255,255,255,0.3)",letterSpacing:"-1px",lineHeight:1}}>{payAmount>0?formatNGN(payAmount):"₦0.00"}</p>
-        <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,0.15)"}}>
-          <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:12,color:"rgba(255,255,255,0.55)"}}>Rate</span><span style={{fontFamily:"'Sora',sans-serif",fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.9)"}}>₦1,648 / $1</span></div>
-          <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:12,color:"rgba(255,255,255,0.55)"}}>Markup</span><span style={{fontFamily:"'Sora',sans-serif",fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.9)"}}>3%</span></div>
-        </div>
-      </div>
-      <div style={{background:T.white,border:`1.5px solid ${T.border}`,borderRadius:16,padding:"6px 18px",marginBottom:14}}>
+
+      <div style={{background:T.white,border:`1.5px solid ${T.border}`,borderRadius:16,padding:"6px 18px",marginTop:14,marginBottom:14}}>
         {rows.map(([label,value],i)=>(
           <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:i<rows.length-1?`1px solid ${T.border}`:"none"}}>
             <span style={{fontSize:12,color:T.text2,fontFamily:"'DM Sans',sans-serif"}}>{label}</span>
-            <span style={{fontFamily:"'Sora',sans-serif",fontSize:12,fontWeight:700,color:T.text,textAlign:"right",maxWidth:"55%",wordBreak:"break-all"}}>{value}</span>
+            <span style={{fontFamily:"'Sora',sans-serif",fontSize:12,fontWeight:700,color:T.text,textAlign:"right",maxWidth:"60%",wordBreak:"break-all"}}>{value}</span>
           </div>
         ))}
       </div>
+
       {step>=2&&expiryTime>0&&(
         <div className="fadein" style={{background:isUrgent?T.orangeLight:T.greenLight,border:`1px solid ${isUrgent?"#FDE68A":"#A7F3D0"}`,borderRadius:12,padding:"10px 16px",marginBottom:14,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
           <div style={{display:"flex",alignItems:"center",gap:6}}>{Ico.clock(isUrgent?T.orange:T.green)}<span style={{fontSize:12,color:isUrgent?"#92400E":T.greenText,fontWeight:500,fontFamily:"'DM Sans',sans-serif"}}>{isUrgent?"Rate expiring soon":"Rate locked"}</span></div>

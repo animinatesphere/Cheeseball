@@ -97,14 +97,33 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
         .asset-row:hover .asset-name{color:${T.blue}!important;}
         .quick-card:hover{border-color:${T.blue}!important;transform:translateY(-2px);box-shadow:0 8px 24px rgba(26,111,255,0.08)!important;}
         .txn-row:hover{background:${T.surface}!important;}
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @media (max-width: 1024px) {
+          .dash-grid-top, .dash-grid-bottom { grid-template-columns: 1fr !important; }
+          .quick-actions-grid { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+        @media (max-width: 640px) {
+          .quick-actions-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .balance-card { padding: 24px 20px !important; }
+          .balance-card h1, .balance-card span { font-size: 28px !important; }
+          .balance-actions { overflow-x: auto !important; padding-bottom: 8px !important; flex-wrap: nowrap !important; }
+          .balance-actions > button { flex-shrink: 0 !important; min-width: 100px !important; }
+          .portfolio-table { border-radius: 18px !important; }
+          .portfolio-grid { display: block !important; }
+          .asset-row { padding: 16px 20px !important; }
+          .asset-hide-mobile { display: none !important; }
+          .ref-card-main { padding: 16px !important; gap: 14px !important; }
+          .ref-card-main h2 { font-size: 13px !important; }
+        }
       `}</style>
       <div style={{ maxWidth: 1280, margin: "0 auto", display: "flex", flexDirection: "column", gap: 24 }}>
 
         {/* ── ROW 1: Balance + Referral ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 360px", gap: 20 }}>
+        <div className="dash-grid-top" style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 20 }}>
 
           {/* Balance card */}
-          <div style={{ background: T.blue, borderRadius: 24, padding: "36px 40px", position: "relative", overflow: "hidden" }}>
+          <div className="balance-card" style={{ background: T.blue, borderRadius: 24, padding: "36px 40px", position: "relative", overflow: "hidden" }}>
             {/* Subtle bg rings */}
             <div style={{ position: "absolute", top: -60, right: -60, width: 260, height: 260, borderRadius: "50%", background: "rgba(255,255,255,0.05)", pointerEvents: "none" }} />
             <div style={{ position: "absolute", bottom: -80, left: -40, width: 200, height: 200, borderRadius: "50%", background: "rgba(255,255,255,0.04)", pointerEvents: "none" }} />
@@ -113,7 +132,7 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
                 <div>
                   <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 10 }}>Total Balance</p>
-                  <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8, alignItems: "center" }}>
                     <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 42, fontWeight: 700, color: "#fff", letterSpacing: "-1.5px", lineHeight: 1 }}>
                       {balanceVisible ? `₦${fmt(totalBalance)}` : "₦ ••••••"}
                     </span>
@@ -132,7 +151,7 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
               </div>
 
               {/* Action buttons */}
-              <div style={{ display: "flex", gap: 10 }}>
+              <div className="balance-actions no-scrollbar" style={{ display: "flex", gap: 10 }}>
                 {[
                   { label: "Buy",     icon: ShoppingCart,     page: "buy",     primary: true  },
                   { label: "Sell",    icon: CircleDollarSign, page: "sell",    primary: false },
@@ -144,7 +163,7 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
                     onClick={() => onNavigate(page)}
                     style={{
                       display: "flex", alignItems: "center", gap: 8,
-                      padding: "10px 18px", borderRadius: 12, border: "none", cursor: "pointer",
+                      padding: "10px 18px", borderRadius: 12, cursor: "pointer",
                       fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 700,
                       background: primary ? "#fff" : "rgba(255,255,255,0.12)",
                       color: primary ? T.blue : "#fff",
@@ -162,37 +181,31 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
             </div>
           </div>
 
-          {/* Referral card */}
-          <div style={{ background: T.text, borderRadius: 24, padding: "32px 28px", position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
-            <div style={{ position: "absolute", top: -30, right: -30, width: 160, height: 160, borderRadius: "50%", background: `${T.blue}18`, pointerEvents: "none" }} />
-            <div style={{ position: "relative", zIndex: 1 }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: `${T.blue}22`, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
-                <Sparkles size={20} color={T.blue} />
-              </div>
-              <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: 24, fontWeight: 700, color: "#fff", letterSpacing: "-0.5px", lineHeight: 1.2, marginBottom: 8 }}>
-                Invite &amp; <span style={{ color: T.blue }}>Earn ₦1,000</span>
-              </h2>
-              <p style={{ fontSize: 13, color: T.text3, lineHeight: 1.6, marginBottom: 24 }}>
-                Help your friends join Cheeseball and get rewarded instantly.
-              </p>
+          {/* Referral card - Mini Version (1/3 size) */}
+          <div className="ref-card-main" style={{ background: T.text, borderRadius: 20, padding: "24px", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", gap: 18 }}>
+            {/* Subtle glow */}
+            <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: `${T.blue}15`, filter: "blur(20px)" }} />
+            
+            <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Gift size={24} color={T.blue} />
             </div>
-            <button
-              onClick={handleCopy}
-              style={{ position: "relative", zIndex: 1, width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", transition: "background 0.15s" }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.1)"}
-              onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
-            >
-              <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: T.blue, letterSpacing: "2px" }}>CHEESE2025</span>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 600, color: copied ? T.green : T.text3, textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                {copied ? "Copied!" : "Copy"}
-                {copied ? <CheckCircle2 size={14} color={T.green} /> : <Copy size={14} />}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 4, letterSpacing: "-0.2px" }}>Invite & Earn ₦1k</h2>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: T.blue, letterSpacing: "1px" }}>CHEESE2025</span>
+                <button 
+                  onClick={handleCopy}
+                  style={{ background: T.blueLight, border: "none", borderRadius: 6, cursor: "pointer", fontSize: 10, fontWeight: 800, color: copied ? T.greenText : T.blue, textTransform: "uppercase", padding: "4px 8px", transition: "all 0.15s" }}
+                >
+                  {copied ? "Copied!" : "Copy"}
+                </button>
               </div>
-            </button>
+            </div>
           </div>
         </div>
 
         {/* ── ROW 2: Quick Actions ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 14 }}>
+        <div className="quick-actions-grid" style={{ display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 14 }}>
           {QUICK_ACTIONS.map((qa) => (
             <button
               key={qa.label}
@@ -209,10 +222,10 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
         </div>
 
         {/* ── ROW 3: Portfolio + Transactions ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 20, alignItems: "start" }}>
+        <div className="dash-grid-bottom" style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 20, alignItems: "start" }}>
 
           {/* Portfolio table */}
-          <div style={{ background: T.white, borderRadius: 24, border: `1.5px solid ${T.border}`, overflow: "hidden" }}>
+          <div className="portfolio-table" style={{ background: T.white, borderRadius: 24, border: `1.5px solid ${T.border}`, overflow: "hidden" }}>
             <div style={{ padding: "22px 28px", borderBottom: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: T.text, letterSpacing: "-0.3px" }}>Portfolio Assets</h2>
               <button style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, fontWeight: 600, color: T.blue, background: "none", border: "none", cursor: "pointer" }}>
@@ -220,55 +233,44 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
               </button>
             </div>
 
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ background: T.surface }}>
-                  {["Asset", "Balance", "Value (₦)", "24h"].map((h, i) => (
-                    <th key={h} style={{ padding: "12px 20px", fontSize: 10, fontWeight: 700, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", textAlign: i === 0 ? "left" : "right" }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {MOCK_ASSETS.map((asset) => (
-                  <tr
-                    key={asset.symbol}
-                    className="asset-row"
-                    onClick={() => onSelectCurrency({ symbol: asset.symbol, name: asset.name })}
-                    style={{ borderTop: `1px solid ${T.border}`, cursor: "pointer", transition: "background 0.12s" }}
-                  >
-                    <td style={{ padding: "16px 20px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        <div style={{ width: 40, height: 40, borderRadius: 12, background: asset.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: asset.color, border: `1px solid ${asset.color}18`, flexShrink: 0 }}>
-                          {asset.icon}
-                        </div>
-                        <div>
-                          <p className="asset-name" style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: T.text, transition: "color 0.12s" }}>{asset.symbol}</p>
-                          <p style={{ fontSize: 11, color: T.text3, fontWeight: 500, marginTop: 1 }}>{asset.name}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td style={{ padding: "16px 20px", textAlign: "right" }}>
-                      <p style={{ fontSize: 13, fontWeight: 600, color: T.text2 }}>{asset.balanceLabel}</p>
-                    </td>
-                    <td style={{ padding: "16px 20px", textAlign: "right" }}>
-                      <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: T.text }}>₦{fmtCompact(asset.valueNGN)}</p>
-                      <p style={{ fontSize: 10, color: T.text3, fontWeight: 600, textTransform: "uppercase", marginTop: 2 }}>Mkt value</p>
-                    </td>
-                    <td style={{ padding: "16px 20px", textAlign: "right" }}>
-                      <span style={{
-                        display: "inline-flex", alignItems: "center", gap: 3,
-                        fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700,
-                        padding: "5px 10px", borderRadius: 8,
-                        background: asset.change >= 0 ? T.greenLight : T.redLight,
-                        color: asset.change >= 0 ? T.greenText : T.redText,
-                      }}>
-                        {asset.change > 0 ? "+" : ""}{asset.change.toFixed(2)}%
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {/* Table head */}
+            <div className="portfolio-grid asset-hide-mobile" style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr", padding: "12px 28px", background: T.surface, borderBottom: `1px solid ${T.border}` }}>
+              {["Asset", "Price", "Balance", "Value"].map((h, i) => (
+                <p key={i} style={{ fontSize: 10, fontWeight: 700, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", textAlign: i > 0 ? "right" : "left" }}>{h}</p>
+              ))}
+            </div>
+
+            {MOCK_ASSETS.map((asset, i) => (
+              <div
+                key={asset.symbol}
+                className="asset-row portfolio-grid"
+                onClick={() => onSelectCurrency({ symbol: asset.symbol, name: asset.name })}
+                style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr", padding: "18px 28px", borderBottom: i === MOCK_ASSETS.length - 1 ? "none" : `1px solid ${T.border}`, cursor: "pointer", transition: "all 0.15s", alignItems: "center" }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: asset.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: asset.color, border: `1px solid ${asset.color}18`, flexShrink: 0 }}>
+                    {asset.icon}
+                  </div>
+                  <div>
+                    <p className="asset-name" style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: T.text, transition: "color 0.12s" }}>{asset.symbol}</p>
+                    <p style={{ fontSize: 11, color: T.text3, fontWeight: 500, marginTop: 1 }}>{asset.name}</p>
+                  </div>
+                </div>
+                
+                <div className="asset-hide-mobile" style={{ textAlign: "right" }}>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 600, color: T.text }}>₦{fmt(asset.valueNGN / (asset.balance || 1))}</p>
+                  <p style={{ fontSize: 11, color: asset.change >= 0 ? T.greenText : T.redText, fontWeight: 600, marginTop: 2 }}>{asset.change > 0 ? "+" : ""}{asset.change}%</p>
+                </div>
+
+                <div className="asset-hide-mobile" style={{ textAlign: "right" }}>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: T.text2 }}>{asset.balanceLabel}</p>
+                </div>
+
+                <div style={{ textAlign: "right" }}>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: T.text }}>₦{fmtCompact(asset.valueNGN)}</p>
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Right column */}

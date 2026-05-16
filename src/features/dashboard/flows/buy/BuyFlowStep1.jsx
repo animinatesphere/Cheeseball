@@ -17,11 +17,11 @@ export default function BuyFlowStep1({selectedAsset,setSelectedAsset,setSelected
     setDdOpen(false);
   };
   return(
-    <div style={{display:"grid",gridTemplateColumns:"1fr 400px",minHeight:"100vh",background:T.white,overflowX:"hidden",maxWidth:"100vw"}} className="buygrid">
-      <div style={{padding:"44px 52px 60px",borderRight:`1px solid ${T.border}`}}>
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 400px", minHeight: "100vh", background: T.white, width: "100%" }} className="buygrid">
+      <div className="step-content" style={{ padding: "44px 52px 60px", borderRight: `1px solid ${T.border}`, width: "100%", minWidth: 0 }}>
         {breadcrumbs}
         <p style={{fontSize:11,fontWeight:600,color:T.blue,textTransform:"uppercase",letterSpacing:"1px",marginBottom:6,fontFamily:"'DM Sans',sans-serif"}}>Transaction</p>
-        <h1 style={{fontFamily:"'Sora',sans-serif",fontSize:28,fontWeight:700,color:T.text,letterSpacing:"-0.6px",lineHeight:1.15}}>Buy Crypto</h1>
+        <h1 className="responsive-title" style={{fontFamily:"'Sora',sans-serif",fontSize:28,fontWeight:700,color:T.text,letterSpacing:"-0.6px",lineHeight:1.15}}>Buy Crypto</h1>
         <p style={{fontSize:14,color:T.text2,marginTop:6,lineHeight:1.6,fontFamily:"'DM Sans',sans-serif"}}>Select an asset and enter the amount you'd like to purchase.</p>
 
         {/* Asset selector */}
@@ -36,7 +36,7 @@ export default function BuyFlowStep1({selectedAsset,setSelectedAsset,setSelected
                   <p style={{fontSize:12,color:T.text2,marginTop:3}}>{selectedAsset.symbol}</p>
                 </div>
               </div>
-              <div style={{display:"flex",alignItems:"center",gap:10}}>
+              <div className="csel-info" style={{display:"flex",alignItems:"center",gap:10}}>
                 <div style={{textAlign:"right"}}>
                   <p style={{fontFamily:"'Sora',sans-serif",fontSize:14,fontWeight:700,color:T.text}}>{formatNGN(selectedAsset.price)}</p>
                   <p style={{fontSize:11,color:T.text3,marginTop:2}}>per {selectedAsset.symbol}</p>
@@ -70,7 +70,7 @@ export default function BuyFlowStep1({selectedAsset,setSelectedAsset,setSelected
           <p style={{fontSize:11,fontWeight:600,color:T.text3,textTransform:"uppercase",letterSpacing:"0.8px",marginBottom:10,fontFamily:"'DM Sans',sans-serif"}}>You pay</p>
           <div style={{border:`1.5px solid ${T.border}`,borderRadius:16,padding:"20px 22px",background:T.white,transition:"border-color 0.18s"}} className="amtwrap">
             <div style={{display:"flex",alignItems:"center",gap:10}}>
-              <span style={{fontFamily:"'Sora',sans-serif",fontSize:36,fontWeight:700,color:T.text3}}>₦</span>
+              <span className="responsive-amount" style={{fontFamily:"'Sora',sans-serif",fontSize:36,fontWeight:700,color:T.text3}}>₦</span>
               <input type="number" placeholder="0.00" value={payAmount} onChange={e=>setPayAmount(e.target.value)}
                 className="buy-amt-input"
                 style={{flex:1,border:"none",outline:"none",fontFamily:"'Sora',sans-serif",fontSize:36,fontWeight:700,color:payAmount>0?T.text:"#CED6E8",background:"transparent",minWidth:0,letterSpacing:"-1.5px"}}/>
@@ -80,10 +80,10 @@ export default function BuyFlowStep1({selectedAsset,setSelectedAsset,setSelected
               </div>
             </div>
           </div>
-          <div style={{display:"flex",gap:8,marginTop:10}}>
+          <div style={{display:"grid", gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))", gap:8, marginTop:10}}>
             {[5000,10000,50000,100000].map(amt=>(
               <button key={amt} onClick={()=>setPayAmount(amt)} className="qbtn"
-                style={{flex:1,border:`1.5px solid ${payAmount==amt?T.blue:T.border}`,background:payAmount==amt?T.blueLight:T.white,borderRadius:10,padding:"8px 4px",fontSize:12,fontWeight:600,color:payAmount==amt?T.blue:T.text2,cursor:"pointer",transition:"all 0.15s",textAlign:"center",fontFamily:"'DM Sans',sans-serif"}}>
+                style={{flex:"1 0 80px",border:`1.5px solid ${payAmount==amt?T.blue:T.border}`,background:payAmount==amt?T.blueLight:T.white,borderRadius:10,padding:"8px 10px",fontSize:12,fontWeight:600,color:payAmount==amt?T.blue:T.text2,cursor:"pointer",transition:"all 0.15s",textAlign:"center",fontFamily:"'DM Sans',sans-serif",minWidth:"fit-content"}}>
                 {formatNGN(amt)}
               </button>
             ))}

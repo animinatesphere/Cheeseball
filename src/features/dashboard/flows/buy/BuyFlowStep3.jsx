@@ -19,10 +19,10 @@ export default function BuyFlowStep3({selectedAsset,receiveAmount,selectedNetwor
 
   return(
     <div style={{display:"grid",gridTemplateColumns:"1fr 400px",minHeight:"100vh",background:T.white,overflowX:"hidden",maxWidth:"100vw"}} className="buygrid">
-      <div style={{padding:"44px 52px 60px",borderRight:`1px solid ${T.border}`}}>
+      <div className="step-content" style={{padding:"44px 52px 60px",borderRight:`1px solid ${T.border}`}}>
         {breadcrumbs}
         <p style={{fontSize:11,fontWeight:600,color:T.blue,textTransform:"uppercase",letterSpacing:"1px",marginBottom:6,fontFamily:"'DM Sans',sans-serif"}}>Step 3 of 6</p>
-        <h1 style={{fontFamily:"'Sora',sans-serif",fontSize:28,fontWeight:700,color:T.text,letterSpacing:"-0.6px",lineHeight:1.15}}>Wallet Address</h1>
+        <h1 className="responsive-title" style={{fontFamily:"'Sora',sans-serif",fontSize:28,fontWeight:700,color:T.text,letterSpacing:"-0.6px",lineHeight:1.15}}>Wallet Address</h1>
         <p style={{fontSize:14,color:T.text2,marginTop:6,lineHeight:1.6,fontFamily:"'DM Sans',sans-serif"}}>Enter the wallet address and select the network where you want to receive your crypto.</p>
 
         {/* Receive preview */}
@@ -70,7 +70,7 @@ export default function BuyFlowStep3({selectedAsset,receiveAmount,selectedNetwor
         </div>
 
         {/* Actions */}
-        <div style={{display:"flex",gap:12,marginTop:28}}>
+        <div className="actions-wrap" style={{display:"flex",gap:12,marginTop:28}}>
           <GhostBtn onClick={prevStep} style={{flex:1}}>← Back</GhostBtn>
           <CTA onClick={nextStep} disabled={!walletAddress||isInvalid} style={{flex:2}}>Continue <Ico.arrow/></CTA>
         </div>

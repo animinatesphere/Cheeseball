@@ -221,9 +221,9 @@ function SellStep({ onContinue }) {
               </div>
             </div>
           </div>
-          <div style={{ display: "flex", gap: 8, marginTop: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(70px, 1fr))", gap: 8, marginTop: 10 }}>
             {[["25%", 0.25], ["50%", 0.5], ["75%", 0.75], ["Max", 1]].map(([lbl, pct]) => (
-              <button key={lbl} className="qbtn" style={{ flex: 1, border: `1.5px solid ${T.border}`, background: T.white, borderRadius: 10, padding: "8px 4px", fontSize: 12, fontWeight: 600, color: T.text2, cursor: "pointer", transition: "all 0.15s", textAlign: "center" }}
+              <button key={lbl} className="qbtn" style={{ flex: "1 0 60px", border: `1.5px solid ${T.border}`, background: T.white, borderRadius: 10, padding: "8px 10px", fontSize: 12, fontWeight: 600, color: T.text2, cursor: "pointer", transition: "all 0.15s", textAlign: "center" }}
                 onClick={() => setAmount((coin.bal * pct).toFixed(6).replace(/\.?0+$/, ""))}>{lbl}</button>
             ))}
           </div>
