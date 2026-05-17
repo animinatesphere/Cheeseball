@@ -36,7 +36,7 @@ const ASSET_META = {
 /* ─── Static Data ────────────────────────────────────────────── */
 const STATS = [
   { value: "50,000+", label: "Active users"       },
-  { value: "₦2.4B+",  label: "Volume traded"      },
+  { value: "₦2.4B+",  label: "Volume exchanged"   },
   { value: "99.9%",   label: "Uptime reliability" },
   { value: "< 5 min", label: "Avg. payout time"   },
 ];
@@ -78,8 +78,8 @@ const FEATURES = [
 ];
 
 const STEPS = [
-  { n: "01", title: "Create your account",      body: "Sign up in 2 minutes. Verify your identity once and you're ready to trade."             },
-  { n: "02", title: "Select an asset & amount", body: "Choose from BTC, USDT, ETH, gift cards and more. Enter how much you want to trade."      },
+  { n: "01", title: "Create your account",      body: "Sign up in 2 minutes. Verify your identity once and you're ready to exchange."          },
+  { n: "02", title: "Select an asset & amount", body: "Choose from BTC, USDT, ETH, gift cards and more. Enter how much you want to exchange."   },
   { n: "03", title: "Get paid instantly",        body: "Send from any wallet or exchange. Once confirmed, your Naira hits your account fast."   },
 ];
 
@@ -271,7 +271,7 @@ export default function LandingPage() {
             <div className="fadein hero-pill">
               <div className="blink" style={{ width: 7, height: 7, borderRadius: "50%", background: T.green, flexShrink: 0 }} />
               <span className="ticker" style={{ fontSize: 12, fontWeight: 600, color: T.blue }}>
-                {tickRate ? `Live: ${tickRate.sym} at ${tickRate.rate}` : "Live in Nigeria · 50,000+ traders"}
+                {tickRate ? `Live: ${tickRate.sym} at ${tickRate.rate}` : "Live in Nigeria · 50,000+ exchangers"}
               </span>
             </div>
 
@@ -281,12 +281,12 @@ export default function LandingPage() {
             </h1>
 
             <p className="fadein-3" style={{ fontSize: 17, color: T.text2, lineHeight: 1.75, maxWidth: 460, marginBottom: 36 }}>
-              The most reliable platform to trade BTC, USDT and Gift Cards in Nigeria. Enjoy premium rates, automated payouts, and bank-grade security.
+              The most reliable platform to exchange BTC, USDT and Gift Cards in Nigeria. Enjoy premium rates, automated payouts, and bank-grade security.
             </p>
 
             <div className="fadein-4 hero-btns" style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 40, flexWrap: "wrap" }}>
               <button className="btn-primary" onClick={onGetStarted} style={{ fontSize: 15, padding: "16px 32px" }}>
-                Start trading free <ArrowRight color="#fff" />
+                Start exchanging free <ArrowRight color="#fff" />
               </button>
               <a href="#rates" className="btn-ghost" style={{ fontSize: 15, padding: "16px 28px" }}>
                 See our rates
@@ -334,7 +334,7 @@ export default function LandingPage() {
               ))}
 
               <button className="btn-primary" style={{ width: "100%", justifyContent: "center", marginTop: 16, fontSize: 14 }} onClick={onGetStarted}>
-                Start trading now <ArrowRight color="#fff" />
+                Start exchanging now <ArrowRight color="#fff" />
               </button>
             </div>
 
@@ -380,10 +380,10 @@ export default function LandingPage() {
           <div style={{ textAlign: "center", marginBottom: 52 }}>
             <p style={{ fontSize: 12, fontWeight: 700, color: T.blue, textTransform: "uppercase", letterSpacing: "1.2px", marginBottom: 12 }}>Why Cheeseball</p>
             <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: 40, fontWeight: 800, color: T.text, letterSpacing: "-1.2px", lineHeight: 1.1, marginBottom: 14 }}>
-              Built for serious traders
+              Built for serious exchangers
             </h2>
             <p style={{ fontSize: 16, color: T.text2, maxWidth: 480, margin: "0 auto", lineHeight: 1.7 }}>
-              Everything you need to trade crypto safely and profitably — without the complexity.
+              Everything you need to exchange crypto safely and profitably — without the complexity.
             </p>
           </div>
 
@@ -406,7 +406,7 @@ export default function LandingPage() {
             <div style={{ textAlign: "center", marginBottom: 52 }}>
               <p style={{ fontSize: 12, fontWeight: 700, color: T.blue, textTransform: "uppercase", letterSpacing: "1.2px", marginBottom: 12 }}>Simple process</p>
               <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: 40, fontWeight: 800, color: T.text, letterSpacing: "-1.2px", lineHeight: 1.1 }}>
-                Trade in 3 steps
+                Exchange in 3 steps
               </h2>
             </div>
 
@@ -508,7 +508,7 @@ export default function LandingPage() {
           <div style={{ textAlign: "center", marginBottom: 52 }}>
             <p style={{ fontSize: 12, fontWeight: 700, color: T.blue, textTransform: "uppercase", letterSpacing: "1.2px", marginBottom: 12 }}>Testimonials</p>
             <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: 40, fontWeight: 800, color: T.text, letterSpacing: "-1.2px", lineHeight: 1.1 }}>
-              Loved by traders across Nigeria
+              Loved by exchangers across Nigeria
             </h2>
           </div>
 
@@ -540,7 +540,7 @@ export default function LandingPage() {
             <div style={{ position: "absolute", bottom: -60, right: 60, width: 200, height: 200, borderRadius: "50%", background: `${T.blue}10`, pointerEvents: "none" }} />
             <div style={{ position: "relative", zIndex: 1 }}>
               <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: 44, fontWeight: 800, color: T.white, letterSpacing: "-1.5px", lineHeight: 1.1, marginBottom: 14 }}>
-                Ready to start trading?
+                Ready to start exchanging?
               </h2>
               <p style={{ fontSize: 16, color: T.text3, lineHeight: 1.7, maxWidth: 480 }}>
                 Join 50,000+ Nigerians already using Cheeseball for the best crypto and gift card rates.
@@ -567,7 +567,7 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <p style={{ fontSize: 14, color: T.text2, lineHeight: 1.7, maxWidth: 240, marginBottom: 18 }}>
-                  Nigeria's most reliable platform for trading crypto and gift cards.
+                  Nigeria's most reliable platform for exchanging crypto and gift cards.
                 </p>
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <ShieldIcon />

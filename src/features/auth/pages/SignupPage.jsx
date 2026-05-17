@@ -1,267 +1,552 @@
-import React, { useState } from "react";
-import hand from "@/assets/33505f890be2287adf471640ddbb8a82fc460c93.png";
-import logo from "@/assets/CHEESEBALL 1.png";
-import message from "@/assets/fluent-mdl2_chat-invite-friend.png";
-import gog from "@/assets/logo googleg 48dp.png";
-import app from "@/assets/ddk.png";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
 import authService from "@/services/authService";
+import { paths } from "@/routes/paths";
 
-const AuthSignup = () => {
+/* ─── Tokens ─────────────────────────────────────────────────── */
+const T = {
+  blue:       "#1A6FFF",
+  blueDark:   "#1259D9",
+  blueLight:  "#EEF3FF",
+  text:       "#0A0F1E",
+  text2:      "#6B7A99",
+  text3:      "#A8B4CC",
+  border:     "#E8EEFF",
+  surface:    "#F7F9FF",
+  white:      "#FFFFFF",
+  green:      "#00C48C",
+  greenLight: "#E6FAF4",
+  greenText:  "#00966B",
+  mintGreen:  "#4ADE80",
+  red:        "#EF4444",
+  redLight:   "#FEF2F2",
+  redText:    "#B91C1C",
+  orange:     "#F59E0B",
+};
+
+/* ─── Left panel data ────────────────────────────────────────── */
+const PERKS = [
+  { icon: "₦", label: "Earn ₦1,000",        sub: "For every friend you refer"             },
+  { icon: "⚡", label: "Instant payouts",    sub: "NGN in your account under 5 minutes"   },
+  { icon: "🔒", label: "Bank-grade security", sub: "256-bit encryption on every exchange"  },
+  { icon: "📈", label: "Best NGN rates",     sub: "Live-updated, no hidden markups"        },
+];
+
+const RECENT = [
+  { initials: "AO", name: "Adesola O.", action: "just joined", color: "#F7931A"  },
+  { initials: "FB", name: "Fatima B.",  action: "just joined", color: T.blue     },
+  { initials: "CE", name: "Chukwu E.",  action: "just joined", color: "#26A17B"  },
+];
+
+/* ─── Icons ──────────────────────────────────────────────────── */
+const EyeIcon = ({ visible }) => visible ? (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={T.text3} strokeWidth="2" strokeLinecap="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+  </svg>
+) : (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={T.text3} strokeWidth="2" strokeLinecap="round">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+);
+
+const ShieldIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={T.mintGreen} strokeWidth="2" strokeLinecap="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+  </svg>
+);
+
+const CheckIcon = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+);
+
+const ArrowRight = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+  </svg>
+);
+
+const GoogleIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24">
+    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+  </svg>
+);
+
+const GiftIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={T.blue} strokeWidth="2" strokeLinecap="round">
+    <polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/>
+    <line x1="12" y1="22" x2="12" y2="7"/>
+    <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+    <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+  </svg>
+);
+
+/* ─── Input component ────────────────────────────────────────── */
+function Field({ label, type = "text", placeholder, value, onChange, onFocus, onBlur, focused, error, right, hint }) {
+  return (
+    <div>
+      <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: T.text2, marginBottom: 7 }}>{label}</label>
+      <div style={{ position: "relative" }}>
+        <input
+          type={type}
+          placeholder={placeholder}
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          style={{
+            width: "100%", border: `1.5px solid ${focused ? T.blue : error ? T.red : T.border}`,
+            borderRadius: 13, padding: right ? "13px 44px 13px 16px" : "13px 16px",
+            fontSize: 14, color: T.text, fontFamily: "'DM Sans', sans-serif",
+            outline: "none", transition: "border-color 0.15s", background: T.white,
+          }}
+        />
+        {right && (
+          <div style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)" }}>
+            {right}
+          </div>
+        )}
+      </div>
+      {error && <p style={{ fontSize: 11, color: T.red, marginTop: 5, fontWeight: 500 }}>{error}</p>}
+      {hint && !error && <p style={{ fontSize: 11, color: T.text3, marginTop: 5 }}>{hint}</p>}
+    </div>
+  );
+}
+
+/* ─── Password strength ──────────────────────────────────────── */
+function PasswordStrength({ password }) {
+  if (!password) return null;
+  const hasLower   = /[a-z]/.test(password);
+  const hasUpper   = /[A-Z]/.test(password);
+  const hasNum     = /\d/.test(password);
+  const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+  const score = [password.length >= 8, hasLower, hasUpper, hasNum, hasSpecial].filter(Boolean).length;
+  const label = score <= 2 ? "Weak" : score <= 3 ? "Fair" : score <= 4 ? "Good" : "Strong";
+  const colors = ["#EF4444", "#EF4444", "#F59E0B", "#00C48C", "#00C48C"];
+  const c = colors[score - 1] || T.border;
+  return (
+    <div style={{ marginTop: 8 }}>
+      <div style={{ display: "flex", gap: 4, marginBottom: 4 }}>
+        {[1,2,3,4].map(i => (
+          <div key={i} style={{ flex: 1, height: 3, borderRadius: 4, background: i <= Math.min(score, 4) ? c : T.border, transition: "background 0.2s" }} />
+        ))}
+      </div>
+      <p style={{ fontSize: 11, color: c, fontWeight: 600 }}>{label} password</p>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+export default function AuthSignup({ onSignUp, onLogin, initialReferralCode = "" }) {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    referral_code: "",
-    email: "",
-    password: "",
-    confirm_password: "",
+    fullName:    "",
+    email:       "",
+    phone:       "",
+    password:    "",
+    confirmPass: "",
+    referral:    initialReferralCode,
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [focused,      setFocused]      = useState("");
+  const [showPass,     setShowPass]     = useState(false);
+  const [showConfirm,  setShowConfirm]  = useState(false);
+  const [agreed,       setAgreed]       = useState(false);
+  const [loading,      setLoading]      = useState(false);
+  const [errors,       setErrors]       = useState({});
+  const [refFromLink,  setRefFromLink]  = useState(false);
+  const [apiError,     setApiError]     = useState("");
 
-  const handleChange = (field) => (e) =>
-    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+  /* Auto-fill referral from URL query param: ?ref=CHEESE-JANE42 */
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const ref    = params.get("ref");
+      if (ref) {
+        setForm(f => ({ ...f, referral: ref }));
+        setRefFromLink(true);
+      }
+    } catch (_) { /* SSR or env without window — safe to ignore */ }
+  }, []);
+
+  const set = (key) => (val) => {
+    setForm(f => ({ ...f, [key]: val }));
+    if (errors[key]) setErrors(e => ({ ...e, [key]: "" }));
+  };
+
+  const validate = () => {
+    const e = {};
+    if (!form.fullName.trim())               e.fullName    = "Full name is required";
+    if (!form.email.includes("@"))           e.email       = "Enter a valid email address";
+    if (form.phone.length < 10)              e.phone       = "Enter a valid phone number";
+    if (form.password.length < 8)            e.password    = "Password must be at least 8 characters";
+    if (form.confirmPass !== form.password)  e.confirmPass = "Passwords do not match";
+    return e;
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-
-    if (!acceptedTerms) {
-      setError("Please accept the Terms and Conditions to continue.");
+    if (e) e.preventDefault();
+    setApiError("");
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length) {
+      setErrors(validationErrors);
       return;
     }
-    if (form.password !== form.confirm_password) {
-      setError("Passwords do not match.");
-      return;
-    }
-    if (form.password.length < 6) {
-      setError("Password must be at least 6 characters.");
-      return;
-    }
-
+    if (!agreed || loading) return;
     setLoading(true);
+
     try {
       await authService.register({
         email: form.email,
         password: form.password,
-        confirm_password: form.confirm_password,
-        referral_code: form.referral_code,
+        confirm_password: form.confirmPass,
+        referral_code: form.referral,
       });
-      // Pass registered email to verify page via query param
-      navigate(`/verify-account?email=${encodeURIComponent(form.email)}`);
+
+      if (onSignUp) {
+        onSignUp();
+      } else {
+        navigate(`${paths.verifyAccount}?email=${encodeURIComponent(form.email)}`);
+      }
     } catch (err) {
-      setError(err.message || "Registration failed. Please try again.");
+      setApiError(err.message || "Registration failed. Please check your credentials and try again.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleLoginRedirect = () => {
+    if (onLogin) {
+      onLogin();
+    } else {
+      navigate(paths.login);
+    }
+  };
+
+  const canSubmit = agreed && form.fullName && form.email && form.phone && form.password && form.confirmPass && !loading;
+
   return (
-    <div
-      className="flex min-h-screen w-full overflow-hidden bg-[#f5f6fa]"
-      style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif" }}
-    >
-      {/* ───────────── LEFT PANEL ───────────── */}
-      <div className="relative hidden lg:flex w-[45%] max-w-[45%] overflow-hidden items-end shrink-0">
-        <img
-          src={hand}
-          alt="Cheeseball background"
-          className="absolute inset-0 w-full h-full object-cover blur-[3px] brightness-75 scale-105"
-        />
-        <div className="absolute inset-0 bg-linear-to-b from-[rgba(0,20,255,0.18)] to-[rgba(9,19,127,0.72)]" />
-        <div className="relative z-2 bg-[#FCFCFC3B] px-9 py-10 text-white w-full">
-          <h2
-            className="font-bold leading-tight mb-3 tracking-tight text-[18px] sm:text-[20px] md:text-[22px] lg:text-[24px] text-center"
-            style={{ textShadow: "0 2px 12px rgba(0,0,0,0.4)" }}
-          >
-            Spend crypto like cash
-          </h2>
-          <p
-            className="text-[clamp(13px,1.2vw,16px)] leading-relaxed text-white/85 text-center mx-auto"
-            style={{ textShadow: "0 1px 6px rgba(0,0,0,0.3)" }}
-          >
-            Convert crypto and use it for real-life payments instantly
-          </p>
-        </div>
-      </div>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap');
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'DM Sans',sans-serif;}
+        input:-webkit-autofill{-webkit-box-shadow:0 0 0 40px ${T.white} inset!important;-webkit-text-fill-color:${T.text}!important;}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .f1{animation:fadeUp 0.45s ease forwards}
+        .f2{animation:fadeUp 0.45s 0.08s ease both}
+        .f3{animation:fadeUp 0.45s 0.16s ease both}
+        .float{animation:float 5s ease-in-out infinite}
+        .blink{animation:blink 1.8s ease-in-out infinite}
+        .google-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:14px;border-radius:14px;border:1.5px solid ${T.border};background:${T.white};cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:${T.text};transition:all 0.15s;}
+        .google-btn:hover{border-color:${T.blue}!important;background:${T.blueLight}!important;}
+        .google-btn:active{transform:scale(0.985)!important;}
+        .submit-btn:hover:not(:disabled){background:${T.blueDark}!important;}
+        .submit-btn:active:not(:disabled){transform:scale(0.985)!important;}
+        .ref-chip-close:hover{background:rgba(26,111,255,0.2)!important;}
 
-      {/* ───────────── RIGHT PANEL ───────────── */}
-      <div className="flex-1 overflow-y-auto flex justify-center items-start py-10 px-5 max-[480px]:py-7 max-[480px]:px-4 bg-white">
-        <div className="w-full max-w-115">
+        .signup-grid { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; font-family: 'DM Sans', sans-serif; }
+        .left-panel { background: ${T.text}; position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 44px 52px; }
+        .right-panel { background: ${T.white}; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 48px 64px; }
+        .mobile-logo { display: none; }
+        .top-link { width: 100%; max-width: 420px; display: flex; justify-content: flex-end; margin-bottom: 28px; }
+
+        @media (max-width: 1024px) {
+          .signup-grid { grid-template-columns: 1fr !important; }
+          .left-panel { display: none !important; }
+          .right-panel { padding: 40px 20px !important; }
+          .mobile-logo { display: flex !important; }
+          .top-link { margin-bottom: 24px !important; }
+        }
+      `}</style>
+
+      <div className="signup-grid">
+
+        {/* ══ LEFT Panel ══ */}
+        <div className="left-panel">
+          <div style={{ position: "absolute", top: -100, right: -100, width: 400, height: 400, borderRadius: "50%", background: `${T.blue}12`, pointerEvents: "none" }} />
+          <div style={{ position: "absolute", bottom: -80, left: -80, width: 300, height: 300, borderRadius: "50%", background: `${T.blue}08`, pointerEvents: "none" }} />
+
           {/* Logo */}
-          <img
-            src={logo}
-            alt="Cheeseball logo"
-            className="block max-h-17.5 max-w-35 mx-auto mb-5 object-contain"
-          />
-
-          <h1 className="text-[clamp(20px,2vw,26px)] font-bold text-center text-[#1e1e1e] mb-1">
-            Sign up
-          </h1>
-          <p className="text-[clamp(13px,1.2vw,16px)] font-semibold text-center text-[#47474a] mb-1">
-            Create your Account
-          </p>
-          <p className="text-[clamp(11px,1vw,13px)] text-center text-[#636567] mb-5">
-            Get started using your email address and password
-          </p>
-
-          {/* Invite banner */}
-          <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-md mb-5 bg-linear-to-r from-[#0014FF] to-[#09137F] text-[#fbfbfb] text-[clamp(11px,1vw,13px)] max-[480px]:text-[11px]">
-            <img src={message} alt="invite" className="w-5 h-5 shrink-0 brightness-[10]" />
-            <p>Invite Detected. Your invite code has been pre-filled.</p>
+          <div style={{ position: "relative", zIndex: 1, cursor: "pointer" }} onClick={() => navigate(paths.home)}>
+            <div style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 800, color: T.white, letterSpacing: "-0.5px" }}>
+              Cheese<span style={{ color: T.blue }}>ball</span>
+            </div>
           </div>
 
-          <form onSubmit={handleSubmit}>
-            {/* ── Fields ── */}
-            <div className="flex flex-col gap-3.5 mb-4">
-              {/* Invite code */}
-              <div className="flex flex-col gap-1">
-                <label className="text-[clamp(12px,1vw,14px)] font-semibold text-[#1e1e1e]">
-                  Invite code
-                </label>
-                <input
-                  type="text"
-                  placeholder="INV- 47736 3773"
-                  value={form.referral_code}
-                  onChange={handleChange("referral_code")}
-                  className="w-full h-11 border border-dashed border-[#a2a2a2] rounded-md outline-none px-3 text-[clamp(12px,1.1vw,14px)] text-[#1e1e1e] bg-[#fafafa] transition-colors focus:border-[#0014ff] focus:bg-white"
-                />
-              </div>
-
-              {/* Email */}
-              <div className="flex flex-col gap-1">
-                <label className="text-[clamp(12px,1vw,14px)] font-semibold text-[#1e1e1e]">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  required
-                  placeholder="you@example.com"
-                  value={form.email}
-                  onChange={handleChange("email")}
-                  className="w-full h-11 border border-[#a2a2a2] rounded-md outline-none px-3 text-[clamp(12px,1.1vw,14px)] text-[#1e1e1e] bg-[#fafafa] transition-colors focus:border-[#0014ff] focus:bg-white"
-                />
-              </div>
-
-              {/* Password */}
-              <div className="flex flex-col gap-1">
-                <label className="text-[clamp(12px,1vw,14px)] font-semibold text-[#1e1e1e]">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    required
-                    placeholder="••••••••••••"
-                    value={form.password}
-                    onChange={handleChange("password")}
-                    className="w-full h-11 border border-[#a2a2a2] rounded-md outline-none px-3 pr-11 text-[clamp(12px,1.1vw,14px)] text-[#1e1e1e] bg-[#fafafa] transition-colors focus:border-[#0014ff] focus:bg-white"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9e9e9e] hover:text-[#1e1e1e] transition-colors"
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Confirm Password */}
-              <div className="flex flex-col gap-1">
-                <label className="text-[clamp(12px,1vw,14px)] font-semibold text-[#1e1e1e]">
-                  Confirm Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showConfirm ? "text" : "password"}
-                    required
-                    placeholder="••••••••••••"
-                    value={form.confirm_password}
-                    onChange={handleChange("confirm_password")}
-                    className="w-full h-11 border border-[#a2a2a2] rounded-md outline-none px-3 pr-11 text-[clamp(12px,1.1vw,14px)] text-[#1e1e1e] bg-[#fafafa] transition-colors focus:border-[#0014ff] focus:bg-white"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirm(!showConfirm)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9e9e9e] hover:text-[#1e1e1e] transition-colors"
-                  >
-                    {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
+          {/* Headline */}
+          <div style={{ position: "relative", zIndex: 1, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 28 }}>
+            <div>
+              <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: 38, fontWeight: 800, color: T.white, letterSpacing: "-1.2px", lineHeight: 1.1, marginBottom: 12 }}>
+                Your money.<br />Your speed.<br /><span style={{ color: T.blue }}>Your rates.</span>
+              </h2>
+              <p style={{ fontSize: 14, color: T.text3, lineHeight: 1.7, maxWidth: 320 }}>
+                Create an account and start exchanging crypto &amp; gift cards for the best Naira rates — no hidden fees.
+              </p>
             </div>
 
-            {/* Terms */}
-            <div className="flex items-center gap-2 mb-4.5">
-              <input
-                type="checkbox"
-                id="terms"
-                checked={acceptedTerms}
-                onChange={(e) => setAcceptedTerms(e.target.checked)}
-                className="w-4 h-4 accent-[#0014ff] shrink-0 cursor-pointer"
-              />
-              <label htmlFor="terms" className="text-[clamp(11px,1vw,13px)] text-[#9e9e9e] cursor-pointer">
-                I accept the{" "}
-                <span className="text-[#1e1e1e] font-semibold cursor-pointer">
-                  Terms and Conditions
-                </span>
-              </label>
+            {/* Perks */}
+            <div className="float" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, padding: "20px", display: "flex", flexDirection: "column", gap: 14 }}>
+              {PERKS.map((p) => (
+                <div key={p.label} style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 11, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, flexShrink: 0 }}>{p.icon}</div>
+                  <div>
+                    <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 700, color: T.white, marginBottom: 2 }}>{p.label}</p>
+                    <p style={{ fontSize: 12, color: T.text3 }}>{p.sub}</p>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            {/* Error */}
-            {error && (
-              <p className="text-[12px] text-red-500 text-center mb-3">{error}</p>
+            {/* Social proof */}
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                {RECENT.map((r, i) => (
+                  <div key={r.initials} style={{ width: 30, height: 30, borderRadius: "50%", background: r.color, border: "2px solid rgba(10,15,30,0.8)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 10, fontWeight: 700, color: "#fff", marginLeft: i > 0 ? -8 : 0, zIndex: RECENT.length - i }}>
+                    {r.initials}
+                  </div>
+                ))}
+              </div>
+              <p style={{ fontSize: 12, color: T.text3, lineHeight: 1.5 }}>
+                <span style={{ color: T.mintGreen, fontWeight: 600 }}>+38 people</span> joined this week
+              </p>
+            </div>
+          </div>
+
+          {/* Footer */}
+          <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 6 }}>
+            <ShieldIcon />
+            <span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", fontWeight: 500 }}>
+              Your transaction is secure · Protected by Cheeseball
+            </span>
+          </div>
+        </div>
+
+        {/* ══ RIGHT — Form Panel ══ */}
+        <div className="right-panel">
+
+          {/* Top link */}
+          <div className="top-link">
+            <span style={{ fontSize: 13, color: T.text2 }}>Already have an account? </span>
+            <button onClick={handleLoginRedirect} style={{ fontSize: 13, fontWeight: 700, color: T.blue, background: "none", border: "none", cursor: "pointer", padding: "0 0 0 5px" }}>
+              Log in
+            </button>
+          </div>
+
+          {/* Mobile Logo */}
+          <div className="mobile-logo" style={{ alignItems: "center", gap: 10, marginBottom: 28, alignSelf: "flex-start", cursor: "pointer" }} onClick={() => navigate(paths.home)}>
+            <div style={{ fontFamily: "'Sora', sans-serif", fontSize: 20, fontWeight: 800, color: T.text, letterSpacing: "-0.5px" }}>
+              Cheese<span style={{ color: T.blue }}>ball</span>
+            </div>
+          </div>
+
+          <div style={{ width: "100%", maxWidth: 420 }}>
+
+            {/* Heading */}
+            <div className="f1" style={{ marginBottom: 28 }}>
+              <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 28, fontWeight: 800, color: T.text, letterSpacing: "-0.7px", marginBottom: 6 }}>
+                Create your account
+              </h1>
+              <p style={{ fontSize: 14, color: T.text2 }}>It takes less than 2 minutes.</p>
+            </div>
+
+            {/* Error banner */}
+            {apiError && (
+              <div style={{ display: "flex", alignItems: "center", gap: 10, background: T.redLight, border: `1px solid #FECACA`, borderRadius: 12, padding: "12px 16px", marginBottom: 20, animation: "fadeUp 0.3s ease" }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={T.red} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0 }}>
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                <p style={{ fontSize: 13, color: T.redText, fontWeight: 500 }}>{apiError}</p>
+              </div>
             )}
 
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="block w-full h-12 border-none rounded-full cursor-pointer text-[clamp(13px,1.2vw,15px)] font-semibold text-white bg-linear-to-r from-[#0014FF] to-[#09137F] mb-5 transition-all hover:opacity-90 hover:-translate-y-px disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
-            >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create account"}
-            </button>
-          </form>
+            {/* Fields form */}
+            <form onSubmit={handleSubmit} className="f3" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
 
-          {/* Divider */}
-          <div className="flex items-center gap-2.5 mb-4">
-            <span className="flex-1 h-px bg-[#d9d9d9]" />
-            <span className="text-[clamp(11px,1vw,13px)] text-[#7f7c7b] whitespace-nowrap">
-              or continue with
-            </span>
-            <span className="flex-1 h-px bg-[#d9d9d9]" />
+              {/* Full name */}
+              <Field
+                label="Full name"
+                placeholder="Jane Doe"
+                value={form.fullName}
+                onChange={set("fullName")}
+                onFocus={() => setFocused("fullName")}
+                onBlur={() => setFocused("")}
+                focused={focused === "fullName"}
+                error={errors.fullName}
+              />
+
+              {/* Email */}
+              <Field
+                label="Email address"
+                type="email"
+                placeholder="you@example.com"
+                value={form.email}
+                onChange={set("email")}
+                onFocus={() => setFocused("email")}
+                onBlur={() => setFocused("")}
+                focused={focused === "email"}
+                error={errors.email}
+              />
+
+              {/* Phone */}
+              <Field
+                label="Phone number"
+                type="tel"
+                placeholder="+234 800 000 0000"
+                value={form.phone}
+                onChange={set("phone")}
+                onFocus={() => setFocused("phone")}
+                onBlur={() => setFocused("")}
+                focused={focused === "phone"}
+                error={errors.phone}
+              />
+
+              {/* Password */}
+              <div>
+                <Field
+                  label="Password"
+                  type={showPass ? "text" : "password"}
+                  placeholder="At least 8 characters"
+                  value={form.password}
+                  onChange={set("password")}
+                  onFocus={() => setFocused("password")}
+                  onBlur={() => setFocused("")}
+                  focused={focused === "password"}
+                  error={errors.password}
+                  right={
+                    <button type="button" onClick={() => setShowPass(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", padding: 0 }}>
+                      <EyeIcon visible={!showPass} />
+                    </button>
+                  }
+                />
+                <PasswordStrength password={form.password} />
+              </div>
+
+              {/* Confirm password */}
+              <Field
+                label="Confirm password"
+                type={showConfirm ? "text" : "password"}
+                placeholder="Re-enter your password"
+                value={form.confirmPass}
+                onChange={set("confirmPass")}
+                onFocus={() => setFocused("confirmPass")}
+                onBlur={() => setFocused("")}
+                focused={focused === "confirmPass"}
+                error={errors.confirmPass}
+                right={
+                  <button type="button" onClick={() => setShowConfirm(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", padding: 0 }}>
+                    <EyeIcon visible={!showConfirm} />
+                  </button>
+                }
+              />
+
+              {/* Referral code */}
+              <div>
+                <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, fontWeight: 600, color: T.text2, marginBottom: 7 }}>
+                  <GiftIcon /> Referral code
+                  <span style={{ fontSize: 11, color: T.text3, fontWeight: 400 }}>(optional)</span>
+                </label>
+
+                {refFromLink ? (
+                  /* Auto-filled pill from referral link */
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "12px 16px", background: T.blueLight, border: `1.5px solid ${T.border}`, borderRadius: 13 }}>
+                    <div style={{ width: 22, height: 22, borderRadius: "50%", background: T.blue, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <CheckIcon />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 700, color: T.blue, letterSpacing: "0.5px" }}>{form.referral}</p>
+                      <p style={{ fontSize: 11, color: "#3B5AA8", marginTop: 1 }}>Referral code applied — you'll both earn ₦1,000</p>
+                    </div>
+                    <button
+                      type="button"
+                      className="ref-chip-close"
+                      onClick={() => { setRefFromLink(false); set("referral")(""); }}
+                      style={{ width: 24, height: 24, borderRadius: "50%", background: "rgba(26,111,255,0.12)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0, transition: "background 0.15s" }}
+                    >
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={T.blue} strokeWidth="3" strokeLinecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
+                  /* Empty input */
+                  <input
+                    type="text"
+                    placeholder="e.g. CHEESE-JANE42"
+                    value={form.referral}
+                    onChange={e => set("referral")(e.target.value.toUpperCase())}
+                    onFocus={() => setFocused("referral")}
+                    onBlur={() => setFocused("")}
+                    style={{ width: "100%", border: `1.5px solid ${focused === "referral" ? T.blue : T.border}`, borderRadius: 13, padding: "13px 16px", fontSize: 14, color: T.text, fontFamily: "'Sora', sans-serif", fontWeight: 600, letterSpacing: "0.5px", outline: "none", transition: "border-color 0.15s", background: T.white }}
+                  />
+                )}
+              </div>
+
+              {/* Terms checkbox */}
+              <div
+                style={{ display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer", marginTop: 2 }}
+                onClick={() => setAgreed(a => !a)}
+              >
+                <div style={{ width: 20, height: 20, borderRadius: 6, border: `2px solid ${agreed ? T.blue : T.border}`, background: agreed ? T.blue : T.white, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1, transition: "all 0.15s" }}>
+                  {agreed && <CheckIcon />}
+                </div>
+                <p style={{ fontSize: 13, color: T.text2, lineHeight: 1.55 }}>
+                  I agree to Cheeseball's{" "}
+                  <span style={{ color: T.blue, fontWeight: 600, cursor: "pointer" }}>Terms of Service</span>
+                  {" "}and{" "}
+                  <span style={{ color: T.blue, fontWeight: 600, cursor: "pointer" }}>Privacy Policy</span>.
+                </p>
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                className="submit-btn"
+                disabled={!canSubmit}
+                style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, cursor: canSubmit ? "pointer" : "not-allowed", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: canSubmit ? T.blue : "#E8EEFF", color: canSubmit ? "#fff" : T.text3, transition: "all 0.18s", marginTop: 10 }}
+              >
+                {loading
+                  ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} /> Creating account…</>
+                  : <>Create account <ArrowRight /></>
+                }
+              </button>
+
+              {/* Divider */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "14px 0" }}>
+                <div style={{ flex: 1, height: 1, background: T.border }} />
+                <span style={{ fontSize: 12, color: T.text3, fontWeight: 500, whiteSpace: "nowrap" }}>or continue with</span>
+                <div style={{ flex: 1, height: 1, background: T.border }} />
+              </div>
+
+              {/* Google */}
+              <button
+                type="button"
+                className="google-btn"
+                style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, padding: "14px", borderRadius: 14, border: `1.5px solid ${T.border}`, background: T.white, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, color: T.text, transition: "all 0.15s" }}
+              >
+                <GoogleIcon /> Continue with Google
+              </button>
+
+              {/* Login link */}
+              <p style={{ textAlign: "center", fontSize: 13, color: T.text2, paddingTop: 10 }}>
+                Already have an account?{" "}
+                <button type="button" onClick={handleLoginRedirect} style={{ fontSize: 13, fontWeight: 700, color: T.blue, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+                  Sign in
+                </button>
+              </p>
+            </form>
           </div>
-
-          {/* Social */}
-          <div className="flex gap-3 justify-center mb-5 max-[480px]:flex-col">
-            <button className="flex items-center justify-center gap-2 px-6 py-2.5 border border-[#e0e0e0] rounded-lg bg-white cursor-pointer text-[clamp(12px,1.1vw,14px)] text-[#1e1e1e] font-medium shadow-sm flex-1 transition-all hover:shadow-md hover:-translate-y-px">
-              <img src={gog} alt="Google" className="w-5 h-5 object-contain" />
-              <span>Google</span>
-            </button>
-            <button className="flex items-center justify-center gap-2 px-6 py-2.5 border border-[#e0e0e0] rounded-lg bg-white cursor-pointer text-[clamp(12px,1.1vw,14px)] text-[#1e1e1e] font-medium shadow-sm flex-1 transition-all hover:shadow-md hover:-translate-y-px">
-              <img src={app} alt="Apple" className="w-5 h-5 object-contain" />
-              <span>Apple</span>
-            </button>
-          </div>
-
-          {/* Login link */}
-            Already have an account?{" "}
-            <button 
-              onClick={() => navigate("/login")}
-              className="text-[#0014ff] font-semibold no-underline hover:underline bg-transparent border-none cursor-pointer"
-            >
-              Login
-            </button>
         </div>
+
       </div>
-    </div>
+    </>
   );
-};
-
-export default AuthSignup;
-
+}
