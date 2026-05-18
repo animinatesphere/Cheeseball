@@ -211,7 +211,7 @@ export default function Auth() {
                 Nigeria's #1 crypto platform
               </p>
               <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: 40, fontWeight: 800, color: T.white, letterSpacing: "-1.2px", lineHeight: 1.1, marginBottom: 14 }}>
-                Trade smarter.<br />Get paid faster.
+                Exchange smarter.<br />Get paid faster.
               </h2>
               <p style={{ fontSize: 15, color: T.text3, lineHeight: 1.7, maxWidth: 340 }}>
                 Buy, sell and swap crypto and gift cards at the best rates in Nigeria — with payouts in under 5 minutes.

@@ -1,4 +1,7 @@
-const API_BASE = "https://cheeseball-v2.vercel.app";
+const API_BASE =
+  window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+    ? ""
+    : "https://cheeseball-v2.vercel.app";
 
 async function parseResponse(response) {
   const contentType = response.headers.get("content-type") || "";
@@ -82,6 +85,14 @@ const authService = {
       "Verification failed",
     ),
 
+  verifyResetToken: (email, token) =>
+    request(
+      "/api/auth/verify-reset-token",
+      { email, token },
+      "Verification failed",
+    ),
+
+
   forgotPassword: (email) =>
     request(
       "/api/auth/forgot-password",
@@ -98,4 +109,3 @@ const authService = {
 };
 
 export default authService;
-

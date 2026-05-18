@@ -1,300 +1,447 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "@/assets/CHEESEBALL 1.png";
-import hand from "@/assets/6ea63607c4c189087888a13bff995a50efe7783e.png";
-import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
-import Toast from "@/shared/components/Toast";
 import authService from "@/services/authService";
+import { paths } from "@/routes/paths";
+import Toast from "@/shared/components/Toast";
 
-/* ─────────────────────────────────────────────
-   Shared layout wrapper (left panel + right panel)
-───────────────────────────────────────────── */
-const Layout = ({ children }) => (
-  <div
-    className="flex min-h-screen w-full overflow-hidden bg-[#f5f6fa]"
-    style={{ fontFamily: "'Inter', 'Segoe UI', sans-serif" }}
-  >
-    {/* Left blurred panel */}
-    <div className="relative hidden lg:flex w-[45%] max-w-[45%] overflow-hidden items-end shrink-0">
-      <img
-        src={hand}
-        alt="Cheeseball background"
-        className="absolute inset-0 w-full h-full object-cover blur-[3px] brightness-75 scale-105"
-      />
-      <div className="absolute inset-0 bg-linear-to-b from-[rgba(0,20,255,0.18)] to-[rgba(9,19,127,0.72)]" />
-      <div className="relative z-2 bg-[#FCFCFC3B] px-9 py-10 text-white w-full">
-        <h2
-          className="font-bold leading-tight mb-3 tracking-tight text-[18px] sm:text-[20px] md:text-[22px] lg:text-[24px] text-center"
-          style={{ textShadow: "0 2px 12px rgba(0,0,0,0.4)" }}
-        >
-          Spend crypto like cash
-        </h2>
-        <p
-          className="text-[clamp(13px,1.2vw,16px)] leading-relaxed text-white/85 text-center mx-auto"
-          style={{ textShadow: "0 1px 6px rgba(0,0,0,0.3)" }}
-        >
-          Convert crypto and use it for real-life payments instantly
-        </p>
-      </div>
-    </div>
+/* ─── Tokens ─────────────────────────────────────────────────── */
+const T = {
+  blue:       "#1A6FFF",
+  blueDark:   "#1259D9",
+  blueLight:  "#EEF3FF",
+  text:       "#0A0F1E",
+  text2:      "#6B7A99",
+  text3:      "#A8B4CC",
+  border:     "#E8EEFF",
+  surface:    "#F7F9FF",
+  white:      "#FFFFFF",
+  green:      "#00C48C",
+  greenLight: "#E6FAF4",
+  greenText:  "#00966B",
+  mintGreen:  "#4ADE80",
+  orange:     "#F97316",
+  red:        "#EF4444",
+  redLight:   "#FEF2F2",
+  redText:    "#B91C1C",
+};
 
-    {/* Right content panel */}
-    <div className="flex-1 overflow-y-auto flex justify-center items-center py-10 px-5 max-[480px]:py-7 max-[480px]:px-4 bg-white">
-      <div className="w-full max-w-sm">
-        <img
-          src={logo}
-          alt="Cheeseball logo"
-          className="block max-w-35 mx-auto mb-8 object-contain"
-        />
-        {children}
-      </div>
-    </div>
-  </div>
+/* ─── Icons ──────────────────────────────────────────────────── */
+const ArrowLeft = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+  </svg>
+);
+const ArrowRight = () => (
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+    <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+  </svg>
+);
+const EyeIcon = ({ visible }) => visible ? (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={T.text3} strokeWidth="2" strokeLinecap="round">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+  </svg>
+) : (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={T.text3} strokeWidth="2" strokeLinecap="round">
+    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+);
+const MailIcon = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={T.blue} strokeWidth="1.8" strokeLinecap="round">
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+    <polyline points="22,6 12,13 2,6"/>
+  </svg>
+);
+const ShieldIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={T.mintGreen} strokeWidth="2" strokeLinecap="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+  </svg>
+);
+const CheckCircle = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
+  </svg>
+);
+const LockIcon = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={T.blue} strokeWidth="1.8" strokeLinecap="round">
+    <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+  </svg>
 );
 
-/* ─────────────────────────────────────────────
-   STEP 1 — Forgot Password (email entry)
-───────────────────────────────────────────── */
-const EmailStep = ({ onNext, onBack, loading, setLoading, setToast }) => {
-  const [email, setEmail] = useState("");
+/* ─── Password strength ──────────────────────────────────────── */
+function PasswordStrength({ password }) {
+  if (!password) return null;
+  const score = [
+    password.length >= 8,
+    /[a-z]/.test(password),
+    /[A-Z]/.test(password),
+    /\d/.test(password),
+    /[^a-zA-Z0-9]/.test(password),
+  ].filter(Boolean).length;
+  const labels = ["", "Weak", "Weak", "Fair", "Good", "Strong"];
+  const colors = ["", T.red, T.red, T.orange, T.green, T.green];
+  const c = colors[score] || T.border;
+  return (
+    <div style={{ marginTop: 8 }}>
+      <div style={{ display: "flex", gap: 4, marginBottom: 5 }}>
+        {[1,2,3,4].map(i => (
+          <div key={i} style={{ flex: 1, height: 3, borderRadius: 4, background: i <= Math.min(score, 4) ? c : T.border, transition: "background 0.2s" }} />
+        ))}
+      </div>
+      <p style={{ fontSize: 11, color: c, fontWeight: 600 }}>{labels[score]}</p>
+    </div>
+  );
+}
 
-  const handleSubmit = async (e) => {
+/* ─── OTP input ──────────────────────────────────────────────── */
+function OTPInput({ value, onChange, error }) {
+  const inputs = useRef([]);
+  const digits  = value.split("").concat(Array(6).fill("")).slice(0, 6);
+
+  const handleChange = (i, val) => {
+    const cleaned = val.replace(/\D/g, "").slice(-1);
+    const next    = [...digits];
+    next[i]       = cleaned;
+    onChange(next.join(""));
+    if (cleaned && i < 5) inputs.current[i + 1]?.focus();
+  };
+
+  const handleKeyDown = (i, e) => {
+    if (e.key === "Backspace" && !digits[i] && i > 0) {
+      inputs.current[i - 1]?.focus();
+      const next = [...digits]; next[i - 1] = ""; onChange(next.join(""));
+    }
+    if (e.key === "ArrowLeft" && i > 0) inputs.current[i - 1]?.focus();
+    if (e.key === "ArrowRight" && i < 5) inputs.current[i + 1]?.focus();
+  };
+
+  const handlePaste = (e) => {
     e.preventDefault();
+    const pasted = e.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+    onChange(pasted.padEnd(6, "").slice(0, 6).trimEnd());
+    const focusIdx = Math.min(pasted.length, 5);
+    inputs.current[focusIdx]?.focus();
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+        {digits.map((d, i) => (
+          <input
+            key={i}
+            ref={el => inputs.current[i] = el}
+            type="text"
+            inputMode="numeric"
+            maxLength={1}
+            value={d}
+            onChange={e => handleChange(i, e.target.value)}
+            onKeyDown={e => handleKeyDown(i, e)}
+            onPaste={handlePaste}
+            onFocus={e => e.target.select()}
+            style={{
+              width: 52, height: 58,
+              textAlign: "center",
+              fontFamily: "'Sora', sans-serif",
+              fontSize: 22, fontWeight: 700,
+              color: T.text,
+              border: `1.5px solid ${error ? T.red : d ? T.blue : T.border}`,
+              borderRadius: 14,
+              background: d ? T.blueLight : T.white,
+              outline: "none",
+              transition: "all 0.15s",
+              caretColor: T.blue,
+            }}
+          />
+        ))}
+      </div>
+      {error && <p style={{ fontSize: 12, color: T.red, textAlign: "center", marginTop: 10, fontWeight: 500 }}>{error}</p>}
+    </div>
+  );
+}
+
+/* ─── Countdown hook ─────────────────────────────────────────── */
+function useCountdown(start, active) {
+  const [secs, setSecs] = useState(start);
+  useEffect(() => {
+    if (!active) { setSecs(start); return; }
+    if (secs <= 0) return;
+    const t = setInterval(() => setSecs(s => s - 1), 1000);
+    return () => clearInterval(t);
+  }, [active, secs]);
+  const reset = () => setSecs(start);
+  return [secs, reset];
+}
+
+/* ─── Left brand panel (shared across all steps) ────────────── */
+function LeftPanel({ step }) {
+  const COPY = {
+    1: { title: "Forgot your\npassword?",    sub: "No worries. Enter your email and we'll send you a reset code in seconds."    },
+    2: { title: "Check your\ninbox.",         sub: "We sent a 6-digit code to your email. It expires in 10 minutes."              },
+    3: { title: "Almost\nthere.",             sub: "Create a strong new password to keep your Cheeseball account secure."         },
+    4: { title: "You're back\nin.",           sub: "Your password has been reset. Sign in and continue exchanging."                  },
+  };
+  const c = COPY[step] || COPY[1];
+
+  return (
+    <div className="brand-panel" style={{ background: T.text, position: "relative", overflow: "hidden", display: "flex", flexDirection: "column", padding: "44px 52px" }}>
+      <div style={{ position: "absolute", top: -100, right: -100, width: 400, height: 400, borderRadius: "50%", background: `${T.blue}12`, pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: -80, left: -80, width: 300, height: 300, borderRadius: "50%", background: `${T.blue}08`, pointerEvents: "none" }} />
+
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <div style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 800, color: T.white, letterSpacing: "-0.5px" }}>
+          Cheese<span style={{ color: T.blue }}>ball</span>
+        </div>
+      </div>
+
+      <div style={{ position: "relative", zIndex: 1, flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 28 }}>
+
+        {/* Step indicator */}
+        {step < 4 && (
+          <div style={{ display: "flex", gap: 6 }}>
+            {[1,2,3].map(i => (
+              <div key={i} style={{ height: 3, borderRadius: 4, flex: i === step ? 2 : 1, background: i <= step ? T.blue : "rgba(255,255,255,0.1)", transition: "all 0.3s" }} />
+            ))}
+          </div>
+        )}
+
+        <div>
+          <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: 40, fontWeight: 800, color: T.white, letterSpacing: "-1.5px", lineHeight: 1.1, marginBottom: 14, whiteSpace: "pre-line" }}>
+            {c.title}
+          </h2>
+          <p style={{ fontSize: 15, color: T.text3, lineHeight: 1.75, maxWidth: 300 }}>{c.sub}</p>
+        </div>
+
+        {/* Tips per step */}
+        {step === 1 && (
+          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: "20px 22px", display: "flex", flexDirection: "column", gap: 12 }}>
+            {[
+              "Make sure you enter the email linked to your account",
+              "Check your spam folder if you don't see the email",
+              "The reset code expires in 10 minutes",
+            ].map((t, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: T.blue, flexShrink: 0, marginTop: 6 }} />
+                <p style={{ fontSize: 13, color: T.text3, lineHeight: 1.6 }}>{t}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {step === 2 && (
+          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: "20px 22px", display: "flex", flexDirection: "column", gap: 12 }}>
+            {[
+              "The code is 6 digits long",
+              "Do not share this code with anyone",
+              "Request a new code if it expires",
+            ].map((t, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: T.blue, flexShrink: 0, marginTop: 6 }} />
+                <p style={{ fontSize: 13, color: T.text3, lineHeight: 1.6 }}>{t}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {step === 3 && (
+          <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: "20px 22px", display: "flex", flexDirection: "column", gap: 12 }}>
+            {[
+              "Use at least 8 characters",
+              "Mix uppercase, lowercase, numbers and symbols",
+              "Do not reuse your previous password",
+            ].map((t, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: T.blue, flexShrink: 0, marginTop: 6 }} />
+                <p style={{ fontSize: 13, color: T.text3, lineHeight: 1.6 }}>{t}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div style={{ position: "relative", zIndex: 1, display: "flex", alignItems: "center", gap: 6 }}>
+        <ShieldIcon />
+        <span style={{ fontSize: 11, color: "rgba(255,255,255,0.25)", fontWeight: 500 }}>
+          Your transaction is secure · Protected by Cheeseball
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+export default function ForgotPassword() {
+  const navigate = useNavigate();
+  const [step,      setStep]      = useState(1);
+  const [email,     setEmail]     = useState("");
+  const [token,     setToken]     = useState("");
+  const [password,  setPassword]  = useState("");
+  const [confirm,   setConfirm]   = useState("");
+  const [showPass,  setShowPass]  = useState(false);
+  const [showConf,  setShowConf]  = useState(false);
+  const [loading,   setLoading]   = useState(false);
+  const [errors,    setErrors]    = useState({});
+  const [focused,   setFocused]   = useState("");
+  const [toast,     setToast]     = useState(null);
+
+  const [countdown, resetCountdown] = useCountdown(60, step === 2);
+
+  const maskEmail = (e) => {
+    if (!e) return "";
+    const parts = e.split("@");
+    if (parts.length < 2) return e;
+    const [user, domain] = parts;
+    return user.slice(0, 2) + "••••••" + "@" + domain;
+  };
+
+  const onBackToLogin = () => navigate(paths.login || "/login");
+
+  /* ── Step 1: send reset email ── */
+  const handleSendEmail = async () => {
+    if (!email.includes("@")) { setErrors({ email: "Enter a valid email address" }); return; }
     setLoading(true);
     try {
       await authService.forgotPassword(email);
-      setToast({ message: "Reset link sent! Check your inbox.", type: "success" });
-      onNext(email);
+      setToast({ message: "Reset code sent! Check your inbox.", type: "success" });
+      setStep(2);
+      resetCountdown();
     } catch (err) {
-      setToast({ message: err.message || "Failed to send reset link. Please try again.", type: "error" });
+      setErrors({ email: err.message || "Failed to send reset code. Please try again." });
+      setToast({ message: err.message || "Failed to send reset code.", type: "error" });
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      {/* Back + title */}
-      <div className="flex items-center gap-3 mb-1">
-        <button
-          type="button"
-          onClick={onBack}
-          className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-          aria-label="Go back"
-        >
-          <ArrowLeft className="w-5 h-5 text-[#1e1e1e]" />
-        </button>
-        <h1 className="font-bold text-[#1e1e1e] text-[16px] sm:text-[18px]">
-          forgot password
-        </h1>
-      </div>
-
-      <p className="text-[clamp(11px,1vw,13px)] text-center text-[#636567] -mt-2 mb-2">
-        enter your email below, if there's an account associated with this email, we'll send a reset link
-      </p>
-
-      {/* Email field */}
-      <div className="flex flex-col gap-1">
-        <label className="text-[clamp(12px,1vw,14px)] font-semibold text-[#1e1e1e]">
-          Email
-        </label>
-        <input
-          id="forgot-email"
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Enter email addresss"
-          className="w-full h-11 border border-[#a2a2a2] rounded-md outline-none px-3 text-[clamp(12px,1.1vw,14px)] text-[#1e1e1e] bg-[#fafafa] transition-colors focus:border-[#0014ff] focus:bg-white"
-        />
-      </div>
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="mt-2 block w-full h-12 border-none rounded-full cursor-pointer text-[clamp(13px,1.2vw,15px)] font-semibold text-white bg-linear-to-r from-[#0014FF] to-[#09137F] transition-all hover:opacity-90 hover:-translate-y-px disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
-      >
-        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Continue"}
-      </button>
-    </form>
-  );
-};
-
-/* ─────────────────────────────────────────────
-   STEP 2 — Reset Password (new password entry)
-───────────────────────────────────────────── */
-const ResetPasswordStep = ({ email, token, onDone, onBack, loading, setLoading, setToast }) => {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (password.length < 6) {
-      setToast({ message: "Password must be at least 6 characters.", type: "error" });
-      return;
-    }
-    if (password !== confirmPassword) {
-      setToast({ message: "Passwords don't match.", type: "error" });
-      return;
-    }
+  /* ── Step 2: verify token ── */
+  const handleVerifyToken = async () => {
+    if (token.length < 6) { setErrors({ token: "Enter the full 6-digit code" }); return; }
     setLoading(true);
     try {
-      await authService.resetPassword({ email, token, password, confirm_password: confirmPassword });
-      onDone();
+      await authService.verifyResetToken(email, token);
+      setErrors({});
+      setStep(3);
     } catch (err) {
-      setToast({ message: err.message || "Could not update password. Please try again.", type: "error" });
+      setErrors({ token: err.message || "Invalid or expired code. Please try again." });
+      setToast({ message: err.message || "Invalid or expired code. Please try again.", type: "error" });
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      {/* Back + title */}
-      <div className="flex items-center gap-3 mb-1">
-        <button
-          type="button"
-          onClick={onBack}
-          className="p-1 rounded-full hover:bg-gray-100 transition-colors"
-          aria-label="Go back"
-        >
-          <ArrowLeft className="w-5 h-5 text-[#1e1e1e]" />
-        </button>
-        <h1 className="font-bold text-[#1e1e1e] text-[16px] sm:text-[18px]">
-          Reset Password
-        </h1>
-      </div>
+  const handleResend = async () => {
+    if (countdown > 0) return;
+    setToken("");
+    setErrors({});
+    try {
+      await authService.forgotPassword(email);
+      setToast({ message: "Reset code resent successfully!", type: "success" });
+      resetCountdown();
+    } catch (err) {
+      setToast({ message: err.message || "Failed to resend code. Please try again.", type: "error" });
+    }
+  };
 
-      <p className="text-[clamp(11px,1vw,13px)] text-center text-[#636567] -mt-2 mb-2">
-        please enter a new password below
-      </p>
+  /* ── Step 3: set new password ── */
+  const handleSetPassword = async () => {
+    const e = {};
+    if (password.length < 8) e.password = "Password must be at least 8 characters";
+    if (confirm !== password) e.confirm  = "Passwords do not match";
+    if (Object.keys(e).length) { setErrors(e); return; }
+    setLoading(true);
+    try {
+      await authService.resetPassword({ email, token, password, confirm_password: confirm });
+      setStep(4);
+    } catch (err) {
+      setErrors({ password: err.message || "Failed to reset password." });
+      setToast({ message: err.message || "Failed to reset password. Please try again.", type: "error" });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      {/* Password */}
-      <div className="flex flex-col gap-1">
-        <label className="text-[clamp(12px,1vw,14px)] font-semibold text-[#1e1e1e]">
-          Password
-        </label>
-        <div className="relative">
-          <input
-            id="reset-password"
-            type={showPassword ? "text" : "password"}
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••••••••"
-            className="w-full h-11 border border-[#a2a2a2] rounded-md outline-none px-3 pr-11 text-[clamp(12px,1.1vw,14px)] text-[#1e1e1e] bg-[#fafafa] transition-colors focus:border-[#0014ff] focus:bg-white"
-          />
-          <button
-            type="button"
-            onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9e9e9e] hover:text-[#1e1e1e] transition-colors"
-          >
-            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Confirm Password */}
-      <div className="flex flex-col gap-1">
-        <label className="text-[clamp(12px,1vw,14px)] font-semibold text-[#1e1e1e]">
-          Confirm Password
-        </label>
-        <div className="relative">
-          <input
-            id="reset-confirm-password"
-            type={showConfirm ? "text" : "password"}
-            required
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="••••••••••••••"
-            className="w-full h-11 border border-[#a2a2a2] rounded-md outline-none px-3 pr-11 text-[clamp(12px,1.1vw,14px)] text-[#1e1e1e] bg-[#fafafa] transition-colors focus:border-[#0014ff] focus:bg-white"
-          />
-          <button
-            type="button"
-            onClick={() => setShowConfirm(!showConfirm)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9e9e9e] hover:text-[#1e1e1e] transition-colors"
-          >
-            {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-          </button>
-        </div>
-      </div>
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="mt-2 block w-full h-12 border-none rounded-full cursor-pointer text-[clamp(13px,1.2vw,15px)] font-semibold text-white bg-linear-to-r from-[#0014FF] to-[#09137F] transition-all hover:opacity-90 hover:-translate-y-px disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center"
-      >
-        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Continue"}
-      </button>
-    </form>
+  const Btn = ({ label, disabled, loading: l, type = "submit" }) => (
+    <button
+      type={type}
+      disabled={disabled || l}
+      className="btn-primary"
+    >
+      {l ? (
+        <>
+          <div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+          Loading…
+        </>
+      ) : (
+        <>
+          {label} <ArrowRight />
+        </>
+      )}
+    </button>
   );
-};
 
-/* ─────────────────────────────────────────────
-   STEP 3 — Password Reset Successful
-───────────────────────────────────────────── */
-const SuccessStep = ({ onLogin }) => (
-  <div className="flex flex-col items-center text-center gap-5">
-    {/* Lock icon */}
-    <div className="mt-4 mb-2">
-      <svg width="80" height="90" viewBox="0 0 80 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="lockGrad" x1="0" y1="0" x2="80" y2="90" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor="#38BDF8" />
-            <stop offset="100%" stopColor="#1D3FC4" />
-          </linearGradient>
-        </defs>
-        {/* Shackle */}
-        <path
-          d="M24 38 V26 C24 13.85 56 13.85 56 26 V38"
-          stroke="url(#lockGrad)"
-          strokeWidth="7"
-          strokeLinecap="round"
-          fill="none"
-        />
-        {/* Body */}
-        <rect x="10" y="36" width="60" height="46" rx="8" fill="url(#lockGrad)" />
-        {/* Keyhole */}
-        <circle cx="40" cy="57" r="7" fill="white" opacity="0.9" />
-        <rect x="37" y="60" width="6" height="10" rx="3" fill="white" opacity="0.9" />
-      </svg>
-    </div>
-
-    <div>
-      <h2 className="text-[20px] font-bold text-[#1e1e1e] mb-2">
-        password reset successful!
-      </h2>
-      <p className="text-[13px] text-[#636567]">
-        Your password has been updated. You can now login
-      </p>
-    </div>
-
-    <div className="w-full mt-8">
-      <button
-        onClick={onLogin}
-        className="block w-full h-12 border-none rounded-full cursor-pointer text-[clamp(13px,1.2vw,15px)] font-semibold text-white bg-linear-to-r from-[#0014FF] to-[#09137F] transition-all hover:opacity-90 hover:-translate-y-px"
-      >
-        Back to log in
-      </button>
-    </div>
-  </div>
-);
-
-/* ─────────────────────────────────────────────
-   Main component
-───────────────────────────────────────────── */
-const ForgotPassword = () => {
-  const [step, setStep] = useState("email"); // email | password | success
-  const [email, setEmail] = useState("");
-  const [token] = useState(""); // token from OTP if needed later
-  const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState(null);
-  const navigate = useNavigate();
+  const BackBtn = ({ onClick }) => (
+    <button type="button" onClick={onClick} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer", fontSize: 13, fontWeight: 600, color: T.text2, padding: 0, marginBottom: 28 }}>
+      <ArrowLeft /> Back
+    </button>
+  );
 
   return (
-    <Layout>
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap');
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'DM Sans',sans-serif;}
+        input:-webkit-autofill{-webkit-box-shadow:0 0 0 40px ${T.white} inset!important;-webkit-text-fill-color:${T.text}!important;}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes popIn{0%{transform:scale(0.8);opacity:0}70%{transform:scale(1.05)}100%{transform:scale(1);opacity:1}}
+        @keyframes ripple{0%{transform:scale(0.85);opacity:0.5}100%{transform:scale(2.4);opacity:0}}
+        .fadein{animation:fadeUp 0.4s ease forwards}
+        .popin{animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards}
+        .mobile-logo{display:none;}
+
+        /* Premium Buttons CSS */
+        .btn-primary {
+          width: 100%;
+          padding: 16px;
+          border-radius: 14px;
+          border: none;
+          font-family: 'Sora', sans-serif;
+          font-size: 15px;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          transition: all 0.15s ease;
+          outline: none;
+        }
+        .btn-primary:not(:disabled) {
+          background: ${T.blue};
+          color: #fff;
+          cursor: pointer;
+        }
+        .btn-primary:disabled {
+          background: #E8EEFF;
+          color: ${T.text3};
+          cursor: not-allowed;
+        }
+        .btn-primary:hover:not(:disabled) {
+          background: ${T.blueDark};
+        }
+        .btn-primary:active:not(:disabled) {
+          transform: scale(0.985);
+        }
+
+        @media (max-width: 1024px) {
+          .forgot-grid { grid-template-columns: 1fr !important; }
+          .brand-panel { display: none !important; }
+          .form-panel { padding: 40px 20px !important; min-height: 100vh !important; justify-content: flex-start !important; }
+          .mobile-logo { display: flex !important; }
+          .nudge-top { position: static !important; margin-bottom: 24px; width: 100%; display: flex; justify-content: flex-end; }
+          .form-container { margin-top: 20px; }
+        }
+      `}</style>
+
       {toast && (
         <Toast
           message={toast.message}
@@ -303,34 +450,203 @@ const ForgotPassword = () => {
         />
       )}
 
-      {step === "email" && (
-        <EmailStep
-          onNext={(e) => { setEmail(e); setStep("password"); }}
-          onBack={() => navigate("/login")}
-          loading={loading}
-          setLoading={setLoading}
-          setToast={setToast}
-        />
-      )}
+      <div className="forgot-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif" }}>
+        <LeftPanel step={step} />
 
-      {step === "password" && (
-        <ResetPasswordStep
-          email={email}
-          token={token}
-          onDone={() => setStep("success")}
-          onBack={() => setStep("email")}
-          loading={loading}
-          setLoading={setLoading}
-          setToast={setToast}
-        />
-      )}
+        {/* ══ RIGHT ══ */}
+        <div className="form-panel" style={{ background: T.white, display: "flex", alignItems: "center", justifyContent: "center", padding: "60px 72px", position: "relative" }}>
 
-      {step === "success" && (
-        <SuccessStep onLogin={() => navigate("/login")} />
-      )}
-    </Layout>
+          {/* Back to login — top right */}
+          <div className="nudge-top" style={{ position: "absolute", top: 32, right: 40 }}>
+            <button type="button" onClick={onBackToLogin} style={{ fontSize: 13, fontWeight: 700, color: T.blue, background: "none", border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 5 }}>
+              <ArrowLeft /> Back to login
+            </button>
+          </div>
+
+          {/* Mobile Logo */}
+          <div className="mobile-logo" style={{ display: "none", alignItems: "center", gap: 10, marginBottom: 40, alignSelf: "flex-start", cursor: "pointer" }} onClick={onBackToLogin}>
+            <div style={{ fontFamily: "'Sora', sans-serif", fontSize: 20, fontWeight: 800, color: T.text, letterSpacing: "-0.5px" }}>
+              Cheese<span style={{ color: T.blue }}>ball</span>
+            </div>
+          </div>
+
+          <div className="form-container" style={{ width: "100%", maxWidth: 400 }}>
+
+            {/* ── STEP 1 — Email ── */}
+            {step === 1 && (
+              <form onSubmit={e => { e.preventDefault(); handleSendEmail(); }} className="fadein">
+                <div style={{ width: 60, height: 60, borderRadius: 18, background: T.blueLight, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
+                  <MailIcon />
+                </div>
+                <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 26, fontWeight: 800, color: T.text, letterSpacing: "-0.6px", marginBottom: 8 }}>Reset your password</h1>
+                <p style={{ fontSize: 14, color: T.text2, lineHeight: 1.6, marginBottom: 32 }}>
+                  Enter the email address on your account and we'll send you a reset code.
+                </p>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: T.text2, marginBottom: 7 }}>Email address</label>
+                    <input
+                      type="email"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={e => { setEmail(e.target.value); if (errors.email) setErrors({}); }}
+                      onFocus={() => setFocused("email")}
+                      onBlur={() => setFocused("")}
+                      style={{ width: "100%", border: `1.5px solid ${focused === "email" ? T.blue : errors.email ? T.red : T.border}`, borderRadius: 13, padding: "13px 16px", fontSize: 14, color: T.text, fontFamily: "'DM Sans', sans-serif", outline: "none", transition: "border-color 0.15s", background: T.white }}
+                    />
+                    {errors.email && <p style={{ fontSize: 11, color: T.red, marginTop: 5, fontWeight: 500 }}>{errors.email}</p>}
+                  </div>
+                  <Btn label="Send reset code" type="submit" disabled={!email} loading={loading} />
+                </div>
+              </form>
+            )}
+
+            {/* ── STEP 2 — Token ── */}
+            {step === 2 && (
+              <form onSubmit={e => { e.preventDefault(); handleVerifyToken(); }} className="fadein">
+                <BackBtn onClick={() => { setStep(1); setToken(""); setErrors({}); }} />
+
+                <div style={{ width: 60, height: 60, borderRadius: 18, background: T.blueLight, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={T.blue} strokeWidth="1.8" strokeLinecap="round">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.6 1.21h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.02z"/>
+                  </svg>
+                </div>
+
+                <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 26, fontWeight: 800, color: T.text, letterSpacing: "-0.6px", marginBottom: 8 }}>Check your email</h1>
+                <p style={{ fontSize: 14, color: T.text2, lineHeight: 1.6, marginBottom: 8 }}>
+                  We sent a 6-digit code to
+                </p>
+                <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: T.text, marginBottom: 32 }}>
+                  {maskEmail(email)}
+                </p>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+                  <OTPInput value={token} onChange={t => { setToken(t); if (errors.token) setErrors({}); }} error={errors.token} />
+
+                  <Btn label="Verify code" type="submit" disabled={token.length < 6} loading={loading} />
+
+                  {/* Resend */}
+                  <div style={{ textAlign: "center" }}>
+                    <p style={{ fontSize: 13, color: T.text2 }}>
+                      Didn't receive it?{" "}
+                      <button
+                        type="button"
+                        onClick={handleResend}
+                        disabled={countdown > 0}
+                        style={{ fontSize: 13, fontWeight: 700, color: countdown > 0 ? T.text3 : T.blue, background: "none", border: "none", cursor: countdown > 0 ? "not-allowed" : "pointer", padding: 0, transition: "color 0.15s" }}
+                      >
+                        {countdown > 0 ? `Resend in ${countdown}s` : "Resend code"}
+                      </button>
+                    </p>
+                  </div>
+                </div>
+              </form>
+            )}
+
+            {/* ── STEP 3 — New password ── */}
+            {step === 3 && (
+              <form onSubmit={e => { e.preventDefault(); handleSetPassword(); }} className="fadein">
+                <BackBtn onClick={() => { setStep(2); setErrors({}); }} />
+
+                <div style={{ width: 60, height: 60, borderRadius: 18, background: T.blueLight, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
+                  <LockIcon />
+                </div>
+
+                <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 26, fontWeight: 800, color: T.text, letterSpacing: "-0.6px", marginBottom: 8 }}>New password</h1>
+                <p style={{ fontSize: 14, color: T.text2, lineHeight: 1.6, marginBottom: 32 }}>
+                  Create a strong password for your Cheeseball account.
+                </p>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+                  {/* Password */}
+                  <div>
+                    <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: T.text2, marginBottom: 7 }}>New password</label>
+                    <div style={{ position: "relative" }}>
+                      <input
+                        type={showPass ? "text" : "password"}
+                        placeholder="At least 8 characters"
+                        value={password}
+                        onChange={e => { setPassword(e.target.value); if (errors.password) setErrors(v => ({ ...v, password: "" })); }}
+                        onFocus={() => setFocused("password")}
+                        onBlur={() => setFocused("")}
+                        style={{ width: "100%", border: `1.5px solid ${focused === "password" ? T.blue : errors.password ? T.red : T.border}`, borderRadius: 13, padding: "13px 44px 13px 16px", fontSize: 14, color: T.text, fontFamily: "'DM Sans', sans-serif", outline: "none", transition: "border-color 0.15s", background: T.white }}
+                      />
+                      <button type="button" onClick={() => setShowPass(v => !v)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", display: "flex" }}>
+                        <EyeIcon visible={!showPass} />
+                      </button>
+                    </div>
+                    {errors.password && <p style={{ fontSize: 11, color: T.red, marginTop: 5, fontWeight: 500 }}>{errors.password}</p>}
+                    <PasswordStrength password={password} />
+                  </div>
+
+                  {/* Confirm */}
+                  <div>
+                    <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: T.text2, marginBottom: 7 }}>Confirm new password</label>
+                    <div style={{ position: "relative" }}>
+                      <input
+                        type={showConf ? "text" : "password"}
+                        placeholder="Re-enter your password"
+                        value={confirm}
+                        onChange={e => { setConfirm(e.target.value); if (errors.confirm) setErrors(v => ({ ...v, confirm: "" })); }}
+                        onFocus={() => setFocused("confirm")}
+                        onBlur={() => setFocused("")}
+                        style={{ width: "100%", border: `1.5px solid ${focused === "confirm" ? T.blue : errors.confirm ? T.red : T.border}`, borderRadius: 13, padding: "13px 44px 13px 16px", fontSize: 14, color: T.text, fontFamily: "'DM Sans', sans-serif", outline: "none", transition: "border-color 0.15s", background: T.white }}
+                      />
+                      <button type="button" onClick={() => setShowConf(v => !v)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", display: "flex" }}>
+                        <EyeIcon visible={!showConf} />
+                      </button>
+                    </div>
+                    {errors.confirm
+                      ? <p style={{ fontSize: 11, color: T.red, marginTop: 5, fontWeight: 500 }}>{errors.confirm}</p>
+                      : confirm && confirm === password && <p style={{ fontSize: 11, color: T.greenText, marginTop: 5, fontWeight: 600 }}>✓ Passwords match</p>
+                    }
+                  </div>
+
+                  <Btn label="Reset password" type="submit" disabled={!password || !confirm} loading={loading} />
+                </div>
+              </form>
+            )}
+
+            {/* ── STEP 4 — Success ── */}
+            {step === 4 && (
+              <div className="fadein" style={{ textAlign: "center" }}>
+                <div style={{ position: "relative", width: 88, height: 88, margin: "0 auto 28px" }}>
+                  <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: `3px solid ${T.green}`, opacity: 0.25, animation: "ripple 1.8s ease-out infinite" }} />
+                  <div className="popin" style={{ width: 88, height: 88, borderRadius: "50%", background: T.green, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <CheckCircle />
+                  </div>
+                </div>
+
+                <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 26, fontWeight: 800, color: T.text, letterSpacing: "-0.6px", marginBottom: 10 }}>Password reset!</h1>
+                <p style={{ fontSize: 14, color: T.text2, lineHeight: 1.7, marginBottom: 36 }}>
+                  Your password has been updated successfully. You can now sign in with your new password.
+                </p>
+
+                <button
+                  type="button"
+                  onClick={onBackToLogin}
+                  style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: T.blue, color: "#fff", transition: "all 0.18s" }}
+                  onMouseEnter={e => e.currentTarget.style.background = T.blueDark}
+                  onMouseLeave={e => e.currentTarget.style.background = T.blue}
+                >
+                  Sign in to your account <ArrowRight />
+                </button>
+              </div>
+            )}
+
+          </div>
+
+          {/* Footer */}
+          <div style={{ position: "absolute", bottom: 24, left: 0, right: 0, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+            <ShieldIcon />
+            <span style={{ fontSize: 11, color: T.text3, fontWeight: 500 }}>
+              Your transaction is secure · Protected by Cheeseball
+            </span>
+          </div>
+        </div>
+      </div>
+    </>
   );
-};
-
-export default ForgotPassword;
-
+}

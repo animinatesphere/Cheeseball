@@ -1,6 +1,10 @@
 import { demoCurrencies, demoPortfolio, demoTransactions, demoUser } from "./demoData";
 
-export const API_BASE = "https://cheeseball-v2.vercel.app";
+export const API_BASE =
+  window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+    ? ""
+    : "https://cheeseball-v2.vercel.app";
+
 
 const ok = (data) => Promise.resolve({ data, error: null });
 const getAccessToken = () => localStorage.getItem("access_token");
