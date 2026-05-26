@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ArrowDownLeft, ArrowUpRight,
   ShoppingCart, CircleDollarSign, ArrowRightLeft, Wallet,
   Gift, ChevronRight, CheckCircle2, BarChart2, Copy,
   Sparkles, History, Eye, EyeOff
 } from "lucide-react";
+import { getWallets, getCurrencies, getUserTransactions } from "@/services/api";
 
 /* ─── Design tokens ──────────────────────────────────────────── */
 const T = {
@@ -36,34 +37,11 @@ const fmt = (n) =>
 const fmtCompact = (n) =>
   new Intl.NumberFormat("en-NG", { notation: "compact", maximumFractionDigits: 1 }).format(n);
 
-/* ─── Static data ────────────────────────────────────────────── */
-const MOCK_ASSETS = [
-  { symbol: "BTC",  name: "Bitcoin",  balance: 0.00412,  balanceLabel: "0.00412 BTC",  valueNGN: 387_500, change: +2.41, color: "#F7931A", bg: "#FEF3E2", icon: "₿" },
-  { symbol: "USDT", name: "Tether",   balance: 245.5,    balanceLabel: "245.50 USDT",  valueNGN: 392_800, change: +0.04, color: "#26A17B", bg: "#E6F7F2", icon: "₮" },
-  { symbol: "ETH",  name: "Ethereum", balance: 0.12,     balanceLabel: "0.12 ETH",     valueNGN: 584_640, change: -1.03, color: "#627EEA", bg: "#EEEFFE", icon: "Ξ" },
-  { symbol: "NGN",  name: "Naira",    balance: 142_000,  balanceLabel: "₦142,000",     valueNGN: 142_000, change: 0,    color: T.blue,    bg: T.blueLight, icon: "₦" },
-];
-
-const MOCK_TXN = [
-  { id: 1, type: "Received BTC",   method: "Crypto",       amount: "+₦58,400",  date: "Today, 10:02 AM",    status: "completed", positive: true  },
-  { id: 2, type: "Sold USDT",      method: "Bank Transfer", amount: "+₦120,000", date: "Yesterday, 3:45 PM", status: "completed", positive: true  },
-  { id: 3, type: "Bought ETH",     method: "Card",          amount: "−₦75,200",  date: "Apr 18, 9:11 AM",   status: "pending",   positive: false },
-  { id: 4, type: "Transfer",       method: "Internal",      amount: "−₦30,000",  date: "Apr 17, 6:22 PM",   status: "failed",    positive: false },
-  { id: 5, type: "Gift Card Sale", method: "Amazon Gift",   amount: "+₦45,000",  date: "Apr 16, 2:10 PM",   status: "completed", positive: true  },
-];
-
-const MARKET = [
-  { symbol: "BTC",  name: "Bitcoin",  price: "₦94,050,000", change: +2.41, color: "#F7931A", icon: "₿" },
-  { symbol: "ETH",  name: "Ethereum", price: "₦4,872,000",  change: -1.03, color: "#627EEA", icon: "Ξ" },
-  { symbol: "USDT", name: "Tether",   price: "₦1,600",      change: +0.04, color: "#26A17B", icon: "₮" },
-  { symbol: "SOL",  name: "Solana",   price: "₦236,800",    change: +4.12, color: "#9945FF", icon: "◎" },
-  { symbol: "BNB",  name: "BNB",      price: "₦976,000",    change: -0.68, color: "#F0B90B", icon: "⬡" },
-];
-
 const STATUS = {
   completed: { color: T.greenText,  bg: T.greenLight,  border: "#A7F3D0", label: "Completed" },
   pending:   { color: T.orangeText, bg: T.orangeLight, border: "#FDE68A", label: "Pending"   },
   failed:    { color: T.redText,    bg: T.redLight,    border: "#FECACA", label: "Failed"    },
+  waiting:   { color: T.orangeText, bg: T.orangeLight, border: "#FDE68A", label: "Pending"   },
 };
 
 const QUICK_ACTIONS = [
@@ -78,6 +56,82 @@ const QUICK_ACTIONS = [
 const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
   const [balanceVisible, setBalanceVisible] = useState(true);
   const [copied, setCopied]                 = useState(false);
+  const [assets, setAssets]                 = useState([]);
+  const [transactions, setTransactions]     = useState([]);
+  const [market, setMarket]                 = useState([]);
+  const [isLoading, setIsLoading]           = useState(true);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [wRes, cRes, tRes] = await Promise.all([
+          getWallets(),
+          getCurrencies(),
+          getUserTransactions(),
+        ]);
+        const wallets = Array.isArray(wRes) ? wRes : (wRes?.data || []);
+        const currencies = Array.isArray(cRes) ? cRes : (cRes?.data || []);
+        const txns = Array.isArray(tRes) ? tRes : (tRes?.data || []);
+
+        const COLORS = ["#F7931A", "#627EEA", "#26A17B", T.blue, "#9945FF", "#F0B90B"];
+        const BGS = ["#FEF3E2", "#EEEFFE", "#E6F7F2", T.blueLight, "#F3EEFF", "#FFFBEB"];
+
+        const TARGET_ASSETS = ["BTC", "ETH", "USDT", "NGN"];
+
+        const computedAssets = TARGET_ASSETS.map((symbol, i) => {
+          const w = wallets.find(w => w.asset === symbol) || { asset: symbol, balance: 0, available_balance: 0 };
+          const cur = currencies.find(c => (c.symbol || c.code) === symbol) || { name: symbol };
+          const price = cur.buy_rate || (symbol === "NGN" ? 1 : 0);
+          return {
+            symbol: symbol,
+            name: cur.name || symbol,
+            balance: w.available_balance || w.balance || 0,
+            balanceLabel: `${w.available_balance || w.balance || 0} ${symbol}`,
+            valueNGN: (w.available_balance || w.balance || 0) * price,
+            change: 0,
+            color: COLORS[i % COLORS.length],
+            bg: BGS[i % BGS.length],
+            icon: symbol[0],
+          };
+        });
+        setAssets(computedAssets);
+
+        const computedMarket = currencies.map((c, i) => ({
+          symbol: c.symbol || c.code,
+          name: c.name,
+          price: `₦${fmt(c.buy_rate || 1)}`,
+          change: 0,
+          color: COLORS[i % COLORS.length],
+          icon: (c.symbol || c.code)[0],
+        }));
+        setMarket(computedMarket);
+
+        const recentTxns = txns.slice(0, 5).map(t => {
+          const type = t.transaction_type || t.type || 'transfer';
+          const isBuy = type.toLowerCase().includes('buy');
+          const isSell = type.toLowerCase().includes('sell');
+          const asset = t.asset_code || 'Crypto';
+          const amount = t.naira_amount || 0;
+          
+          return {
+            id: t.id || Math.random(),
+            type: isBuy ? `Bought ${asset}` : (isSell ? `Sold ${asset}` : type),
+            method: t.payment_method || t.payout_method || 'Wallet',
+            amount: isBuy ? `−₦${fmt(amount)}` : `+₦${fmt(amount)}`,
+            date: new Date(t.created_at || Date.now()).toLocaleString(),
+            status: t.status === 'pending_payment' ? 'pending' : (t.status || 'pending'),
+            positive: !isBuy && type !== 'withdraw',
+          };
+        });
+        setTransactions(recentTxns);
+      } catch (err) {
+        console.error("Dashboard data load error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   const handleCopy = () => {
     navigator.clipboard.writeText("CHEESE2025");
@@ -85,16 +139,24 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const totalBalance = MOCK_ASSETS.reduce((s, a) => s + a.valueNGN, 0);
-  const filteredMarket = MARKET.filter(
+  const totalBalance = assets.reduce((s, a) => s + a.valueNGN, 0);
+  const filteredMarket = market.filter(
     (m) => m.symbol.toLowerCase().includes(searchQuery.toLowerCase()) || m.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (isLoading) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "60vh", gap: 16 }}>
+        <style>{`@keyframes cb-spin{to{transform:rotate(360deg)}}`}</style>
+        <div style={{ width: 40, height: 40, border: `3px solid ${T.border}`, borderTopColor: T.blue, borderRadius: "50%", animation: "cb-spin 0.6s linear infinite" }} />
+        <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "1px" }}>Loading dashboard…</p>
+      </div>
+    );
+  }
 
   return (
     <>
       <style>{`
-        .asset-row:hover{background:${T.surface}!important;}
-        .asset-row:hover .asset-name{color:${T.blue}!important;}
         .quick-card:hover{border-color:${T.blue}!important;transform:translateY(-2px);box-shadow:0 8px 24px rgba(26,111,255,0.08)!important;}
         .txn-row:hover{background:${T.surface}!important;}
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -146,7 +208,7 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
                 </div>
                 <div style={{ background: "rgba(255,255,255,0.1)", borderRadius: 14, padding: "12px 18px", border: "1px solid rgba(255,255,255,0.1)", textAlign: "center" }}>
                   <p style={{ fontSize: 10, color: "rgba(255,255,255,0.5)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 4 }}>Assets</p>
-                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1 }}>{MOCK_ASSETS.length}</p>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1 }}>{assets.length}</p>
                 </div>
               </div>
 
@@ -240,12 +302,11 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
               ))}
             </div>
 
-            {MOCK_ASSETS.map((asset, i) => (
+            {assets.map((asset, i) => (
               <div
                 key={asset.symbol}
-                className="asset-row portfolio-grid"
-                onClick={() => onSelectCurrency({ symbol: asset.symbol, name: asset.name })}
-                style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr", padding: "18px 28px", borderBottom: i === MOCK_ASSETS.length - 1 ? "none" : `1px solid ${T.border}`, cursor: "pointer", transition: "all 0.15s", alignItems: "center" }}
+                className="portfolio-grid"
+                style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr", padding: "18px 28px", borderBottom: i === assets.length - 1 ? "none" : `1px solid ${T.border}`, alignItems: "center" }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ width: 40, height: 40, borderRadius: 12, background: asset.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: asset.color, border: `1px solid ${asset.color}18`, flexShrink: 0 }}>
@@ -291,8 +352,11 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
               </div>
 
               <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                {MOCK_TXN.map((txn) => {
-                  const cfg = STATUS[txn.status];
+                {transactions.length === 0 && !isLoading && (
+                  <p style={{ fontSize: 13, color: T.text3, textAlign: "center", padding: "10px 0" }}>No recent activity.</p>
+                )}
+                {transactions.map((txn) => {
+                  const cfg = STATUS[txn.status] || STATUS.pending;
                   return (
                     <div
                       key={txn.id}

@@ -88,6 +88,19 @@ export default function Auth() {
   const onSignUp = () => navigate(paths.signup);
   const onForgotPassword = () => navigate(paths.forgotPassword);
 
+  // Show friendly message when redirected due to expired session
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("session_expired") === "true") {
+      setToast({
+        message: "Your session has expired. Please log in again.",
+        type: "info",
+      });
+      // Clean up the URL without triggering a navigation
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, []);
+
   useEffect(() => {
     const fetchRates = async () => {
       try {

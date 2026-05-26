@@ -12,10 +12,9 @@ const T = {
 const STEPS = [
   { id: 1, label: "Buy Crypto" },
   { id: 2, label: "Price Preview" },
-  { id: 3, label: "Wallet Address" },
-  { id: 4, label: "Payment Method" },
-  { id: 5, label: "Confirm Payment" },
-  { id: 6, label: "Complete" },
+  { id: 3, label: "Payment Method" },
+  { id: 4, label: "Confirm Payment" },
+  { id: 5, label: "Complete" },
 ];
 
 const BuyCryptoBreadcrumbs = ({ currentStep, onStepClick, onBackToDashboard }) => {

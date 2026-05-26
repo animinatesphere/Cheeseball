@@ -21,15 +21,29 @@ const Ico = {
   send:()=><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>,
 };
 
+import { confirmSellCryptoSent } from "../../../../services/api";
+
 export default function SendCryptoStep({ order, onSent }) {
   const [copied,setCopied] = useState(false);
   const [loading,setLoading] = useState(false);
   const o = order;
-  const brokerAddress = "bc1qbrokerwallet123abc456def789xyz";
-  const network = o.coin.name === "Ethereum" ? "ERC-20" : o.coin.name === "BNB" ? "BEP-20" : o.coin.name;
+  const brokerAddress = o.transaction?.broker_wallet_address || "Awaiting address...";
+  const network = o.transaction?.network || o.coin.name;
 
   const copyAddress = () => { navigator.clipboard.writeText(brokerAddress).catch(()=>{}); setCopied(true); setTimeout(()=>setCopied(false),2000); };
-  const handleSent = () => { setLoading(true); setTimeout(()=>{setLoading(false); onSent?.();},1500); };
+  const handleSent = async () => { 
+      setLoading(true); 
+      try {
+          if (o.transaction?.id) {
+              await confirmSellCryptoSent(o.transaction.id);
+          }
+          setLoading(false); 
+          onSent?.();
+      } catch (e) {
+          alert("Failed to confirm: " + e.message);
+          setLoading(false);
+      }
+  };
 
   return (
     <>

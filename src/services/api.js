@@ -1,13 +1,7 @@
-import { demoCurrencies, demoPortfolio, demoTransactions, demoUser } from "./demoData";
+export const API_BASE = "https://cheeseball-v2.vercel.app";
 
-export const API_BASE =
-  window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-    ? ""
-    : "https://cheeseball-v2.vercel.app";
-
-
-const ok = (data) => Promise.resolve({ data, error: null });
 const getAccessToken = () => localStorage.getItem("access_token");
+const getRefreshToken = () => localStorage.getItem("refresh_token");
 
 const authHeaders = () => {
   const token = getAccessToken();
@@ -20,7 +14,80 @@ async function parseResponse(response) {
   return { __raw: await response.text() };
 }
 
-async function request(path, options = {}) {
+/* ─── Token Refresh Logic ─── */
+
+let isRefreshing = false;
+let refreshPromise = null;
+
+function clearAuthAndRedirect() {
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
+  localStorage.removeItem("user_email");
+
+  // Only redirect if not already on login/signup/auth pages
+  const authPaths = ["/login", "/signup", "/auth", "/verify-account", "/forgot-password"];
+  if (!authPaths.some((p) => window.location.pathname.startsWith(p))) {
+    window.location.href = "/login?session_expired=true";
+  }
+}
+
+async function refreshAccessToken() {
+  const refresh = getRefreshToken();
+  if (!refresh) {
+    clearAuthAndRedirect();
+    throw new Error("Session expired. Please log in again.");
+  }
+
+  // Mutex: if a refresh is already in flight, wait for it
+  if (isRefreshing && refreshPromise) {
+    return refreshPromise;
+  }
+
+  isRefreshing = true;
+  refreshPromise = (async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/auth/token/refresh`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", accept: "application/json" },
+        body: JSON.stringify({ refresh_token: refresh }),
+      });
+
+      if (!response.ok) {
+        clearAuthAndRedirect();
+        throw new Error("Session expired. Please log in again.");
+      }
+
+      const data = await response.json();
+      if (data.access) {
+        localStorage.setItem("access_token", data.access);
+      }
+      // Some backends also rotate the refresh token
+      if (data.refresh) {
+        localStorage.setItem("refresh_token", data.refresh);
+      }
+      return data.access;
+    } catch (err) {
+      clearAuthAndRedirect();
+      throw err;
+    } finally {
+      isRefreshing = false;
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+}
+
+function isTokenError(data) {
+  if (data?.code === "token_not_valid") return true;
+  if (typeof data?.detail === "string" && data.detail.toLowerCase().includes("token")) return true;
+  if (Array.isArray(data?.messages)) {
+    return data.messages.some((m) => m?.token_type === "access" || m?.token_class === "AccessToken");
+  }
+  return false;
+}
+
+async function request(path, options = {}, _isRetry = false) {
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
@@ -31,6 +98,17 @@ async function request(path, options = {}) {
     },
   });
   const data = await parseResponse(response);
+
+  // If 401 and this is a token error, try to refresh and retry once
+  if (response.status === 401 && isTokenError(data) && !_isRetry) {
+    try {
+      await refreshAccessToken();
+      return request(path, options, true); // retry with fresh token
+    } catch {
+      throw new Error("Session expired. Please log in again.");
+    }
+  }
+
   if (!response.ok) {
     throw new Error(data?.detail || data?.message || data?.__raw || "Request failed");
   }
@@ -54,17 +132,14 @@ const normalizeListResponse = (data, fallback = []) => {
 };
 
 export const getCurrentUser = () =>
-  Promise.resolve({
-    ...demoUser,
-    email: localStorage.getItem("user_email") || demoUser.email,
-  });
+  request("/api/users/me").catch(() => ({ email: localStorage.getItem("user_email") }));
 
 export const getProfile = async () =>
   withFallback(
     async () => request("/api/users/me"),
     {
-      id: demoUser.id,
-      email: localStorage.getItem("user_email") || demoUser.email,
+      id: "unknown",
+      email: localStorage.getItem("user_email") || "",
       full_name: "Account Owner",
       phone: "",
     },
@@ -73,56 +148,45 @@ export const getProfile = async () =>
 export const getAccountStats = async () =>
   withFallback(
     async () => request("/api/users/me/stats"),
-    { totalTrades: demoTransactions.length, activeOrders: 0, totalVolume: "₦5.2M" },
+    { totalTrades: 0, activeOrders: 0, totalVolume: "₦0" },
   );
 
 export const getCurrencies = async () =>
-  ok(await withFallback(async () => normalizeListResponse(await request("/api/currencies"), demoCurrencies), demoCurrencies));
+  withFallback(async () => normalizeListResponse(await request("/api/currencies"), []), []);
 
 export const getUserPortfolio = async () =>
-  ok(await withFallback(async () => normalizeListResponse(await request("/api/wallets"), demoPortfolio), demoPortfolio));
+  withFallback(async () => normalizeListResponse(await request("/api/wallets"), []), []);
 
 export const validatePromoCode = async (code) =>
-  ok(
-    await withFallback(
-      async () => request("/api/promo-codes/validate", { method: "POST", body: JSON.stringify({ code }) }),
-      code?.trim().toUpperCase() === "CHEESE2025"
-        ? { valid: true, discount: 1000, benefit: 1000 }
-        : { valid: false, discount: 0, benefit: 0 },
-    ),
+  withFallback(
+    async () => request("/api/promo-codes/validate", { method: "POST", body: JSON.stringify({ code }) }),
+    code?.trim().toUpperCase() === "CHEESE2025"
+      ? { valid: true, discount: 1000, benefit: 1000 }
+      : { valid: false, discount: 0, benefit: 0 },
   );
 
 export const createTransaction = async (payload) =>
-  ok(
-    await withFallback(
-      async () => request("/api/broker/transactions", { method: "POST", body: JSON.stringify(payload) }),
-      { id: crypto.randomUUID?.() || `txn-${Date.now()}`, ...payload },
-    ),
+  withFallback(
+    async () => request("/api/broker/transactions", { method: "POST", body: JSON.stringify(payload) }),
+    { id: crypto.randomUUID?.() || `txn-${Date.now()}`, ...payload },
   );
 
 export const createGiftCardTrade = async (payload) =>
-  ok(
-    await withFallback(
-      async () => request("/api/gift-card-trades", { method: "POST", body: JSON.stringify(payload) }),
-      { id: crypto.randomUUID?.() || `gift-${Date.now()}`, ...payload },
-    ),
+  withFallback(
+    async () => request("/api/gift-card-trades", { method: "POST", body: JSON.stringify(payload) }),
+    { id: crypto.randomUUID?.() || `gift-${Date.now()}`, ...payload },
   );
 
 export const getUserTransactions = async () =>
-  ok(await withFallback(async () => normalizeListResponse(await request("/api/broker/transactions"), demoTransactions), demoTransactions));
+  withFallback(async () => normalizeListResponse(await request("/api/broker/transactions"), []), []);
 
 export const getUserGiftCardTrades = async () =>
-  ok(await withFallback(async () => normalizeListResponse(await request("/api/gift-card-trades"), []), []));
+  withFallback(async () => normalizeListResponse(await request("/api/gift-card-trades"), []), []);
 
 export const getWallets = async () =>
   withFallback(
     async () => normalizeListResponse(await request("/api/wallets"), []),
-    [
-      { asset: "NGN", balance: 142000, available_balance: 142000 },
-      { asset: "BTC", balance: 0.00412, available_balance: 0.00412 },
-      { asset: "USDT", balance: 245.5, available_balance: 245.5 },
-      { asset: "ETH", balance: 0.12, available_balance: 0.12 },
-    ],
+    []
   );
 
 export const previewConversion = async (fromAsset, toAsset, fromAmount) =>
@@ -154,7 +218,7 @@ export const executeConversion = async (payload) =>
   );
 
 export const getBeneficiaries = async () =>
-  ok(await withFallback(async () => normalizeListResponse(await request("/api/payouts/beneficiaries"), []), []));
+  withFallback(async () => normalizeListResponse(await request("/api/payouts/beneficiaries"), []), []);
 
 export const createDeposit = async (asset, amount) =>
   withFallback(
@@ -212,3 +276,67 @@ export const uploadFile = async (file, folder = "uploads") => {
   );
 };
 
+/* ─── Buy Crypto Flow ─── */
+
+export const getBuyQuote = async (asset, nairaAmount) =>
+  request("/api/rates/buy-quote", {
+    method: "POST",
+    body: JSON.stringify({ asset, naira_amount: nairaAmount }),
+  });
+
+export const createBuyTransaction = async (quoteId, paymentMethod) =>
+  request("/api/broker/buy", {
+    method: "POST",
+    body: JSON.stringify({ quote_id: quoteId, payment_method: paymentMethod }),
+  });
+
+export const setupPayment = async (transactionId, paymentMethod) =>
+  request("/api/payments/setup", {
+    method: "POST",
+    body: JSON.stringify({ transaction_id: transactionId, payment_method: paymentMethod }),
+  });
+
+export const getPaymentInstructions = async () =>
+  request("/api/payments/instructions");
+
+export const submitBankTransferProof = async (transactionId, receiptReference, receiptUrl) =>
+  request(`/api/payments/transactions/${transactionId}/bank-transfer/submit`, {
+    method: "POST",
+    body: JSON.stringify({ receipt_reference: receiptReference, receipt_url: receiptUrl }),
+  });
+
+export const getBuyTransactionStatus = async (transactionId) =>
+  request(`/api/broker/transactions/${transactionId}`);
+
+/* ─── Sell Crypto Flow ─── */
+
+export const getSellQuote = async (asset, cryptoAmount) =>
+  request("/api/rates/sell-quote", {
+    method: "POST",
+    body: JSON.stringify({ asset, crypto_amount: cryptoAmount }),
+  });
+
+export const createSellTransaction = async (payload) =>
+  request("/api/broker/sell", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+export const confirmSellCryptoSent = async (transactionId) =>
+  request(`/api/broker/transactions/${transactionId}/sell-crypto-sent`, {
+    method: "POST",
+  });
+
+export const getBeneficiaryBankAccounts = async () =>
+  withFallback(async () => normalizeListResponse(await request("/api/payouts/beneficiaries"), []), []);
+
+export const createBeneficiaryBankAccount = async (payload) =>
+  request("/api/payouts/beneficiaries", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+export const deleteBeneficiaryBankAccount = async (id) =>
+  request(`/api/payouts/beneficiaries/${id}`, {
+    method: "DELETE",
+  });

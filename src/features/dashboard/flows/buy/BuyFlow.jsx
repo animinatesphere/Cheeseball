@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { ASSETS, NETWORKS, PRICE_EXPIRY_TIME, T } from "./BuyFlowShared";
+import { ASSETS, T } from "./BuyFlowShared";
 import BuyCryptoBreadcrumbs from "./BuyCryptoBreadcrumbs";
 import BuyFlowStep1 from "./BuyFlowStep1";
 import BuyFlowStep2 from "./BuyFlowStep2";
 import BuyFlowStep3 from "./BuyFlowStep3";
 import BuyFlowStep4 from "./BuyFlowStep4";
 import BuyFlowStep5 from "./BuyFlowStep5";
-import BuyFlowStep6 from "./BuyFlowStep6";
 
 const GLOBAL_CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
@@ -90,90 +89,144 @@ const GLOBAL_CSS = `
 `;
 
 const BuyFlow = ({ onBack }) => {
-  const [step, setStep]                   = useState(1);
+  // Navigation
+  const [step, setStep] = useState(1);
+
+  // Step 1 state
   const [selectedAsset, setSelectedAsset] = useState(ASSETS[0]);
-  const [payAmount, setPayAmount]         = useState(150000);
-  const [receiveAmount]                   = useState(0.00155569);
-  const [walletAddress, setWalletAddress] = useState("");
-  const [walletLabel, setWalletLabel]     = useState("");
-  const [selectedNetwork, setSelectedNetwork] = useState(NETWORKS[ASSETS[0].symbol][0]);
-  const [paymentMethod, setPaymentMethod] = useState("wallet");
-  const [expiryTime, setExpiryTime]       = useState(PRICE_EXPIRY_TIME);
-  const [isExpired, setIsExpired]         = useState(false);
+  const [payAmount, setPayAmount]         = useState(0);
   const [searchQuery, setSearchQuery]     = useState("");
-  const [proofFile, setProofFile]         = useState(null);
-  const [hasPaid, setHasPaid]             = useState(false);
 
+  // API data state
+  const [quoteData, setQuoteData]           = useState(null);   // from POST /api/rates/buy-quote
+  const [transactionData, setTransactionData] = useState(null); // from POST /api/broker/buy
+  const [paymentData, setPaymentData]       = useState(null);   // from POST /api/payments/setup
+  const [bankInstructions, setBankInstructions] = useState(null);
+
+  // Step 3 state
+  const [paymentMethod, setPaymentMethod]   = useState("ngn_wallet");
+
+  // Step 4 state
+  const [proofFile, setProofFile]           = useState(null);
+  const [hasPaid, setHasPaid]               = useState(false);
+
+  // Quote expiry
+  const [expiryTime, setExpiryTime]         = useState(0);
+  const [isExpired, setIsExpired]           = useState(false);
+
+  // Derived values from quote
+  const receiveAmount = quoteData?.crypto_amount ? parseFloat(quoteData.crypto_amount) : 0;
+  const finalRate     = quoteData?.final_rate    ? parseFloat(quoteData.final_rate)    : 0;
+
+  // Countdown timer driven from quoteData.expires_at
   useEffect(() => {
-    if (step >= 2 && step < 6 && expiryTime > 0 && !isExpired) {
-      const t = setInterval(() => setExpiryTime(p => p - 1), 1000);
-      return () => clearInterval(t);
-    }
-    if (expiryTime === 0) setIsExpired(true);
-  }, [step, expiryTime, isExpired]);
+    if (!quoteData?.expires_at || step < 2 || step >= 5) return;
+    const tick = () => {
+      const remaining = Math.max(0, Math.round((new Date(quoteData.expires_at) - Date.now()) / 1000));
+      setExpiryTime(remaining);
+      if (remaining === 0) setIsExpired(true);
+    };
+    tick();
+    const t = setInterval(tick, 1000);
+    return () => clearInterval(t);
+  }, [quoteData, step]);
 
-  const resetExpiry = () => { setExpiryTime(PRICE_EXPIRY_TIME); setIsExpired(false); };
-  const nextStep    = () => setStep(p => Math.min(p + 1, 6));
+  const resetExpiry = () => { setIsExpired(false); setStep(1); setQuoteData(null); };
+  const nextStep    = () => setStep(p => Math.min(p + 1, 5));
   const prevStep    = () => setStep(p => Math.max(p - 1, 1));
 
-  const breadcrumbs = <BuyCryptoBreadcrumbs currentStep={step} onStepClick={setStep} onBackToDashboard={onBack} />;
-  const commonProps = { payAmount, receiveAmount, selectedAsset, expiryTime, walletAddress, selectedNetwork, breadcrumbs };
+  const breadcrumbs = (
+    <BuyCryptoBreadcrumbs
+      currentStep={step}
+      onStepClick={s => { if (s < step) setStep(s); }}
+      onBackToDashboard={onBack}
+    />
+  );
+
+  const commonProps = {
+    payAmount,
+    receiveAmount,
+    selectedAsset,
+    expiryTime,
+    finalRate,
+    breadcrumbs,
+  };
 
   return (
-    <div style={{ minHeight:"100vh", background: T.white, overflowX:"hidden", width:"100%" }}>
+    <div style={{ minHeight: "100vh", background: T.white, overflowX: "hidden", width: "100%" }}>
       <style>{GLOBAL_CSS}</style>
-
-      {/* Top breadcrumb bar removed, passed as prop instead */}
-
       <div style={{ animation: "fadeUp 0.25s ease forwards" }}>
+
         {step === 1 && (
           <BuyFlowStep1
-            selectedAsset={selectedAsset} setSelectedAsset={setSelectedAsset}
-            setSelectedNetwork={setSelectedNetwork} payAmount={payAmount}
-            setPayAmount={setPayAmount} searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery} nextStep={nextStep} onViewAll={onBack}
+            selectedAsset={selectedAsset}
+            setSelectedAsset={setSelectedAsset}
+            payAmount={payAmount}
+            setPayAmount={setPayAmount}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
             breadcrumbs={breadcrumbs}
+            onQuoteFetched={(quote) => { setQuoteData(quote); setIsExpired(false); nextStep(); }}
           />
         )}
+
         {step === 2 && (
           <BuyFlowStep2
-            {...commonProps} nextStep={nextStep} prevStep={prevStep}
-            isExpired={isExpired} resetExpiry={resetExpiry}
+            {...commonProps}
+            quoteData={quoteData}
+            isExpired={isExpired}
+            resetExpiry={resetExpiry}
+            nextStep={nextStep}
+            prevStep={prevStep}
           />
         )}
+
         {step === 3 && (
           <BuyFlowStep3
-            {...commonProps} setSelectedNetwork={setSelectedNetwork}
-            setWalletAddress={setWalletAddress} walletLabel={walletLabel}
-            setWalletLabel={setWalletLabel} nextStep={nextStep} prevStep={prevStep}
-            isExpired={isExpired} resetExpiry={resetExpiry}
+            {...commonProps}
+            paymentMethod={paymentMethod}
+            setPaymentMethod={setPaymentMethod}
+            nextStep={nextStep}
+            prevStep={prevStep}
           />
         )}
+
         {step === 4 && (
           <BuyFlowStep4
-            {...commonProps} paymentMethod={paymentMethod}
-            setPaymentMethod={setPaymentMethod} nextStep={nextStep} prevStep={prevStep}
+            {...commonProps}
+            paymentMethod={paymentMethod}
+            quoteData={quoteData}
+            transactionData={transactionData}
+            setTransactionData={setTransactionData}
+            paymentData={paymentData}
+            setPaymentData={setPaymentData}
+            bankInstructions={bankInstructions}
+            setBankInstructions={setBankInstructions}
+            proofFile={proofFile}
+            setProofFile={setProofFile}
+            hasPaid={hasPaid}
+            setHasPaid={setHasPaid}
+            prevStep={prevStep}
+            onSuccess={() => setStep(5)}
           />
         )}
+
         {step === 5 && (
           <BuyFlowStep5
-            {...commonProps} paymentMethod={paymentMethod} prevStep={prevStep}
-            setStep={setStep} hasPaid={hasPaid} setHasPaid={setHasPaid}
-            proofFile={proofFile} setProofFile={setProofFile}
-          />
-        )}
-        {step === 6 && (
-          <BuyFlowStep6
-            paymentMethod={paymentMethod} receiveAmount={receiveAmount}
-            selectedAsset={selectedAsset} payAmount={payAmount}
-            walletAddress={walletAddress} onBack={onBack} setStep={setStep}
+            paymentMethod={paymentMethod}
+            receiveAmount={receiveAmount}
+            selectedAsset={selectedAsset}
+            payAmount={payAmount}
+            transactionData={transactionData}
+            onBack={onBack}
+            setStep={setStep}
             breadcrumbs={breadcrumbs}
           />
         )}
+
       </div>
     </div>
   );
 };
 
 export default BuyFlow;
-

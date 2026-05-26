@@ -1,159 +1,151 @@
-import React, { useState } from "react";
-import { T, Ico, formatNGN, formatTime, truncateAddress, CTA, GhostBtn, RightPanel, SecureFooter } from "./BuyFlowShared";
+import React from "react";
+import { T, Ico, formatNGN, SecureFooter } from "./BuyFlowShared";
 
-function WalletVariant({payAmount,receiveAmount,selectedAsset,walletAddress,selectedNetwork,expiryTime,prevStep,setStep,breadcrumbs}){
-  return(
-    <div style={{display:"grid",gridTemplateColumns:"1fr 400px",minHeight:"100vh",background:T.white,maxWidth:"100vw"}} className="buygrid">
-      <div className="step-content" style={{padding:"0 52px 60px",borderRight:`1px solid ${T.border}`}}>
-        {breadcrumbs}
-        <p style={{fontSize:11,fontWeight:600,color:T.blue,textTransform:"uppercase",letterSpacing:"1px",marginBottom:6,fontFamily:"'DM Sans',sans-serif"}}>Step 5 of 6</p>
-        <h1 className="responsive-title" style={{fontFamily:"'Sora',sans-serif",fontSize:28,fontWeight:700,color:T.text,letterSpacing:"-0.6px"}}>Pay with NGN Wallet</h1>
-        <p style={{fontSize:14,color:T.text2,marginTop:6,lineHeight:1.6,fontFamily:"'DM Sans',sans-serif"}}>Review and confirm payment from your NGN wallet.</p>
+const methodLabels = {
+  ngn_wallet: "NGN Wallet",
+  paystack: "Paystack",
+  bank_transfer: "Bank Transfer",
+};
 
-        {/* Payment method badge */}
-        <div style={{marginTop:28,border:`1.5px solid ${T.blue}`,borderRadius:16,padding:"16px 20px",background:T.blueLight,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
-          <div style={{display:"flex",alignItems:"center",gap:14}}>
-            <div style={{width:48,height:48,borderRadius:14,background:T.white,display:"flex",alignItems:"center",justifyContent:"center",color:T.blue,border:`1.5px solid ${T.border}`}}><Ico.wallet/></div>
-            <div><p style={{fontFamily:"'Sora',sans-serif",fontSize:14,fontWeight:700,color:T.text}}>NGN Wallet</p><p style={{fontSize:12,color:T.text2,fontFamily:"'DM Sans',sans-serif"}}>Pay instantly from balance</p></div>
+export default function BuyFlowStep5({ paymentMethod, receiveAmount, selectedAsset, payAmount, transactionData, onBack, setStep, breadcrumbs }) {
+  // Bank transfer goes to pending_review, others are completed
+  const isBankTransfer   = paymentMethod === "bank_transfer";
+  const txnStatus        = transactionData?.status || (isBankTransfer ? "pending_review" : "completed");
+  const isPendingReview  = txnStatus === "pending_review";
+  const isCompleted      = txnStatus === "completed";
+
+  const cryptoAmount = transactionData?.crypto_amount ? parseFloat(transactionData.crypto_amount) : receiveAmount;
+  const nairaAmount  = transactionData?.naira_amount  ? parseFloat(transactionData.naira_amount)  : payAmount;
+
+  return (
+    <div className="step-content" style={{maxWidth:960,margin:"0 auto",padding:"44px 24px 80px"}}>
+      {breadcrumbs}
+
+      {/* Status hero */}
+      <div style={{textAlign:"center",marginBottom:40}}>
+        <div style={{position:"relative",width:96,height:96,margin:"0 auto 20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+          {isCompleted && (
+            <div className="ripple" style={{position:"absolute",width:96,height:96,borderRadius:"50%",background:T.greenLight,animation:"ripple 1.8s ease-out infinite"}}/>
+          )}
+          {isPendingReview && (
+            <div style={{position:"absolute",width:96,height:96,borderRadius:"50%",background:T.orangeLight,animation:"ripple 2.2s ease-out infinite"}}/>
+          )}
+          <div className="popIn" style={{
+            width:80,height:80,borderRadius:"50%",
+            background:isCompleted?T.green:isPendingReview?T.orange:"#6B7A99",
+            display:"flex",alignItems:"center",justifyContent:"center",
+            position:"relative",zIndex:1
+          }}>
+            {isCompleted ? Ico.check("#fff") : Ico.clock("#fff")}
           </div>
-          <div style={{display:"flex",alignItems:"center",gap:5,padding:"6px 12px",background:T.white,border:`1px solid ${T.border}`,borderRadius:999}}>
-            {Ico.check(T.blue)}
-            <span style={{fontSize:12,fontWeight:600,color:T.blue,fontFamily:"'DM Sans',sans-serif"}}>Selected</span>
-          </div>
         </div>
 
-        {/* Wallet balance */}
-        <div style={{marginTop:20,background:"#F0FDF4",border:"1.5px solid #DCFCE7",borderRadius:16,padding:"20px 22px",display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
-          <div style={{display:"flex",alignItems:"center",gap:14}}>
-            <div style={{width:48,height:48,borderRadius:14,background:T.white,display:"flex",alignItems:"center",justifyContent:"center",border:"1.5px solid #DCFCE7"}}><Ico.wallet/></div>
-            <div><p style={{fontSize:13,color:"#166534",fontFamily:"'DM Sans',sans-serif"}}>Available balance</p><p style={{fontFamily:"'Sora',sans-serif",fontSize:22,fontWeight:700,color:T.text,marginTop:2}}>₦250,000.00</p></div>
-          </div>
-          <div style={{display:"flex",alignItems:"center",gap:5,padding:"6px 14px",background:"#DCFCE7",borderRadius:999}}>
-            {Ico.check("#16A34A")}
-            <span style={{fontSize:12,fontWeight:600,color:"#15803D",fontFamily:"'DM Sans',sans-serif"}}>Sufficient</span>
-          </div>
-        </div>
-
-        {/* Payment detail */}
-        <div style={{marginTop:20,background:T.surface,border:`1.5px solid ${T.border}`,borderRadius:16,padding:"16px 20px"}}>
-          {[["You pay",formatNGN(payAmount)],["Balance after payment","₦100,000.00"]].map(([l,v],i)=>(
-            <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:i===0?`1px solid ${T.border}`:"none"}}>
-              <span style={{fontSize:13,color:T.text2,fontFamily:"'DM Sans',sans-serif"}}>{l}</span>
-              <span style={{fontFamily:"'Sora',sans-serif",fontSize:13,fontWeight:700,color:T.text}}>{v}</span>
-            </div>
-          ))}
-        </div>
-
-        <div style={{display:"flex",alignItems:"flex-start",gap:10,background:T.blueLight,borderRadius:14,padding:"14px 18px",marginTop:16}}>
-          <Ico.info/>
-          <p style={{fontSize:13,color:"#1A3A8A",lineHeight:1.6,fontFamily:"'DM Sans',sans-serif"}}>Your payment will be processed instantly and crypto sent to your wallet address.</p>
-        </div>
-
-        <div className="actions-wrap" style={{display:"flex",gap:12,marginTop:28}}>
-          <GhostBtn onClick={prevStep} style={{flex:1}}>← Back</GhostBtn>
-          <CTA onClick={()=>setStep(6)} style={{flex:2}}><Ico.lock/> Pay {formatNGN(payAmount)}</CTA>
-        </div>
-        <SecureFooter/>
+        {isCompleted && (
+          <>
+            <h1 className="responsive-title" style={{fontFamily:"'Sora',sans-serif",fontSize:30,fontWeight:700,color:T.text,letterSpacing:"-0.8px"}}>Purchase Successful!</h1>
+            <p style={{fontSize:15,color:T.text2,marginTop:8,fontFamily:"'DM Sans',sans-serif"}}>{cryptoAmount} {selectedAsset.symbol} has been added to your Cheeseball wallet.</p>
+          </>
+        )}
+        {isPendingReview && (
+          <>
+            <h1 className="responsive-title" style={{fontFamily:"'Sora',sans-serif",fontSize:30,fontWeight:700,color:T.text,letterSpacing:"-0.8px"}}>Proof Submitted!</h1>
+            <p style={{fontSize:15,color:T.text2,marginTop:8,fontFamily:"'DM Sans',sans-serif"}}>Your payment proof is under review. We'll credit your wallet within 1–24 hours.</p>
+          </>
+        )}
       </div>
-      <RightPanel payAmount={payAmount} receiveAmount={receiveAmount} selectedAsset={selectedAsset} expiryTime={expiryTime} walletAddress={walletAddress} selectedNetwork={selectedNetwork} step={5}/>
-    </div>
-  );
-}
 
-function PaystackVariant({payAmount,receiveAmount,selectedAsset,walletAddress,expiryTime,prevStep,setStep,breadcrumbs}){
-  return(
-    <div style={{background:T.white,minHeight:"100vh",width:"100%"}}>
-      <div className="step-content" style={{padding:"44px 52px 0"}}>{breadcrumbs}</div>
-      <div className="step-content" style={{padding:"0 52px 60px",maxWidth:600,margin:"0 auto",width:"100%"}}>
-      <div style={{background:T.white,border:`1.5px solid ${T.border}`,borderRadius:20,padding:24,textAlign:"center"}}>
-        <div style={{width:64,height:64,background:"#ECFDF3",borderRadius:18,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 20px",color:"#16A34A"}}><Ico.card/></div>
-        <h2 className="responsive-title" style={{fontFamily:"'Sora',sans-serif",fontSize:20,fontWeight:700,color:T.text,marginBottom:8}}>Pay with Paystack</h2>
-        <p style={{fontSize:14,color:T.text2,fontFamily:"'DM Sans',sans-serif",lineHeight:1.6,marginBottom:24}}>You'll be redirected to Paystack to complete your payment securely.</p>
-        <div style={{background:T.surface,border:`1.5px solid ${T.border}`,borderRadius:16,padding:"20px 24px",marginBottom:20}}>
-          {[["Amount",formatNGN(payAmount)],["You receive",`${receiveAmount} ${selectedAsset.symbol}`],["Wallet",truncateAddress(walletAddress)]].map(([l,v],i,a)=>(
-            <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"10px 0",borderBottom:i<a.length-1?`1px solid ${T.border}`:"none"}}>
-              <span style={{fontSize:13,color:T.text2,fontFamily:"'DM Sans',sans-serif"}}>{l}</span>
-              <span style={{fontFamily:"'Sora',sans-serif",fontSize:13,fontWeight:700,color:T.text}}>{v}</span>
+      {/* Two-column receipt + next steps */}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:28}} className="s6grid">
+
+        {/* LEFT: Transaction receipt */}
+        <div>
+          <p style={{fontSize:11,fontWeight:700,color:T.text3,textTransform:"uppercase",letterSpacing:"1px",marginBottom:12,fontFamily:"'DM Sans',sans-serif"}}>Transaction Receipt</p>
+          <div style={{background:T.white,border:`1.5px solid ${T.border}`,borderRadius:20,overflow:"hidden"}}>
+            {/* Top band */}
+            <div style={{background:isCompleted?T.green:T.orange,padding:"20px 24px"}}>
+              <p style={{fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.7)",textTransform:"uppercase",letterSpacing:"0.7px",marginBottom:8,fontFamily:"'DM Sans',sans-serif"}}>
+                {isCompleted ? "You received" : "Pending amount"}
+              </p>
+              <p className="responsive-amount" style={{fontFamily:"'Sora',sans-serif",fontSize:32,fontWeight:700,color:"#fff",letterSpacing:"-1px",lineHeight:1}}>
+                {cryptoAmount} {selectedAsset.symbol}
+              </p>
             </div>
-          ))}
+            {/* Receipt rows */}
+            <div style={{padding:"4px 24px"}}>
+              {[
+                ["You Paid",       formatNGN(nairaAmount)],
+                ["Asset",          `${selectedAsset.name} (${selectedAsset.symbol})`],
+                ["Delivery",       "Cheeseball Internal Wallet"],
+                ["Payment Method", methodLabels[paymentMethod] || paymentMethod],
+                ["Status",         isPendingReview ? "⏳ Pending Review" : isCompleted ? "✅ Completed" : txnStatus],
+                ...(transactionData?.id ? [["Transaction ID", String(transactionData.id).slice(0, 16) + "…"]] : []),
+              ].map(([l,v],i,a)=>(
+                <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"13px 0",borderBottom:i<a.length-1?`1.5px dashed ${T.border}`:"none"}}>
+                  <span style={{fontSize:13,color:T.text2,fontFamily:"'DM Sans',sans-serif"}}>{l}</span>
+                  <span style={{fontFamily:"'Sora',sans-serif",fontSize:13,fontWeight:700,color:T.text,textAlign:"right",maxWidth:"55%",wordBreak:"break-all"}}>{v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-        {expiryTime>0&&<div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:6,background:T.orangeLight,border:"1px solid #FDE68A",borderRadius:999,padding:"8px 16px",marginBottom:20}}>
-          {Ico.clock(T.orange)}<span style={{fontSize:12,fontWeight:700,color:"#92400E",fontFamily:"'DM Sans',sans-serif"}}>Rate expires in {formatTime(expiryTime)}</span>
-        </div>}
-        <div className="actions-wrap" style={{display:"flex",gap:12}}>
-          <GhostBtn onClick={prevStep} style={{flex:1}}>Back</GhostBtn>
-          <CTA onClick={()=>setStep(6)} style={{flex:2}}>Proceed <Ico.arrow/></CTA>
-        </div>
-        <p style={{fontSize:11,color:T.text3,marginTop:14,fontFamily:"'DM Sans',sans-serif"}}>Secure payment powered by Paystack</p>
-      </div>
-    </div>
-    </div>
-  );
-}
 
-function BankVariant({payAmount,receiveAmount,selectedAsset,prevStep,setStep,hasPaid,setHasPaid,proofFile,setProofFile,breadcrumbs}){
-  const [uploading,setUploading]=useState(false);
-  if(!hasPaid) return(
-    <div style={{background:T.white,minHeight:"100vh",width:"100%"}}>
-      <div className="step-content" style={{padding:"44px 52px 0"}}>{breadcrumbs}</div>
-      <div className="step-content" style={{padding:"0 52px 60px",maxWidth:600,margin:"0 auto",width:"100%"}}>
-      <div style={{background:T.white,border:`1.5px solid ${T.border}`,borderRadius:20,padding:24}}>
-        <h2 className="responsive-title" style={{fontFamily:"'Sora',sans-serif",fontSize:22,fontWeight:700,color:T.text,marginBottom:24,textAlign:"center"}}>Bank Transfer Details</h2>
-        <div style={{background:T.surface,border:`1.5px solid ${T.border}`,borderRadius:16,padding:"20px 24px",textAlign:"center",marginBottom:20}}>
-          <p style={{fontSize:11,fontWeight:700,color:T.text3,textTransform:"uppercase",letterSpacing:"1px",marginBottom:6,fontFamily:"'DM Sans',sans-serif"}}>Transfer exactly</p>
-          <p style={{fontFamily:"'Sora',sans-serif",fontSize:28,fontWeight:700,color:T.text}}>{formatNGN(payAmount)}</p>
-        </div>
-        <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:20}}>
-          {[["Bank","Example Bank"],["Account Name","CheeseBall Technologies"],["Account Number","1234567890",true]].map(([l,v,copy],i)=>(
-            <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"14px 18px",background:T.surface,border:`1.5px solid ${T.border}`,borderRadius:14}}>
-              <span style={{fontSize:13,color:T.text2,fontFamily:"'DM Sans',sans-serif"}}>{l}</span>
-              <div style={{display:"flex",alignItems:"center",gap:8}}>
-                <span style={{fontFamily:"'Sora',sans-serif",fontSize:13,fontWeight:700,color:T.text}}>{v}</span>
-                {copy&&<button onClick={()=>navigator.clipboard.writeText(v)} style={{background:"none",border:"none",cursor:"pointer",color:T.blue,display:"flex"}}><Ico.copy/></button>}
+        {/* RIGHT: Status + Next steps */}
+        <div style={{display:"flex",flexDirection:"column",gap:20}}>
+          {isCompleted && (
+            <div style={{background:T.greenLight,border:"1.5px solid #A7F3D0",borderRadius:20,padding:"24px",display:"flex",alignItems:"flex-start",gap:16}}>
+              <div style={{width:52,height:52,borderRadius:"50%",background:"#A7F3D0",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{Ico.check(T.greenText)}</div>
+              <div>
+                <h3 style={{fontFamily:"'Sora',sans-serif",fontSize:16,fontWeight:700,color:T.text,marginBottom:6}}>Crypto in Your Wallet</h3>
+                <p style={{fontSize:13,color:T.text2,lineHeight:1.65,fontFamily:"'DM Sans',sans-serif"}}>{cryptoAmount} {selectedAsset.symbol} has been credited to your Cheeseball internal wallet. You can swap, send, or hold it anytime.</p>
               </div>
             </div>
-          ))}
-        </div>
-        <div style={{display:"flex",alignItems:"flex-start",gap:10,background:T.orangeLight,borderRadius:12,padding:"12px 16px",marginBottom:24}}>
-          {Ico.info()}
-          <p style={{fontSize:12,color:"#92400E",fontFamily:"'DM Sans',sans-serif",lineHeight:1.55}}>After payment, upload your proof of transfer for faster review.</p>
-        </div>
-        <div className="actions-wrap" style={{display:"flex",gap:12}}>
-          <GhostBtn onClick={prevStep} style={{flex:1}}>Back</GhostBtn>
-          <CTA onClick={()=>setHasPaid(true)} style={{flex:2}}>I Have Paid</CTA>
+          )}
+
+          {isPendingReview && (
+            <div style={{background:T.orangeLight,border:"1.5px solid #FDE68A",borderRadius:20,padding:"24px",display:"flex",alignItems:"flex-start",gap:16}}>
+              <div style={{width:52,height:52,borderRadius:"50%",background:"#FDE68A",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{Ico.clock("#92400E")}</div>
+              <div>
+                <h3 style={{fontFamily:"'Sora',sans-serif",fontSize:16,fontWeight:700,color:T.text,marginBottom:6}}>Under Review</h3>
+                <p style={{fontSize:13,color:T.text2,lineHeight:1.65,fontFamily:"'DM Sans',sans-serif"}}>Our team is reviewing your payment proof. Once approved, {cryptoAmount} {selectedAsset.symbol} will be credited to your wallet. This typically takes 1–24 hours.</p>
+              </div>
+            </div>
+          )}
+
+          <div style={{background:T.blueLight,border:`1.5px solid ${T.border}`,borderRadius:20,padding:"24px"}}>
+            <h3 style={{fontFamily:"'Sora',sans-serif",fontSize:16,fontWeight:700,color:T.text,marginBottom:8}}>What's next?</h3>
+            <p style={{fontSize:13,color:T.text2,lineHeight:1.65,fontFamily:"'DM Sans',sans-serif",marginBottom:20}}>
+              {isCompleted
+                ? "Monitor your portfolio on the dashboard. You can sell, swap, or hold your new crypto anytime."
+                : "You'll be notified once your payment is verified and crypto is released to your wallet."
+              }
+            </p>
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              <button
+                onClick={() => {}} // navigate to history
+                style={{width:"100%",padding:"14px",borderRadius:14,border:`1.5px solid ${T.border}`,background:T.white,color:T.blue,fontSize:14,fontWeight:700,fontFamily:"'Sora',sans-serif",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}
+                className="ghostbtn">
+                View Transactions <Ico.arrow/>
+              </button>
+              <button
+                onClick={onBack}
+                style={{width:"100%",padding:"14px",borderRadius:14,border:"none",background:T.blue,color:"#fff",fontSize:14,fontWeight:700,fontFamily:"'Sora',sans-serif",cursor:"pointer"}}
+                className="ctabtn">
+                Back to Dashboard
+              </button>
+              {isCompleted && (
+                <button
+                  onClick={() => setStep(1)}
+                  style={{width:"100%",padding:"14px",borderRadius:14,border:`1.5px solid ${T.border}`,background:T.white,color:T.text2,fontSize:14,fontWeight:600,fontFamily:"'DM Sans',sans-serif",cursor:"pointer"}}
+                  className="ghostbtn">
+                  Buy More Crypto
+                </button>
+              )}
+            </div>
+          </div>
+
+          <SecureFooter/>
         </div>
       </div>
     </div>
-    </div>
-  );
-  return(
-    <div style={{background:T.white,minHeight:"100vh",width:"100%"}}>
-      <div className="step-content" style={{padding:"44px 52px 0"}}>{breadcrumbs}</div>
-      <div className="step-content" style={{padding:"0 52px 60px",maxWidth:600,margin:"0 auto",width:"100%"}}>
-      <div style={{background:T.white,border:`1.5px solid ${T.border}`,borderRadius:20,padding:24}}>
-        <h2 className="responsive-title" style={{fontFamily:"'Sora',sans-serif",fontSize:22,fontWeight:700,color:T.text,marginBottom:24,textAlign:"center"}}>Upload Payment Proof</h2>
-        <div onClick={()=>document.getElementById("proofInput").click()} style={{border:`2px dashed ${T.border}`,borderRadius:20,padding:"48px 24px",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",textAlign:"center",cursor:"pointer",background:T.surface,transition:"border-color 0.18s"}} className="dropzone">
-          <input type="file" id="proofInput" style={{display:"none"}} onChange={e=>setProofFile(e.target.files[0])}/>
-          <div style={{width:56,height:56,background:T.white,borderRadius:16,border:`1.5px solid ${T.border}`,display:"flex",alignItems:"center",justifyContent:"center",marginBottom:14,color:T.blue}}><Ico.upload/></div>
-          <p style={{fontFamily:"'Sora',sans-serif",fontSize:14,fontWeight:700,color:T.text,marginBottom:4}}>Upload screenshot or receipt</p>
-          <p style={{fontSize:12,color:T.text3,fontFamily:"'DM Sans',sans-serif"}}>Max 5MB — JPG, PNG or PDF</p>
-          {proofFile&&<div style={{marginTop:14,padding:"6px 16px",background:T.blue,color:"#fff",borderRadius:999,fontSize:11,fontWeight:700,fontFamily:"'DM Sans',sans-serif"}}>{proofFile.name}</div>}
-        </div>
-        <div className="actions-wrap" style={{display:"flex",gap:12,marginTop:24}}>
-          <GhostBtn onClick={()=>setHasPaid(false)} style={{flex:1}}>Back</GhostBtn>
-          <CTA onClick={()=>{setUploading(true);setTimeout(()=>{setUploading(false);setStep(6);},2000);}} disabled={!proofFile||uploading} style={{flex:2}}>
-            {uploading?<><Ico.refresh/> Uploading…</>:"Submit Proof"}
-          </CTA>
-        </div>
-      </div>
-    </div>
-    </div>
   );
 }
-
-export default function BuyFlowStep5({paymentMethod,payAmount,receiveAmount,selectedAsset,walletAddress,expiryTime,prevStep,setStep,hasPaid,setHasPaid,proofFile,setProofFile,selectedNetwork,breadcrumbs}){
-  if(paymentMethod==="wallet") return <WalletVariant payAmount={payAmount} receiveAmount={receiveAmount} selectedAsset={selectedAsset} walletAddress={walletAddress} selectedNetwork={selectedNetwork} expiryTime={expiryTime} prevStep={prevStep} setStep={setStep} breadcrumbs={breadcrumbs}/>;
-  if(paymentMethod==="paystack") return <PaystackVariant payAmount={payAmount} receiveAmount={receiveAmount} selectedAsset={selectedAsset} walletAddress={walletAddress} expiryTime={expiryTime} prevStep={prevStep} setStep={setStep} breadcrumbs={breadcrumbs}/>;
-  return <BankVariant payAmount={payAmount} receiveAmount={receiveAmount} selectedAsset={selectedAsset} prevStep={prevStep} setStep={setStep} hasPaid={hasPaid} setHasPaid={setHasPaid} proofFile={proofFile} setProofFile={setProofFile} breadcrumbs={breadcrumbs}/>;
-}
-

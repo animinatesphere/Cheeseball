@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
-import { Bell, Menu, Search, LayoutDashboard, ShoppingCart, CircleDollarSign, ArrowRightLeft, ArrowDownLeft, Gift, History, HelpCircle, Settings, ChevronRight, X, ShieldCheck } from "lucide-react";
+import { Bell, Menu, Search, LayoutDashboard, ShoppingCart, CircleDollarSign, ArrowRightLeft, ArrowDownLeft, Gift, History, HelpCircle, Settings, ChevronRight, X, ShieldCheck, Landmark } from "lucide-react";
 import { createTransaction, createGiftCardTrade, getCurrentUser } from "@/services/api";
 
 import CurrencyRates from "../components/CurrencyRates";
-import CurrencyDetail from "../components/CurrencyDetail";
 import ConvertFlow from "../flows/swap/ConvertFlow";
 import AwaitingDeposit from "../flows/transaction/AwaitingDeposit";
 import BuyFlow from "../flows/buy/BuyFlow";
 import PaymentSuccessModal from "../flows/transaction/PaymentSuccessModal";
 import AddressBook from "../components/AddressBook";
+import BankAccounts from "../components/BankAccounts";
 import SupportPage from "../components/SupportPage";
 import HistoryPage from "../components/HistoryPage";
 import SellCryptocurrency from "../flows/sell/SellCryptocurrency";
@@ -51,7 +51,8 @@ const NAV_ITEMS = [
   { id: "swap",          icon: ArrowRightLeft,   label: "Swap"       },
   { id: "deposit",       icon: ArrowDownLeft,    label: "Deposit"    },
   { id: "giftcard-swap", icon: Gift,             label: "Gift Cards" },
-  { id: "history",       icon: History,          label: "History"    },
+  { id: "history",       icon: History,          label: "Transactions"},
+  { id: "bank-accounts", icon: Landmark,         label: "Bank Accounts"},
   { id: "kyc",           icon: ShieldCheck,      label: "KYC Verify" },
   { id: "support",       icon: HelpCircle,       label: "Support"    },
   { id: "account",       icon: Settings,         label: "Settings"   },
@@ -355,17 +356,7 @@ const CurrencyPage = () => {
                   <div className="dash-main" style={{ padding: "28px 32px 48px" }}>
                     <CurrencyRates
                       searchQuery={searchQuery}
-                      onSelectCurrency={(cur) => { setSelectedCurrency(cur); navigate("/currency-change/detail"); }}
                       onNavigate={handleNavigation}
-                    />
-                  </div>
-                } />
-                <Route path="detail" element={
-                  <div className="dash-main" style={{ padding: "28px 32px 48px" }}>
-                    <CurrencyDetail
-                      currency={selectedCurrency}
-                      onBack={handleBack}
-                      onExchange={() => navigate("/currency-change/swap")}
                     />
                   </div>
                 } />
@@ -421,6 +412,8 @@ const CurrencyPage = () => {
                 <Route path="account" element={<SettingsPage onNavigate={handleNavigation} />} />
                 <Route path="support" element={<SupportPage onNavigate={handleNavigation} />} />
                 <Route path="address-book" element={<div className="dash-main" style={{ padding: "28px 32px 48px" }}><AddressBook onBack={() => navigate("/currency-change/support")} /></div>} />
+                <Route path="bank-accounts" element={<div className="dash-main" style={{ padding: "28px 32px 48px" }}><BankAccounts onBack={() => navigate("/currency-change/dashboard")} /></div>} />
+                <Route path="kyc" element={<div className="dash-main" style={{ padding: "28px 32px 48px" }}><KYCVerification /></div>} />
               </Routes>
             </main>
 

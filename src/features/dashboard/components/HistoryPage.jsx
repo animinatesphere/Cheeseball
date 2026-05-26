@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   ArrowDownLeft, CircleDollarSign, Gift, ChevronRight,
   Download, Search, SlidersHorizontal, X, ChevronDown,
   History, Wallet, ShoppingCart, ArrowRightLeft,
 } from "lucide-react";
+import { getUserTransactions } from "@/services/api";
 
 /* ─── Design tokens ──────────────────────────────────────────── */
 const T = {
@@ -32,26 +33,11 @@ const T = {
 const fmtNGN = (n) =>
   "₦" + Number(Math.abs(n)).toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
-/* ─── Data ───────────────────────────────────────────────────── */
-const ALL_TXN = [
-  { id: "CHB-001", type: "sell",     label: "Sold BTC",          asset: "BTC",  icon: "₿", iconColor: "#F7931A", iconBg: "#FEF3E2",     amount: +120_000, date: "2024-04-22", time: "10:02 AM", status: "completed", method: "Bank Transfer",    bank: "Demo Bank · 0123456789",   ref: "CHB-2024-00847" },
-  { id: "CHB-002", type: "buy",      label: "Bought ETH",        asset: "ETH",  icon: "Ξ", iconColor: "#627EEA", iconBg: "#EEEFFE",     amount: -75_200,  date: "2024-04-21", time: "3:45 PM",  status: "completed", method: "Card",             bank: null,                       ref: "CHB-2024-00821" },
-  { id: "CHB-003", type: "sell",     label: "Sold USDT",         asset: "USDT", icon: "₮", iconColor: "#26A17B", iconBg: "#E6F7F2",     amount: +58_400,  date: "2024-04-20", time: "9:11 AM",  status: "pending",   method: "NGN Wallet",      bank: null,                       ref: "CHB-2024-00810" },
-  { id: "CHB-004", type: "deposit",  label: "Deposit",           asset: "NGN",  icon: "₦", iconColor: T.blue,   iconBg: T.blueLight,   amount: +50_000,  date: "2024-04-19", time: "6:22 PM",  status: "completed", method: "Bank Transfer",    bank: "Access Bank · 0987654321", ref: "CHB-2024-00798" },
-  { id: "CHB-005", type: "swap",     label: "Swapped BTC→USDT",  asset: "BTC",  icon: "₿", iconColor: "#F7931A", iconBg: "#FEF3E2",     amount: -30_000,  date: "2024-04-18", time: "2:10 PM",  status: "completed", method: "Swap",             bank: null,                       ref: "CHB-2024-00784" },
-  { id: "CHB-006", type: "giftcard", label: "Gift Card Sale",    asset: "GIFT", icon: "G", iconColor: T.orange, iconBg: T.orangeLight, amount: +45_000,  date: "2024-04-17", time: "11:30 AM", status: "completed", method: "Amazon Gift Card", bank: null,                       ref: "CHB-2024-00771" },
-  { id: "CHB-007", type: "sell",     label: "Sold SOL",          asset: "SOL",  icon: "◎", iconColor: "#9945FF", iconBg: "#F3EEFF",     amount: +88_200,  date: "2024-04-16", time: "4:55 PM",  status: "failed",    method: "Bank Transfer",    bank: "Demo Bank · 0123456789",   ref: "CHB-2024-00755" },
-  { id: "CHB-008", type: "buy",      label: "Bought BTC",        asset: "BTC",  icon: "₿", iconColor: "#F7931A", iconBg: "#FEF3E2",     amount: -200_000, date: "2024-04-15", time: "8:00 AM",  status: "completed", method: "Card",             bank: null,                       ref: "CHB-2024-00740" },
-  { id: "CHB-009", type: "withdraw", label: "Withdrawal",        asset: "NGN",  icon: "₦", iconColor: T.blue,   iconBg: T.blueLight,   amount: -40_000,  date: "2024-04-14", time: "1:20 PM",  status: "pending",   method: "Bank Transfer",    bank: "GTBank · 0112233445",      ref: "CHB-2024-00729" },
-  { id: "CHB-010", type: "sell",     label: "Sold BNB",          asset: "BNB",  icon: "B", iconColor: "#F0B90B", iconBg: "#FFFBEB",     amount: +62_400,  date: "2024-04-13", time: "5:40 PM",  status: "completed", method: "NGN Wallet",       bank: null,                       ref: "CHB-2024-00712" },
-  { id: "CHB-011", type: "buy",      label: "Bought USDT",       asset: "USDT", icon: "₮", iconColor: "#26A17B", iconBg: "#E6F7F2",     amount: -95_000,  date: "2024-04-12", time: "10:50 AM", status: "completed", method: "Card",             bank: null,                       ref: "CHB-2024-00700" },
-  { id: "CHB-012", type: "giftcard", label: "Gift Card Sale",    asset: "GIFT", icon: "G", iconColor: T.orange, iconBg: T.orangeLight, amount: +22_500,  date: "2024-04-11", time: "3:15 PM",  status: "failed",    method: "iTunes Gift Card", bank: null,                       ref: "CHB-2024-00688" },
-];
-
 const STATUS_CFG = {
   completed: { label: "Completed", color: T.greenText,  bg: T.greenLight,  border: "#A7F3D0" },
   pending:   { label: "Pending",   color: T.orangeText, bg: T.orangeLight, border: "#FDE68A" },
   failed:    { label: "Failed",    color: T.redText,    bg: T.redLight,    border: "#FECACA" },
+  waiting:   { label: "Pending",   color: T.orangeText, bg: T.orangeLight, border: "#FDE68A" },
 };
 
 const TYPE_CFG = {
@@ -61,6 +47,7 @@ const TYPE_CFG = {
   deposit:  { label: "Deposit",   color: T.blue,       bg: T.blueLight   },
   withdraw: { label: "Withdraw",  color: T.orangeText, bg: T.orangeLight },
   giftcard: { label: "Gift Card", color: "#92400E",    bg: "#FFFBEB"     },
+  transfer: { label: "Transfer",  color: T.text2,      bg: T.surface     },
 };
 
 const TYPE_ICON = {
@@ -70,14 +57,8 @@ const TYPE_ICON = {
   deposit:  ArrowDownLeft,
   withdraw: Wallet,
   giftcard: Gift,
+  transfer: ArrowRightLeft,
 };
-
-const SUMMARY = [
-  { label: "Total Transactions", value: String(ALL_TXN.length),                                                          color: T.blue       },
-  { label: "Total Volume",       value: "₦889,200",                                                                      color: T.green      },
-  { label: "Completed",          value: String(ALL_TXN.filter(t => t.status === "completed").length),                    color: T.greenText  },
-  { label: "Pending / Failed",   value: String(ALL_TXN.filter(t => t.status !== "completed").length),                   color: T.orangeText },
-];
 
 const STATUS_TABS  = ["All", "Completed", "Pending", "Failed"];
 const TYPE_FILTERS = ["All Types", "Buy", "Sell", "Swap", "Deposit", "Withdraw", "Gift Card"];
@@ -151,8 +132,49 @@ export default function TransactionHistory({ onNavigate }) {
   const [search,     setSearch]     = useState("");
   const [selected,   setSelected]   = useState(null);
   const [typeOpen,   setTypeOpen]   = useState(false);
+  const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading]   = useState(true);
 
-  const filtered = useMemo(() => ALL_TXN.filter((t) => {
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const txns = await getUserTransactions();
+        const txnsList = Array.isArray(txns) ? txns : (txns?.data || []);
+        
+        const mapped = txnsList.map(t => {
+          const type = t.transaction_type || t.type || 'transfer';
+          const isBuy = type.toLowerCase().includes('buy');
+          const isSell = type.toLowerCase().includes('sell');
+          const assetSymbol = t.asset_code || 'Crypto';
+          const amount = parseFloat(t.naira_amount || 0);
+          return {
+            id: t.id,
+            type: type,
+            label: isBuy ? `Bought ${assetSymbol}` : (isSell ? `Sold ${assetSymbol}` : type),
+            asset: assetSymbol,
+            icon: assetSymbol[0]?.toUpperCase() || 'C',
+            iconColor: T.blue,
+            iconBg: T.blueLight,
+            amount: isBuy ? -amount : amount,
+            date: new Date(t.created_at || Date.now()).toLocaleDateString(),
+            time: new Date(t.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            status: t.status === 'pending_payment' ? 'pending' : (t.status || 'pending'),
+            method: t.payment_method || t.payout_method || 'Wallet',
+            bank: t.bank_name ? `${t.bank_name} · ${t.bank_account_number || ''}` : null,
+            ref: t.id || `TXN-${Math.floor(Math.random()*10000)}`,
+          };
+        });
+        setTransactions(mapped);
+      } catch (error) {
+        console.error("Failed to load transactions", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  const filtered = useMemo(() => transactions.filter((t) => {
     const matchStatus = statusTab === "All" || t.status === statusTab.toLowerCase();
     const matchType   = typeFilter === "All Types" || TYPE_CFG[t.type]?.label === typeFilter;
     const matchSearch = !search ||
@@ -160,11 +182,17 @@ export default function TransactionHistory({ onNavigate }) {
       t.ref.toLowerCase().includes(search.toLowerCase()) ||
       t.asset.toLowerCase().includes(search.toLowerCase());
     return matchStatus && matchType && matchSearch;
-  }), [statusTab, typeFilter, search]);
+  }), [transactions, statusTab, typeFilter, search]);
 
   const totalIn  = filtered.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
   const totalOut = filtered.filter(t => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0);
   const hasFilters = statusTab !== "All" || typeFilter !== "All Types" || search;
+
+  const SUMMARY = [
+    { label: "Total Transactions", value: String(transactions.length),                                                          color: T.blue       },
+    { label: "Completed",          value: String(transactions.filter(t => t.status === "completed").length),                    color: T.greenText  },
+    { label: "Pending / Failed",   value: String(transactions.filter(t => t.status !== "completed").length),                   color: T.orangeText },
+  ];
 
   return (
     <>
@@ -207,6 +235,15 @@ export default function TransactionHistory({ onNavigate }) {
 
       <div style={{ minHeight: "100vh", background: T.surface, fontFamily: "'DM Sans', sans-serif", color: T.text, display: "flex", flexDirection: "column" }}>
 
+        {isLoading ? (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flex: 1, minHeight: "60vh", gap: 16 }}>
+            <style>{`@keyframes cb-spin{to{transform:rotate(360deg)}}`}</style>
+            <div style={{ width: 40, height: 40, border: `3px solid ${T.border}`, borderTopColor: T.blue, borderRadius: "50%", animation: "cb-spin 0.6s linear infinite" }} />
+            <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "1px" }}>Loading transactions…</p>
+          </div>
+        ) : (
+        <>
+
         {/* Top bar */}
         <div className="history-top-bar" style={{ background: T.white, borderBottom: `1px solid ${T.border}`, height: 60, padding: "0 40px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
           <nav style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -232,7 +269,7 @@ export default function TransactionHistory({ onNavigate }) {
           </div>
 
           {/* Summary cards */}
-          <div className="fadein summary-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14, marginBottom: 24 }}>
+          <div className="fadein summary-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 24 }}>
             {SUMMARY.map((s) => (
               <div key={s.label} style={{ background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 18, padding: "20px 22px" }}>
                 <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 10 }}>{s.label}</p>
@@ -409,7 +446,7 @@ export default function TransactionHistory({ onNavigate }) {
           {filtered.length > 0 && (
             <div className="txn-summary-footer" style={{ marginTop: 14, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 14, flexWrap: "wrap", gap: 16 }}>
               <p style={{ fontSize: 13, color: T.text2, fontWeight: 500 }}>
-                Showing <span style={{ fontWeight: 700, color: T.text }}>{filtered.length}</span> of {ALL_TXN.length} transactions
+                Showing <span style={{ fontWeight: 700, color: T.text }}>{filtered.length}</span> of {transactions.length} transactions
               </p>
               <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
@@ -434,6 +471,8 @@ export default function TransactionHistory({ onNavigate }) {
           <span style={{ fontSize: 12, color: T.text2, fontWeight: 500 }}>Your transaction is secure · </span>
           <span style={{ fontSize: 12, fontWeight: 600, color: T.mintGreen }}>Protected by Cheeseball</span>
         </div>
+        </>
+        )}
       </div>
 
       {/* Detail drawer */}

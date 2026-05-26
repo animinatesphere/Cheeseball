@@ -1,12 +1,12 @@
 import React from "react";
 
 export const ASSETS = [
-  { id:"bitcoin", symbol:"BTC", name:"Bitcoin", network:"Bitcoin Network", price:96420000, change:2.14, icon:"₿", color:"#F7931A", bg:"#FEF3E2" },
-  { id:"ethereum", symbol:"ETH", name:"Ethereum", network:"Ethereum Network", price:4710000, change:-0.87, icon:"Ξ", color:"#627EEA", bg:"#EEEFFE" },
-  { id:"tether", symbol:"USDT", name:"Tether", network:"Tron Network (TRC20)", price:1550, change:0.01, icon:"₮", color:"#26A17B", bg:"#E6F7F2" },
-  { id:"solana", symbol:"SOL", name:"Solana", network:"Solana Network", price:228000, change:4.56, icon:"◎", color:"#9945FF", bg:"#F1E9FF" },
-  { id:"bnb", symbol:"BNB", name:"BNB", network:"BSC (BEP20)", price:887000, change:1.33, icon:"⬡", color:"#F0B90B", bg:"#FEF8E6" },
-  { id:"xrp", symbol:"XRP", name:"XRP", network:"Ripple Network", price:960, change:-1.08, icon:"✕", color:"#000000", bg:"#E6E6E6" },
+  { id:"bitcoin", symbol:"BTC", name:"Bitcoin", network:"Bitcoin Network", price:108280523, change:2.14, icon:"₿", color:"#F7931A", bg:"#FEF3E2" },
+  { id:"ethereum", symbol:"ETH", name:"Ethereum", network:"Ethereum Network", price:4236420, change:-0.87, icon:"Ξ", color:"#627EEA", bg:"#EEEFFE" },
+  { id:"tether", symbol:"USDT", name:"Tether", network:"Tron Network (TRC20)", price:1412, change:0.01, icon:"₮", color:"#26A17B", bg:"#E6F7F2" },
+  { id:"solana", symbol:"SOL", name:"Solana", network:"Solana Network", price:211821, change:4.56, icon:"◎", color:"#9945FF", bg:"#F1E9FF" },
+  { id:"bnb", symbol:"BNB", name:"BNB", network:"BSC (BEP20)", price:847284, change:1.33, icon:"⬡", color:"#F0B90B", bg:"#FEF8E6" },
+  { id:"xrp", symbol:"XRP", name:"XRP", network:"Ripple Network", price:847, change:-1.08, icon:"✕", color:"#000000", bg:"#E6E6E6" },
 ];
 
 export const NETWORKS = {
@@ -41,11 +41,19 @@ export const Ico = {
   upload: ()=><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>,
   refresh:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>,
   chevDn: ()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A8B4CC" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9"/></svg>,
+  paystack: ()=><svg width="20" height="20" viewBox="0 0 44.6 44.3" fill="none"><path fill="#00C3F7" d="M39.9,0H2.3C1.1,0,0,1.1,0,2.4v4.2C0,7.9,1.1,9,2.3,9h37.6c1.3,0,2.3-1.1,2.4-2.4V2.4C42.3,1.1,41.2,0,39.9,0L39.9,0z M39.9,23.6H2.3c-0.6,0-1.2,0.3-1.7,0.7C0.2,24.7,0,25.3,0,26v4.2c0,1.3,1.1,2.4,2.3,2.4h37.6c1.3,0,2.3-1,2.4-2.4V26C42.3,24.6,41.2,23.6,39.9,23.6L39.9,23.6z M23.5,35.4H2.3c-0.6,0-1.2,0.2-1.6,0.7c-0.4,0.4-0.7,1-0.7,1.7V42c0,1.3,1.1,2.4,2.3,2.4h21.1c1.3,0,2.3-1.1,2.3-2.4v-4.3C25.8,36.4,24.8,35.4,23.5,35.4L23.5,35.4z M42.3,11.8h-40c-0.6,0-1.2,0.2-1.6,0.7c-0.4,0.4-0.7,1-0.7,1.7v4.2c0,1.3,1.1,2.4,2.3,2.4h39.9c1.3,0,2.3-1.1,2.3-2.4v-4.2C44.6,12.9,43.6,11.8,42.3,11.8L42.3,11.8z"/></svg>,
 };
 
+export const NGN_RATE = 1412.14; // approx NGN per 1 USD — used for display only
 export const formatNGN = v=>new Intl.NumberFormat("en-NG",{style:"currency",currency:"NGN",minimumFractionDigits:0}).format(v);
+export const formatUSD = v => {
+  if (v >= 100) return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(v);
+  if (v >= 1)   return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2}).format(v);
+  return         new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:4}).format(v);
+};
 export const truncateAddress = a=>a?`${a.slice(0,6)}...${a.slice(-4)}`:"";
 export const formatTime = s=>`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
+
 
 export const SecureFooter = ()=>(
   <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,marginTop:"auto",paddingTop:24}}>
@@ -71,11 +79,9 @@ export const GhostBtn = ({onClick,children,style={}})=>(
   </button>
 );
 
-export const RightPanel = ({payAmount,receiveAmount,selectedAsset,expiryTime,walletAddress,selectedNetwork,step})=>{
+export const RightPanel = ({payAmount,receiveAmount,selectedAsset,expiryTime,step})=>{
   const isUrgent = expiryTime<=60;
-  const rows=[["You pay",payAmount>0?formatNGN(payAmount):"—"],["You receive",receiveAmount>0?`${receiveAmount} ${selectedAsset.symbol}`:"—"],["Asset",`${selectedAsset.name} (${selectedAsset.symbol})`]];
-  if(step>=3&&walletAddress) rows.push(["Wallet",truncateAddress(walletAddress)]);
-  if(step>=3&&selectedNetwork) rows.push(["Network",`${selectedAsset.symbol} · ${selectedNetwork}`]);
+  const rows=[["You pay",payAmount>0?formatNGN(payAmount):"—"],["You receive",receiveAmount>0?`${receiveAmount} ${selectedAsset.symbol}`:"—"],["Asset",`${selectedAsset.name} (${selectedAsset.symbol})`],["Delivery","Internal Wallet"]];
   return(
     <div className="rightpanel" style={{padding:"44px 28px 60px",background:T.surface,display:"flex",flexDirection:"column",minHeight:"100vh"}}>
       <p style={{fontSize:11,fontWeight:600,color:T.text3,textTransform:"uppercase",letterSpacing:"0.8px",marginBottom:16,fontFamily:"'DM Sans',sans-serif"}}>Order Summary</p>
@@ -98,8 +104,7 @@ export const RightPanel = ({payAmount,receiveAmount,selectedAsset,expiryTime,wal
           <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>You will pay</p>
           <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 24, fontWeight: 700, color: payAmount > 0 ? "#fff" : "rgba(255,255,255,0.3)", letterSpacing: "-1px", lineHeight: 1, overflowWrap: "break-word" }}>{payAmount > 0 ? formatNGN(payAmount) : "₦0.00"}</p>
           <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,0.15)"}}>
-            <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:"rgba(255,255,255,0.55)"}}>Rate</span><span style={{fontFamily:"'Sora',sans-serif",fontSize:11,fontWeight:700,color:"rgba(255,255,255,0.9)"}}>₦1,648 / $1</span></div>
-            <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:"rgba(255,255,255,0.55)"}}>Markup</span><span style={{fontFamily:"'Sora',sans-serif",fontSize:11,fontWeight:700,color:"rgba(255,255,255,0.9)"}}>3%</span></div>
+            <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:"rgba(255,255,255,0.55)"}}>Delivery</span><span style={{fontFamily:"'Sora',sans-serif",fontSize:11,fontWeight:700,color:"rgba(255,255,255,0.9)"}}>Internal Wallet</span></div>
           </div>
         </div>
       </div>
@@ -123,4 +128,3 @@ export const RightPanel = ({payAmount,receiveAmount,selectedAsset,expiryTime,wal
     </div>
   );
 };
-
