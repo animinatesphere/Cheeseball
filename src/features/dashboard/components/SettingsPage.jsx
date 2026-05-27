@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Copy, CheckCircle2, ChevronRight, Shield, Bell,
   Landmark, LogOut, Camera, Check, Eye, EyeOff,
 } from "lucide-react";
+import { getCurrentUser } from "@/services/api";
+import authService from "@/services/authService";
 
 /* ─── Tokens ─────────────────────────────────────────────────── */
 const T = {
@@ -22,24 +24,6 @@ const T = {
   red:         "#EF4444",
   redLight:    "#FEF2F2",
   redText:     "#B91C1C",
-};
-
-/* ─── Mock user ──────────────────────────────────────────────── */
-const USER = {
-  name:       "Jane Doe",
-  email:      "jane.doe@gmail.com",
-  phone:      "+234 800 000 0000",
-  initials:   "JD",
-  joined:     "March 2024",
-  verified:   true,
-  referralCode:"CHEESE-JANE42",
-  referralLink:"https://cheeseball.io/ref/CHEESE-JANE42",
-  referrals:  7,
-  earned:     "₦7,000",
-  banks: [
-    { id: 1, name: "Demo Bank",   account: "Jane Doe",  number: "0123456789" },
-    { id: 2, name: "Access Bank", account: "Jane Doe",  number: "0987654321" },
-  ],
 };
 
 /* ─── Helpers ────────────────────────────────────────────────── */
@@ -97,12 +81,24 @@ function Row({ icon: Icon, label, value, action, danger, last, onClick }) {
 export default function SettingsPage({ onNavigate }) {
   const [copied,  setCopied]  = useState(false);
   const [notifs,  setNotifs]  = useState({ transactions: true, rates: false, promos: true });
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    getCurrentUser().then(setUser);
+  }, []);
 
   const copyRef = (text) => {
     navigator.clipboard.writeText(text).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  const name = user ? `${user.first_name || ""} ${user.last_name || ""}`.trim() || "User" : "Loading...";
+  const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : "CB";
+  const verified = !!user?.verified_at;
+  const joinedDate = user?.verified_at ? new Date(user.verified_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "Recently";
+  const referralCode = user?.referral_code || "N/A";
+  const referralLink = user?.referral_code ? `https://cheeseball.io/ref/${user.referral_code}` : "";
 
   return (
     <>
@@ -142,7 +138,7 @@ export default function SettingsPage({ onNavigate }) {
               {/* Avatar */}
               <div style={{ position: "relative", flexShrink: 0 }}>
                 <div style={{ width: 68, height: 68, borderRadius: "50%", background: T.blue, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: "#fff" }}>{USER.initials}</span>
+                  <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: "#fff" }}>{initials}</span>
                 </div>
                 <div style={{ position: "absolute", bottom: 0, right: 0, width: 22, height: 22, borderRadius: "50%", background: T.surface, border: `2px solid ${T.white}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
                   <Camera size={10} color={T.text2} />
@@ -152,18 +148,17 @@ export default function SettingsPage({ onNavigate }) {
               {/* Info */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 700, color: T.text, letterSpacing: "-0.4px" }}>{USER.name}</p>
-                  {USER.verified && (
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 700, color: T.text, letterSpacing: "-0.4px" }}>{name}</p>
+                  {verified && (
                     <div style={{ display: "flex", alignItems: "center", gap: 4, background: T.greenLight, borderRadius: 20, padding: "3px 9px" }}>
                       <Check size={10} color={T.green} strokeWidth={3} />
                       <span style={{ fontSize: 10, fontWeight: 700, color: T.greenText, textTransform: "uppercase", letterSpacing: "0.4px" }}>Verified</span>
                     </div>
                   )}
                 </div>
-                <p style={{ fontSize: 13, color: T.text2, marginBottom: 3 }}>{USER.email}</p>
-                <p style={{ fontSize: 11, color: T.text3, fontWeight: 500 }}>Member since {USER.joined}</p>
+                <p style={{ fontSize: 13, color: T.text2, marginBottom: 3 }}>{user?.email || "Loading..."}</p>
+                <p style={{ fontSize: 11, color: T.text3, fontWeight: 500 }}>Member since {joinedDate}</p>
               </div>
-
 
             </div>
           </div>
@@ -180,8 +175,8 @@ export default function SettingsPage({ onNavigate }) {
                   </p>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1 }}>{USER.referrals}</p>
-                  <p style={{ fontSize: 11, color: T.text3, marginTop: 2 }}>referrals · {USER.earned} earned</p>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1 }}>0</p>
+                  <p style={{ fontSize: 11, color: T.text3, marginTop: 2 }}>referrals · ₦0 earned</p>
                 </div>
               </div>
 
@@ -189,10 +184,10 @@ export default function SettingsPage({ onNavigate }) {
               <div className="ref-row" style={{ display: "flex", gap: 8 }}>
                 <div style={{ flex: 1, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "12px 16px" }}>
                   <p style={{ fontSize: 10, color: T.text3, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 3 }}>Your code</p>
-                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: T.blue, letterSpacing: "1.5px" }}>{USER.referralCode}</p>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: T.blue, letterSpacing: "1.5px" }}>{referralCode}</p>
                 </div>
                 <button
-                  onClick={() => copyRef(USER.referralLink)}
+                  onClick={() => copyRef(referralLink)}
                   style={{ display: "flex", alignItems: "center", gap: 7, padding: "12px 18px", background: copied ? T.greenLight : T.blue, border: "none", borderRadius: 12, cursor: "pointer", fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 700, color: copied ? T.greenText : "#fff", transition: "all 0.18s", whiteSpace: "nowrap" }}
                 >
                   {copied ? <><CheckCircle2 size={14} /> Copied!</> : <><Copy size={14} /> Copy Link</>}
@@ -203,9 +198,9 @@ export default function SettingsPage({ onNavigate }) {
 
           {/* ── Account ── */}
           <SectionCard title="Account">
-            <Row label="Full name"  value={USER.name}  onClick={() => {}} />
-            <Row label="Email"      value={USER.email} onClick={() => {}} />
-            <Row label="Phone"      value={USER.phone} onClick={() => {}} last />
+            <Row label="Full name"  value={name}  onClick={() => {}} />
+            <Row label="Email"      value={user?.email || "Loading..."} onClick={() => {}} />
+            <Row label="Phone"      value={user?.phone_number || "Not set"} onClick={() => {}} last />
           </SectionCard>
 
           {/* ── Security ── */}
@@ -233,7 +228,7 @@ export default function SettingsPage({ onNavigate }) {
 
           {/* ── Danger zone ── */}
           <SectionCard>
-            <Row icon={LogOut} label="Log out" danger onClick={() => {}} last />
+            <Row icon={LogOut} label="Log out" danger onClick={() => authService.logout()} last />
           </SectionCard>
 
         </div>
