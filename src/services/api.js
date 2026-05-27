@@ -12,6 +12,22 @@ async function parseResponse(response) {
   return { __raw: await response.text() };
 }
 
+/* ─── In-Memory Token Store ─── */
+
+let _accessToken = null;
+let _refreshToken = null;
+
+export function setTokens(access, refresh) {
+  _accessToken = access || null;
+  _refreshToken = refresh || null;
+}
+
+export function clearTokens() {
+  _accessToken = null;
+  _refreshToken = null;
+  localStorage.removeItem("user_email");
+}
+
 /* ─── Token Refresh Logic ─── */
 
 let isRefreshing = false;
@@ -26,18 +42,29 @@ async function refreshAccessToken() {
   isRefreshing = true;
   refreshPromise = (async () => {
     try {
+      const headers = { "Content-Type": "application/json", accept: "application/json" };
+      // Attach refresh token as Bearer if we have it in memory
+      if (_refreshToken) {
+        headers["Authorization"] = `Bearer ${_refreshToken}`;
+      }
+
       const response = await fetch(`${API_BASE}/api/auth/token/refresh`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", accept: "application/json" },
+        headers,
         credentials: "include",
-        body: JSON.stringify({}),
+        body: JSON.stringify(_refreshToken ? { refresh_token: _refreshToken } : {}),
       });
 
       if (!response.ok) {
+        clearTokens();
         throw new Error("Token refresh failed");
       }
 
-      // Backend rotates cookies (HttpOnly) on success.
+      const data = await parseResponse(response);
+      // Store new tokens from response body
+      if (data?.access) {
+        setTokens(data.access, data.refresh || _refreshToken);
+      }
       return true;
     } finally {
       isRefreshing = false;
@@ -62,19 +89,23 @@ const AUTH_CREDENTIAL_PATHS = [
 function shouldAttemptRefresh(path, data) {
   // Never auto-refresh for auth credential endpoints (login, register, etc.)
   if (AUTH_CREDENTIAL_PATHS.some((p) => path.startsWith(p))) return false;
-  // For all other endpoints, a 401 likely means the access token expired.
-  // With HttpOnly cookies the server may not include structured token error data,
-  // so we attempt refresh on any 401 from protected endpoints.
   return true;
 }
 
 async function request(path, options = {}, _isRetry = false) {
+  const authHeaders = {};
+  // Attach access token via Authorization header if available
+  if (_accessToken) {
+    authHeaders["Authorization"] = `Bearer ${_accessToken}`;
+  }
+
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
     credentials: "include",
     headers: {
       accept: "application/json",
       ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
+      ...authHeaders,
       ...options.headers,
     },
   });
@@ -84,7 +115,7 @@ async function request(path, options = {}, _isRetry = false) {
   if (response.status === 401 && !_isRetry && shouldAttemptRefresh(path, data)) {
     try {
       await refreshAccessToken();
-      return request(path, options, true); // retry with fresh cookie
+      return request(path, options, true); // retry with fresh token
     } catch {
       throw new Error("Session expired. Please log in again.");
     }

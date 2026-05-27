@@ -1,3 +1,5 @@
+import { setTokens } from "./api";
+
 const API_BASE =
   window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
     ? ""
@@ -65,12 +67,18 @@ const authService = {
       "Registration failed",
     ),
 
-  login: ({ email, password }) =>
-    request(
+  login: async ({ email, password }) => {
+    const data = await request(
       "/api/auth/token/pair",
       { email, password },
       "Login failed",
-    ),
+    );
+    // Store tokens in memory for Authorization header usage
+    if (data?.access) {
+      setTokens(data.access, data.refresh);
+    }
+    return data;
+  },
 
   resendOTP: (email) =>
     request(
@@ -79,12 +87,18 @@ const authService = {
       "Failed to resend token",
     ),
 
-  verifyOTP: (email, token) =>
-    request(
+  verifyOTP: async (email, token) => {
+    const data = await request(
       "/api/auth/verify-token",
       { email, token },
       "Verification failed",
-    ),
+    );
+    // Store tokens in memory after verification (auto-login)
+    if (data?.access) {
+      setTokens(data.access, data.refresh);
+    }
+    return data;
+  },
 
   verifyResetToken: (email, token) =>
     request(
@@ -92,7 +106,6 @@ const authService = {
       { email, token },
       "Verification failed",
     ),
-
 
   forgotPassword: (email) =>
     request(
