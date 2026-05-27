@@ -46,6 +46,7 @@ async function request(path, body, fallbackMessage) {
       "Content-Type": "application/json",
       accept: "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(body),
   });
 

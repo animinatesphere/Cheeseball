@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import SendCryptoStep from "./SendCryptoStep";
 import PaymentSubmittedStep from "./PaymentSubmittedStep";
-import { getCurrencies, getWallets, getSellQuote, createSellTransaction, getBeneficiaries, createBeneficiaryBankAccount } from "../../../../services/api";
+import { API_BASE, getCurrencies, getWallets, getSellQuote, createSellTransaction, getBeneficiaries, createBeneficiaryBankAccount } from "../../../../services/api";
 
 /* ─── Constants ───────────────────────────────────────── */
 const RATE_TTL    = 300; // 5 min in seconds
@@ -131,17 +131,19 @@ function SellStep({ onContinue }) {
         q = await getSellQuote(coin.sym, null).catch(() => null); // getSellQuote needs updating to send naira_amount if cryptoAmount is null
         
         // Let's use fetch directly since api wrapper doesn't support the overloaded signature perfectly yet
-        const res = await fetch("https://cheeseball-v2.vercel.app/api/rates/sell-quote", {
+        const res = await fetch(`${API_BASE}/api/rates/sell-quote`, {
             method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("access_token") },
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify({ asset: coin.sym, naira_amount: v })
         });
         if (!res.ok) throw new Error("Failed");
         q = await res.json();
       } else {
-        const res = await fetch("https://cheeseball-v2.vercel.app/api/rates/sell-quote", {
+        const res = await fetch(`${API_BASE}/api/rates/sell-quote`, {
             method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("access_token") },
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify({ asset: coin.sym, crypto_amount: v })
         });
         if (!res.ok) throw new Error("Failed");
@@ -466,9 +468,10 @@ function ConfirmStep({ order: o, onConfirm }) {
             payout_method: isBank ? "beneficiary_bank" : "ngn_wallet",
             beneficiary_id: isBank ? o.bank.id : null,
         };
-        const res = await fetch("https://cheeseball-v2.vercel.app/api/broker/sell", {
+        const res = await fetch(`${API_BASE}/api/broker/sell`, {
             method: "POST",
-            headers: { "Content-Type": "application/json", Authorization: "Bearer " + localStorage.getItem("access_token") },
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
             body: JSON.stringify(payload)
         });
         if (!res.ok) throw new Error("Failed to create transaction");

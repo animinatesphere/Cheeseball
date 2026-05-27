@@ -13,6 +13,7 @@ import PrivacyPolicy from "@/features/marketing/pages/PrivacyPolicyPage";
 import AMLPolicy from "@/features/marketing/pages/AMLPolicyPage";
 import { Careers, Press } from "@/features/marketing/pages/CompanyPages";
 import { paths } from "./paths";
+import ProtectedRoute from "./ProtectedRoute";
 
 const AppRoutes = () => (
   <Routes>
@@ -23,7 +24,14 @@ const AppRoutes = () => (
     <Route path={paths.verifyAccount} element={<Verify />} />
     <Route path={paths.emailVerified} element={<EmailVerified />} />
     <Route path={paths.forgotPassword} element={<ForgotPassword />} />
-    <Route path={`${paths.dashboard}/*`} element={<CurrencyPage />} />
+    <Route 
+      path={`${paths.dashboard}/*`} 
+      element={
+        <ProtectedRoute>
+          <CurrencyPage />
+        </ProtectedRoute>
+      } 
+    />
     <Route path={paths.about} element={<AboutUs />} />
     <Route path={paths.terms} element={<TermsOfService />} />
     <Route path={paths.privacy} element={<PrivacyPolicy />} />

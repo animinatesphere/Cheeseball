@@ -1,12 +1,7 @@
 export const API_BASE = "https://cheeseball-v2.vercel.app";
 
-const getAccessToken = () => localStorage.getItem("access_token");
-const getRefreshToken = () => localStorage.getItem("refresh_token");
-
-const authHeaders = () => {
-  const token = getAccessToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
+const AUTH_PAGES = ["/login", "/signup", "/auth", "/verify-account", "/forgot-password"];
+const isOnAuthPage = () => AUTH_PAGES.some((p) => window.location.pathname.startsWith(p));
 
 async function parseResponse(response) {
   const contentType = response.headers.get("content-type") || "";
@@ -20,24 +15,15 @@ let isRefreshing = false;
 let refreshPromise = null;
 
 function clearAuthAndRedirect() {
-  localStorage.removeItem("access_token");
-  localStorage.removeItem("refresh_token");
   localStorage.removeItem("user_email");
 
-  // Only redirect if not already on login/signup/auth pages
-  const authPaths = ["/login", "/signup", "/auth", "/verify-account", "/forgot-password"];
-  if (!authPaths.some((p) => window.location.pathname.startsWith(p))) {
+  // Only redirect if not already on auth pages
+  if (!isOnAuthPage()) {
     window.location.href = "/login?session_expired=true";
   }
 }
 
 async function refreshAccessToken() {
-  const refresh = getRefreshToken();
-  if (!refresh) {
-    clearAuthAndRedirect();
-    throw new Error("Session expired. Please log in again.");
-  }
-
   // Mutex: if a refresh is already in flight, wait for it
   if (isRefreshing && refreshPromise) {
     return refreshPromise;
@@ -49,7 +35,8 @@ async function refreshAccessToken() {
       const response = await fetch(`${API_BASE}/api/auth/token/refresh`, {
         method: "POST",
         headers: { "Content-Type": "application/json", accept: "application/json" },
-        body: JSON.stringify({ refresh_token: refresh }),
+        credentials: "include",
+        body: JSON.stringify({}),
       });
 
       if (!response.ok) {
@@ -57,15 +44,9 @@ async function refreshAccessToken() {
         throw new Error("Session expired. Please log in again.");
       }
 
-      const data = await response.json();
-      if (data.access) {
-        localStorage.setItem("access_token", data.access);
-      }
-      // Some backends also rotate the refresh token
-      if (data.refresh) {
-        localStorage.setItem("refresh_token", data.refresh);
-      }
-      return data.access;
+      // Backend should rotate cookies (HttpOnly) here.
+      // Keep return value for callers that care about completion.
+      return true;
     } catch (err) {
       clearAuthAndRedirect();
       throw err;
@@ -90,17 +71,18 @@ function isTokenError(data) {
 async function request(path, options = {}, _isRetry = false) {
   const response = await fetch(`${API_BASE}${path}`, {
     ...options,
+    credentials: "include",
     headers: {
       accept: "application/json",
       ...(options.body instanceof FormData ? {} : { "Content-Type": "application/json" }),
-      ...authHeaders(),
       ...options.headers,
     },
   });
   const data = await parseResponse(response);
 
-  // If 401 and this is a token error, try to refresh and retry once
-  if (response.status === 401 && isTokenError(data) && !_isRetry) {
+  // If 401, try refresh once and retry.
+  // (With HttpOnly cookies, the server may not return a "token_not_valid" payload.)
+  if (response.status === 401 && (isTokenError(data) || true) && !_isRetry) {
     try {
       await refreshAccessToken();
       return request(path, options, true); // retry with fresh token
@@ -130,6 +112,8 @@ const normalizeListResponse = (data, fallback = []) => {
   if (Array.isArray(data?.results)) return data.results;
   return fallback;
 };
+
+export const getCurrentUserStrict = () => request("/api/users/me");
 
 export const getCurrentUser = () =>
   request("/api/users/me").catch(() => ({ email: localStorage.getItem("user_email") }));
