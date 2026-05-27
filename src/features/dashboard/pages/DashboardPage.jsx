@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
-import { Bell, Menu, Search, LayoutDashboard, ShoppingCart, CircleDollarSign, ArrowRightLeft, ArrowDownLeft, Gift, History, HelpCircle, Settings, ChevronRight, X, ShieldCheck, Landmark } from "lucide-react";
+import { Bell, Menu, Search, LayoutDashboard, ShoppingCart, CircleDollarSign, ArrowRightLeft, ArrowDownLeft, Gift, History, HelpCircle, Settings, ChevronRight, X, ShieldCheck, Landmark, LogOut } from "lucide-react";
 import { createTransaction, createGiftCardTrade, getCurrentUser } from "@/services/api";
+import authService from "@/services/authService";
 
 import CurrencyRates from "../components/CurrencyRates";
 import ConvertFlow from "../flows/swap/ConvertFlow";
@@ -59,7 +60,7 @@ const NAV_ITEMS = [
 ];
 
 /* ─── Sidebar Component ─── */
-const Sidebar = ({ onNavigate, collapsed, mobileOpen, setMobileOpen, initials }) => {
+const Sidebar = ({ onNavigate, collapsed, mobileOpen, setMobileOpen, initials, userEmail, onLogout }) => {
   const location = useLocation();
   const currentPage = location.pathname.split("/").pop() || "dashboard";
 
@@ -131,21 +132,29 @@ const Sidebar = ({ onNavigate, collapsed, mobileOpen, setMobileOpen, initials })
         {!collapsed && (
           <div style={{ padding: "12px 10px", borderTop: `1px solid ${T.border}` }}>
             <div
-              onClick={() => onNavigate("account")}
-              style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 12, background: T.surface, border: `1px solid ${T.border}`, cursor: "pointer", transition: "border-color 0.15s" }}
+              style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 12, background: T.surface, border: `1px solid ${T.border}`, transition: "border-color 0.15s" }}
               onMouseEnter={e => e.currentTarget.style.borderColor = T.blue}
               onMouseLeave={e => e.currentTarget.style.borderColor = T.border}
             >
-              <div style={{ width: 32, height: 32, borderRadius: "50%", background: T.blue, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <div onClick={() => onNavigate("account")} style={{ width: 32, height: 32, borderRadius: "50%", background: T.blue, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, cursor: "pointer" }}>
                 <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 11, color: "#fff" }}>{initials}</span>
               </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 12, fontWeight: 600, color: T.text, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>My Account</p>
+              <div onClick={() => onNavigate("account")} style={{ flex: 1, minWidth: 0, cursor: "pointer" }}>
+                <p style={{ fontSize: 12, fontWeight: 600, color: T.text, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{userEmail || "Loading..."}</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
-                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: T.green }} />
-                  <p style={{ fontSize: 10, color: T.text3, fontWeight: 600, margin: 0, textTransform: "uppercase", letterSpacing: "0.5px" }}>Verified</p>
+                  <div style={{ width: 6, height: 6, borderRadius: "50%", background: T.orange }} />
+                  <p style={{ fontSize: 10, color: T.text3, fontWeight: 600, margin: 0, textTransform: "uppercase", letterSpacing: "0.5px" }}>Unverified</p>
                 </div>
               </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); onLogout(); }}
+                title="Logout"
+                style={{ width: 32, height: 32, borderRadius: 8, background: "transparent", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: T.text3, transition: "all 0.15s", flexShrink: 0 }}
+                onMouseEnter={e => { e.currentTarget.style.background = T.redLight; e.currentTarget.style.color = T.red; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = T.text3; }}
+              >
+                <LogOut size={16} />
+              </button>
             </div>
           </div>
         )}
@@ -278,6 +287,8 @@ const CurrencyPage = () => {
             mobileOpen={mobileOpen}
             setMobileOpen={setMobileOpen}
             initials={initials}
+            userEmail={user?.email}
+            onLogout={() => authService.logout()}
           />
         </div>
         <div className="lg:hidden">
@@ -287,6 +298,8 @@ const CurrencyPage = () => {
             mobileOpen={mobileOpen}
             setMobileOpen={setMobileOpen}
             initials={initials}
+            userEmail={user?.email}
+            onLogout={() => authService.logout()}
           />
         </div>
 

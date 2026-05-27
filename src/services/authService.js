@@ -1,4 +1,4 @@
-import { setTokens } from "./api";
+import { setTokens, clearTokens } from "./api";
 
 const API_BASE =
   window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
@@ -120,6 +120,15 @@ const authService = {
       { email, token, password, confirm_password },
       "Failed to reset password",
     ),
+
+  logout: async () => {
+    try {
+      await request("/api/auth/logout", {}, "Logout failed");
+    } finally {
+      clearTokens();
+      window.location.href = "/login";
+    }
+  },
 };
 
 export default authService;
