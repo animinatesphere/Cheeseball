@@ -144,10 +144,34 @@ const BankAccounts = ({ onBack }) => {
 
   /* ─── Render ───────────────────────────────────────────────── */
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "1fr 420px", minHeight: "100vh", background: T.white, overflowX: "hidden", maxWidth: "100vw" }}>
-      
-      {/* ── Left Column: List ─────────────────────────────────── */}
-      <div style={{ padding: "44px 52px 60px", borderRight: `1px solid ${T.border}` }}>
+    <>
+      <style>{`
+        .bank-layout {
+          display: grid;
+          grid-template-columns: 1fr 420px;
+          min-height: 100vh;
+          background: ${T.white};
+          overflow-x: hidden;
+          max-width: 100vw;
+        }
+        .bank-left { padding: 44px 52px 60px; border-right: 1px solid ${T.border}; }
+        .bank-right { padding: 44px 40px; background: ${T.surface}; display: flex; flex-direction: column; }
+        
+        @media (max-width: 1024px) {
+          .bank-layout {
+            grid-template-columns: 1fr;
+            display: flex;
+            flex-direction: column-reverse;
+          }
+          .bank-left { padding: 32px 20px 60px; border-right: none; border-top: 1px solid ${T.border}; }
+          .bank-right { padding: 32px 20px; }
+        }
+      `}</style>
+
+      <div className="bank-layout">
+        
+        {/* ── Left Column: List ─────────────────────────────────── */}
+        <div className="bank-left">
         <nav style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 36, flexWrap: "wrap" }}>
           <span style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer" }} onClick={onBack}>Dashboard</span>
           <span style={{ color: T.text3, fontSize: 12 }}>›</span>
@@ -306,7 +330,7 @@ const BankAccounts = ({ onBack }) => {
       </div>
 
       {/* ── Right Column: Form ────────────────────────────────── */}
-      <div style={{ padding: "44px 40px", background: T.surface, display: "flex", flexDirection: "column" }}>
+      <div className="bank-right">
         
         <div style={{ background: T.white, borderRadius: 20, padding: "28px", border: `1px solid ${T.border}`, boxShadow: "0 4px 12px rgba(10,15,30,0.03)" }}>
           <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 4 }}>Add New Account</h2>
