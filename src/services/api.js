@@ -17,15 +17,6 @@ async function parseResponse(response) {
 let isRefreshing = false;
 let refreshPromise = null;
 
-function clearAuthAndRedirect() {
-  localStorage.removeItem("user_email");
-
-  // Only redirect if not already on auth pages
-  if (!isOnAuthPage()) {
-    window.location.href = "/login?session_expired=true";
-  }
-}
-
 async function refreshAccessToken() {
   // Mutex: if a refresh is already in flight, wait for it
   if (isRefreshing && refreshPromise) {
@@ -43,16 +34,11 @@ async function refreshAccessToken() {
       });
 
       if (!response.ok) {
-        clearAuthAndRedirect();
-        throw new Error("Session expired. Please log in again.");
+        throw new Error("Token refresh failed");
       }
 
-      // Backend should rotate cookies (HttpOnly) here.
-      // Keep return value for callers that care about completion.
+      // Backend rotates cookies (HttpOnly) on success.
       return true;
-    } catch (err) {
-      clearAuthAndRedirect();
-      throw err;
     } finally {
       isRefreshing = false;
       refreshPromise = null;
