@@ -139,8 +139,8 @@ const Sidebar = ({ onNavigate, collapsed, mobileOpen, setMobileOpen, initials, u
               <div onClick={() => onNavigate("account")} style={{ width: 32, height: 32, borderRadius: "50%", background: T.blue, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, cursor: "pointer" }}>
                 <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 11, color: "#fff" }}>{initials}</span>
               </div>
-              <div onClick={() => onNavigate("account")} style={{ flex: 1, minWidth: 0, cursor: "pointer" }}>
-                <p style={{ fontSize: 12, fontWeight: 600, color: T.text, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{userEmail || "Loading..."}</p>
+              <div onClick={() => onNavigate("account")} style={{ flex: 1, minWidth: 0, overflow: "hidden", cursor: "pointer" }}>
+                <p title={userEmail || "Loading..."} style={{ fontSize: 12, fontWeight: 600, color: T.text, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{userEmail || "Loading..."}</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 5, marginTop: 2 }}>
                   <div className="blink" style={{ width: 6, height: 6, borderRadius: "50%", background: T.red }} />
                   <p style={{ fontSize: 10, color: T.text3, fontWeight: 600, margin: 0, textTransform: "uppercase", letterSpacing: "0.5px" }}>Unverified</p>
