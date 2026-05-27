@@ -466,7 +466,7 @@ const BankAccounts = ({ onBack }) => {
         </div>
 
       </div>
-    </div>
+    </>
   );
 };
 
