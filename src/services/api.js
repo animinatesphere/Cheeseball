@@ -1,4 +1,7 @@
-export const API_BASE = "https://cheeseball-v2.vercel.app";
+export const API_BASE =
+  window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+    ? ""
+    : "https://cheeseball-v2.vercel.app";
 
 const AUTH_PAGES = ["/login", "/signup", "/auth", "/verify-account", "/forgot-password"];
 const isOnAuthPage = () => AUTH_PAGES.some((p) => window.location.pathname.startsWith(p));
@@ -59,13 +62,24 @@ async function refreshAccessToken() {
   return refreshPromise;
 }
 
-function isTokenError(data) {
-  if (data?.code === "token_not_valid") return true;
-  if (typeof data?.detail === "string" && data.detail.toLowerCase().includes("token")) return true;
-  if (Array.isArray(data?.messages)) {
-    return data.messages.some((m) => m?.token_type === "access" || m?.token_class === "AccessToken");
-  }
-  return false;
+// Paths where a 401 means "bad credentials", NOT "expired token".
+const AUTH_CREDENTIAL_PATHS = [
+  "/api/auth/token/pair",
+  "/api/auth/register",
+  "/api/auth/verify-token",
+  "/api/auth/verify-reset-token",
+  "/api/auth/forgot-password",
+  "/api/auth/reset-password",
+  "/api/auth/resend-token",
+];
+
+function shouldAttemptRefresh(path, data) {
+  // Never auto-refresh for auth credential endpoints (login, register, etc.)
+  if (AUTH_CREDENTIAL_PATHS.some((p) => path.startsWith(p))) return false;
+  // For all other endpoints, a 401 likely means the access token expired.
+  // With HttpOnly cookies the server may not include structured token error data,
+  // so we attempt refresh on any 401 from protected endpoints.
+  return true;
 }
 
 async function request(path, options = {}, _isRetry = false) {
@@ -80,12 +94,11 @@ async function request(path, options = {}, _isRetry = false) {
   });
   const data = await parseResponse(response);
 
-  // If 401, try refresh once and retry.
-  // (With HttpOnly cookies, the server may not return a "token_not_valid" payload.)
-  if (response.status === 401 && (isTokenError(data) || true) && !_isRetry) {
+  // If 401 on a protected endpoint, try refreshing the access token once.
+  if (response.status === 401 && !_isRetry && shouldAttemptRefresh(path, data)) {
     try {
       await refreshAccessToken();
-      return request(path, options, true); // retry with fresh token
+      return request(path, options, true); // retry with fresh cookie
     } catch {
       throw new Error("Session expired. Please log in again.");
     }
@@ -113,14 +126,14 @@ const normalizeListResponse = (data, fallback = []) => {
   return fallback;
 };
 
-export const getCurrentUserStrict = () => request("/api/users/me");
+export const getCurrentUserStrict = () => request("/api/auth/me", { method: "GET" });
 
 export const getCurrentUser = () =>
-  request("/api/users/me").catch(() => ({ email: localStorage.getItem("user_email") }));
+  request("/api/auth/me", { method: "GET" }).catch(() => ({ email: localStorage.getItem("user_email") }));
 
 export const getProfile = async () =>
   withFallback(
-    async () => request("/api/users/me"),
+    async () => request("/api/auth/me", { method: "GET" }),
     {
       id: "unknown",
       email: localStorage.getItem("user_email") || "",
@@ -131,7 +144,7 @@ export const getProfile = async () =>
 
 export const getAccountStats = async () =>
   withFallback(
-    async () => request("/api/users/me/stats"),
+    async () => request("/api/auth/me/stats", { method: "GET" }),
     { totalTrades: 0, activeOrders: 0, totalVolume: "₦0" },
   );
 
