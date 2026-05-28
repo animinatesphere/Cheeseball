@@ -425,7 +425,7 @@ const CurrencyPage = () => {
                 <Route path="account" element={<SettingsPage onNavigate={handleNavigation} />} />
                 <Route path="support" element={<SupportPage onNavigate={handleNavigation} />} />
                 <Route path="address-book" element={<div className="dash-main" style={{ padding: "28px 32px 48px" }}><AddressBook onBack={() => navigate("/currency-change/support")} /></div>} />
-                <Route path="bank-accounts" element={<div className="dash-main" style={{ padding: "28px 32px 48px" }}><BankAccounts onBack={() => navigate("/currency-change/dashboard")} /></div>} />
+                <Route path="bank-accounts" element={<BankAccounts onNavigate={handleNavigation} />} />
                 <Route path="kyc" element={<div className="dash-main" style={{ padding: "28px 32px 48px" }}><KYCVerification /></div>} />
               </Routes>
             </main>
