@@ -74,7 +74,7 @@ const Sidebar = ({ onNavigate, collapsed, mobileOpen, setMobileOpen, initials, u
       )}
 
       <aside style={{
-        position: "fixed", top: 0, left: 0, height: "100vh", zIndex: 70,
+        position: "fixed", top: 0, left: 0, height: "100dvh", zIndex: 70,
         width: collapsed ? 64 : 240,
         background: T.white,
         borderRight: `1px solid ${T.border}`,
@@ -277,7 +277,7 @@ const CurrencyPage = () => {
         }
       `}</style>
 
-      <div style={{ display: "flex", height: "100vh", background: T.surface, fontFamily: "'DM Sans', sans-serif", overflow: "hidden" }}>
+      <div style={{ display: "flex", height: "100dvh", background: T.surface, fontFamily: "'DM Sans', sans-serif", overflow: "hidden" }}>
         
         {/* SIDEBAR */}
         <div className="hidden lg:block">
