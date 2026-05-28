@@ -28,21 +28,38 @@ const MAX_ACCOUNTS = 5;
 
 /* ─── Nigerian banks ─────────────────────────────────────────── */
 const BANKS = [
-  { id: "access",   name: "Access Bank",    color: "#E84142", abbr: "ACC" },
-  { id: "gtb",      name: "GTBank",          color: "#F7941D", abbr: "GTB" },
-  { id: "firstbank",name: "First Bank",      color: "#003C88", abbr: "FBN" },
-  { id: "zenith",   name: "Zenith Bank",     color: "#C8102E", abbr: "ZEN" },
-  { id: "uba",      name: "UBA",             color: "#E31837", abbr: "UBA" },
-  { id: "kuda",     name: "Kuda Bank",       color: "#4B0082", abbr: "KDA" },
-  { id: "opay",     name: "OPay",            color: "#00AA40", abbr: "OPY" },
-  { id: "palmpay",  name: "PalmPay",         color: "#07A858", abbr: "PAL" },
-  { id: "wema",     name: "Wema Bank",       color: "#7B2D8B", abbr: "WEM" },
-  { id: "sterling", name: "Sterling Bank",   color: "#C0392B", abbr: "STR" },
-  { id: "fcmb",     name: "FCMB",            color: "#006633", abbr: "FCM" },
-  { id: "stanbic",  name: "Stanbic IBTC",   color: "#0033A0", abbr: "STN" },
-  { id: "fidelity", name: "Fidelity Bank",  color: "#009A44", abbr: "FID" },
-  { id: "polaris",  name: "Polaris Bank",   color: "#800000", abbr: "POL" },
-  { id: "union",    name: "Union Bank",     color: "#003366", abbr: "UNB" },
+  // ── Commercial banks ──
+  { id: "access",       name: "Access Bank",                      color: "#E84142", abbr: "ACC" },
+  { id: "citibank",     name: "Citibank Nigeria",                 color: "#003B70", abbr: "CTI" },
+  { id: "ecobank",      name: "Ecobank Nigeria",                  color: "#00529B", abbr: "ECO" },
+  { id: "fidelity",     name: "Fidelity Bank",                    color: "#009A44", abbr: "FID" },
+  { id: "firstbank",    name: "First Bank of Nigeria",            color: "#003C88", abbr: "FBN" },
+  { id: "fcmb",         name: "First City Monument Bank",         color: "#006633", abbr: "FCM" },
+  { id: "globus",       name: "Globus Bank",                      color: "#D4A017", abbr: "GLB" },
+  { id: "gtb",          name: "Guaranty Trust Bank",              color: "#F7941D", abbr: "GTB" },
+  { id: "keystone",     name: "Keystone Bank",                    color: "#00A651", abbr: "KEY" },
+  { id: "nova",         name: "Nova Commercial Bank",             color: "#1C1C5E", abbr: "NOV" },
+  { id: "optimus",      name: "Optimus Bank",                     color: "#2E4057", abbr: "OPT" },
+  { id: "parallex",     name: "Parallex Bank",                    color: "#4B286D", abbr: "PAR" },
+  { id: "polaris",      name: "Polaris Bank",                     color: "#800000", abbr: "POL" },
+  { id: "premiumtrust", name: "Premium Trust Bank",               color: "#0B3D91", abbr: "PTB" },
+  { id: "providus",     name: "Providus Bank",                    color: "#F26522", abbr: "PRV" },
+  { id: "signature",    name: "Signature Bank",                   color: "#1A237E", abbr: "SIG" },
+  { id: "stanbic",      name: "Stanbic IBTC Bank",               color: "#0033A0", abbr: "STN" },
+  { id: "stanchart",    name: "Standard Chartered Bank Nigeria",  color: "#0072AA", abbr: "SCB" },
+  { id: "sterling",     name: "Sterling Bank",                    color: "#C0392B", abbr: "STR" },
+  { id: "suntrust",     name: "SunTrust Bank Nigeria",            color: "#E8B600", abbr: "SUN" },
+  { id: "titan",        name: "Titan Trust Bank",                 color: "#1B3A5C", abbr: "TTB" },
+  { id: "union",        name: "Union Bank of Nigeria",            color: "#003366", abbr: "UBN" },
+  { id: "uba",          name: "United Bank for Africa",           color: "#E31837", abbr: "UBA" },
+  { id: "unity",        name: "Unity Bank",                       color: "#00653E", abbr: "UNT" },
+  { id: "wema",         name: "Wema Bank",                        color: "#7B2D8B", abbr: "WEM" },
+  { id: "zenith",       name: "Zenith Bank",                      color: "#C8102E", abbr: "ZEN" },
+  // ── Fintechs / MFBs ──
+  { id: "opay",         name: "OPay",                             color: "#00AA40", abbr: "OPY" },
+  { id: "palmpay",      name: "PalmPay",                          color: "#07A858", abbr: "PAL" },
+  { id: "moniepoint",   name: "Moniepoint",                       color: "#0055FF", abbr: "MNP" },
+  { id: "fairmoney",    name: "FairMoney",                        color: "#6C3FBF", abbr: "FMN" },
 ];
 
 /* ─── Icons ──────────────────────────────────────────────────── */
@@ -179,6 +196,12 @@ function AddAccountDrawer({ onClose, onSave }) {
   const [verifyErr,   setVerifyErr]   = useState("");
   const [saving,      setSaving]      = useState(false);
   const [bankOpen,    setBankOpen]    = useState(false);
+  const [bankSearch,  setBankSearch]  = useState("");
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+
+  const filteredBanks = BANKS.filter(b =>
+    b.name.toLowerCase().includes(bankSearch.toLowerCase())
+  );
 
   const selectedBank = BANKS.find(b => b.id === bankId);
   const canVerify    = bankId && accNumber.length === 10 && !verified;
@@ -216,12 +239,26 @@ function AddAccountDrawer({ onClose, onSave }) {
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "flex-start", justifyContent: "flex-end" }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: isMobile ? "flex-end" : "flex-start", justifyContent: isMobile ? "center" : "flex-end" }}>
       <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(10,15,30,0.35)", backdropFilter: "blur(4px)" }} />
-      <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 420, height: "100vh", background: T.white, borderLeft: `1px solid ${T.border}`, display: "flex", flexDirection: "column", animation: "slideIn 0.25s ease" }}>
+      <div style={{
+        position: "relative", zIndex: 1, width: "100%",
+        ...(isMobile
+          ? { maxHeight: "92vh", borderRadius: "22px 22px 0 0", animation: "slideUp 0.3s ease" }
+          : { maxWidth: 420, height: "100vh", borderLeft: `1px solid ${T.border}`, animation: "slideIn 0.25s ease" }
+        ),
+        background: T.white, display: "flex", flexDirection: "column",
+      }}>
+
+        {/* Mobile drag handle */}
+        {isMobile && (
+          <div style={{ display: "flex", justifyContent: "center", padding: "10px 0 0" }}>
+            <div style={{ width: 40, height: 4, borderRadius: 2, background: T.border }} />
+          </div>
+        )}
 
         {/* Header */}
-        <div style={{ padding: "24px 28px", borderBottom: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ padding: isMobile ? "16px 20px" : "24px 28px", borderBottom: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
             <p style={{ fontSize: 11, color: T.text3, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 4 }}>Bank accounts</p>
             <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 16, fontWeight: 700, color: T.text }}>Add new account</p>
@@ -231,7 +268,7 @@ function AddAccountDrawer({ onClose, onSave }) {
           </button>
         </div>
 
-        <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px", display: "flex", flexDirection: "column", gap: 20 }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: isMobile ? "20px 20px" : "24px 28px", display: "flex", flexDirection: "column", gap: 20 }}>
 
           {/* Bank selector */}
           <div>
@@ -260,24 +297,43 @@ function AddAccountDrawer({ onClose, onSave }) {
               </div>
 
               {bankOpen && (
-                <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 14, zIndex: 10, maxHeight: 260, overflowY: "auto", boxShadow: "0 8px 24px rgba(10,15,30,0.1)" }}>
-                  {BANKS.map((b) => (
-                    <div
-                      key={b.id}
-                      onClick={() => { setBankId(b.id); setBankOpen(false); setVerified(false); setAccName(""); }}
-                      style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", cursor: "pointer", background: bankId === b.id ? T.blueLight : T.white, transition: "background 0.12s" }}
-                      onMouseEnter={e => { if (bankId !== b.id) e.currentTarget.style.background = T.surface; }}
-                      onMouseLeave={e => { if (bankId !== b.id) e.currentTarget.style.background = T.white; }}
-                    >
-                      <BankAvatar bankId={b.id} size={30} />
-                      <span style={{ fontSize: 13, fontWeight: 600, color: bankId === b.id ? T.blue : T.text }}>{b.name}</span>
-                      {bankId === b.id && (
-                        <div style={{ marginLeft: "auto", width: 20, height: 20, borderRadius: "50%", background: T.blue, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <Ico.check />
-                        </div>
-                      )}
+                <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 14, zIndex: 10, maxHeight: 300, overflowY: "auto", boxShadow: "0 8px 24px rgba(10,15,30,0.1)" }}>
+                  {/* Search input */}
+                  <div style={{ position: "sticky", top: 0, background: T.white, padding: "10px 12px", borderBottom: `1px solid ${T.border}`, zIndex: 1 }}>
+                    <input
+                      type="text"
+                      placeholder="Search bank…"
+                      value={bankSearch}
+                      onChange={e => setBankSearch(e.target.value)}
+                      autoFocus
+                      style={{ width: "100%", border: `1.5px solid ${T.border}`, borderRadius: 10, padding: "9px 12px", fontSize: 13, color: T.text, outline: "none", fontFamily: "'DM Sans', sans-serif" }}
+                      onFocus={e => e.target.style.borderColor = T.blue}
+                      onBlur={e => e.target.style.borderColor = T.border}
+                    />
+                  </div>
+                  {filteredBanks.length === 0 ? (
+                    <div style={{ padding: "20px 14px", textAlign: "center" }}>
+                      <p style={{ fontSize: 13, color: T.text3 }}>No banks found</p>
                     </div>
-                  ))}
+                  ) : (
+                    filteredBanks.map((b) => (
+                      <div
+                        key={b.id}
+                        onClick={() => { setBankId(b.id); setBankOpen(false); setVerified(false); setAccName(""); setBankSearch(""); }}
+                        style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", cursor: "pointer", background: bankId === b.id ? T.blueLight : T.white, transition: "background 0.12s" }}
+                        onMouseEnter={e => { if (bankId !== b.id) e.currentTarget.style.background = T.surface; }}
+                        onMouseLeave={e => { if (bankId !== b.id) e.currentTarget.style.background = T.white; }}
+                      >
+                        <BankAvatar bankId={b.id} size={30} />
+                        <span style={{ fontSize: 13, fontWeight: 600, color: bankId === b.id ? T.blue : T.text }}>{b.name}</span>
+                        {bankId === b.id && (
+                          <div style={{ marginLeft: "auto", width: 20, height: 20, borderRadius: "50%", background: T.blue, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            <Ico.check />
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
                 </div>
               )}
             </div>
@@ -343,7 +399,7 @@ function AddAccountDrawer({ onClose, onSave }) {
         </div>
 
         {/* Footer */}
-        <div style={{ padding: "18px 28px", borderTop: `1px solid ${T.border}` }}>
+        <div style={{ padding: isMobile ? "16px 20px" : "18px 28px", borderTop: `1px solid ${T.border}` }}>
           <button
             onClick={handleSave}
             disabled={!canSave || saving}
@@ -418,6 +474,7 @@ export default function BankAccountPage({ onNavigate }) {
         ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:${T.border};border-radius:4px;}
         @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+        @keyframes slideUp{from{transform:translateY(100%);opacity:0}to{transform:translateY(0);opacity:1}}
         @keyframes popIn{0%{transform:scale(0.95);opacity:0}100%{transform:scale(1);opacity:1}}
         @keyframes spin{to{transform:rotate(360deg)}}
         .fadein{animation:fadeUp 0.3s ease forwards}

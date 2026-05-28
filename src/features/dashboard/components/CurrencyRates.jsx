@@ -34,8 +34,12 @@ const T = {
 /* ─── Helpers ────────────────────────────────────────────────── */
 const fmt = (n) =>
   new Intl.NumberFormat("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+const fmtUSD = (n) =>
+  new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
 const fmtCompact = (n) =>
   new Intl.NumberFormat("en-NG", { notation: "compact", maximumFractionDigits: 1 }).format(n);
+const fmtCompactUSD = (n) =>
+  new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(n);
 
 const STATUS = {
   completed: { color: T.greenText,  bg: T.greenLight,  border: "#A7F3D0", label: "Completed" },
@@ -81,13 +85,21 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
         const computedAssets = TARGET_ASSETS.map((symbol, i) => {
           const w = wallets.find(w => w.asset === symbol) || { asset: symbol, balance: 0, available_balance: 0 };
           const cur = currencies.find(c => (c.symbol || c.code) === symbol) || { name: symbol };
-          const price = cur.buy_rate || (symbol === "NGN" ? 1 : 0);
+          const priceNGN = cur.buy_rate || (symbol === "NGN" ? 1 : 0);
+          const bal = w.available_balance || w.balance || 0;
+          const isNGN = symbol === "NGN";
+          // For crypto assets, derive a USD price from the NGN rate (approx ₦1,650/USD)
+          const usdRate = cur.usd_rate || (isNGN ? 0 : (priceNGN / 1650));
           return {
             symbol: symbol,
             name: cur.name || symbol,
-            balance: w.available_balance || w.balance || 0,
-            balanceLabel: `${w.available_balance || w.balance || 0} ${symbol}`,
-            valueNGN: (w.available_balance || w.balance || 0) * price,
+            balance: bal,
+            balanceLabel: `${bal} ${symbol}`,
+            valueNGN: bal * priceNGN,
+            valueUSD: isNGN ? 0 : bal * usdRate,
+            priceNGN: priceNGN,
+            priceUSD: usdRate,
+            isNGN,
             change: 0,
             color: COLORS[i % COLORS.length],
             bg: BGS[i % BGS.length],
@@ -139,7 +151,8 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const totalBalance = assets.reduce((s, a) => s + a.valueNGN, 0);
+  const ngnAsset = assets.find(a => a.symbol === "NGN");
+  const ngnBalance = ngnAsset ? ngnAsset.valueNGN : 0;
   const filteredMarket = market.filter(
     (m) => m.symbol.toLowerCase().includes(searchQuery.toLowerCase()) || m.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -194,10 +207,10 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
             <div style={{ position: "relative", zIndex: 1 }}>
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28 }}>
                 <div>
-                  <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 10 }}>Total Balance</p>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.55)", textTransform: "uppercase", letterSpacing: "1px", marginBottom: 10 }}>NGN Balance</p>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr auto", gap: 8, alignItems: "center" }}>
                     <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 42, fontWeight: 700, color: "#fff", letterSpacing: "-1.5px", lineHeight: 1 }}>
-                      {balanceVisible ? `₦${fmt(totalBalance)}` : "₦ ••••••"}
+                      {balanceVisible ? `₦${fmt(ngnBalance)}` : "₦ ••••••"}
                     </span>
                     <button
                       onClick={() => setBalanceVisible(v => !v)}
@@ -321,7 +334,9 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
                 </div>
                 
                 <div className="asset-hide-mobile" style={{ textAlign: "right" }}>
-                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 600, color: T.text }}>₦{fmt(asset.valueNGN / (asset.balance || 1))}</p>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 600, color: T.text }}>
+                    {asset.isNGN ? `₦${fmt(asset.priceNGN)}` : `$${fmtUSD(asset.priceUSD)}`}
+                  </p>
                   <p style={{ fontSize: 11, color: asset.change >= 0 ? T.greenText : T.redText, fontWeight: 600, marginTop: 2 }}>{asset.change > 0 ? "+" : ""}{asset.change}%</p>
                 </div>
 
@@ -330,7 +345,9 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
                 </div>
 
                 <div style={{ textAlign: "right" }}>
-                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: T.text }}>₦{fmtCompact(asset.valueNGN)}</p>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: T.text }}>
+                    {asset.isNGN ? `₦${fmtCompact(asset.valueNGN)}` : `$${fmtCompactUSD(asset.valueUSD)}`}
+                  </p>
                 </div>
               </div>
             ))}
