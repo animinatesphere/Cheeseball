@@ -169,8 +169,9 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
           .quick-actions-grid { grid-template-columns: repeat(2, 1fr) !important; }
           .balance-card { padding: 24px 20px !important; }
           .balance-card h1, .balance-card span { font-size: 28px !important; }
-          .balance-actions { overflow-x: auto !important; padding-bottom: 8px !important; flex-wrap: nowrap !important; }
-          .balance-actions > button { flex-shrink: 0 !important; min-width: 100px !important; }
+          .balance-actions { overflow-x: visible !important; flex-wrap: nowrap !important; gap: 8px !important; padding-bottom: 0 !important; width: 100%; display: flex; justify-content: space-between; }
+          .balance-btn { flex: 1 !important; min-width: 0 !important; padding: 12px 2px !important; flex-direction: column !important; justify-content: center !important; gap: 6px !important; font-size: 11px !important; border-radius: 14px !important; }
+          .balance-btn > svg { width: 18px !important; height: 18px !important; }
           .portfolio-table { border-radius: 18px !important; }
           .portfolio-grid { display: block !important; }
           .asset-row { padding: 16px 20px !important; }
@@ -222,6 +223,7 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
                 ].map(({ label, icon: Icon, page, primary }) => (
                   <button
                     key={label}
+                    className="balance-btn"
                     onClick={() => onNavigate(page)}
                     style={{
                       display: "flex", alignItems: "center", gap: 8,
