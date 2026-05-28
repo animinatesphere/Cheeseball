@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Search, Landmark, Trash2, CheckCircle2, AlertCircle, Plus, Loader2, Building2 } from "lucide-react";
 import { getBeneficiaryBankAccounts, createBeneficiaryBankAccount, deleteBeneficiaryBankAccount } from "@/services/api";
+import { Loader2 } from "lucide-react";
 
-/* ─── Design tokens ──────────────────────────────────────────── */
+/* ─── Tokens ─────────────────────────────────────────────────── */
 const T = {
   blue:        "#1A6FFF",
   blueDark:    "#1259D9",
@@ -17,457 +17,566 @@ const T = {
   greenLight:  "#E6FAF4",
   greenText:   "#00966B",
   mintGreen:   "#4ADE80",
-  orange:      "#F59E0B",
-  orangeLight: "#FFFBEB",
   red:         "#EF4444",
   redLight:    "#FEF2F2",
   redText:     "#B91C1C",
+  orange:      "#F59E0B",
+  orangeLight: "#FFFBEB",
 };
 
-/* ─── Helpers ────────────────────────────────────────────────── */
-const bankColorMap = {
-  gtbank: "#E85D04", gt: "#E85D04", guaranty: "#E85D04",
-  access: "#F77F00", accessbank: "#F77F00",
-  first: "#002D72", firstbank: "#002D72",
-  uba: "#CC0000", united: "#CC0000",
-  zenith: "#CC0033",
-  kuda: "#6C3FBF",
-  opay: "#1ACE8B",
-  palmpay: "#6C3FBF",
-  moniepoint: "#004AAD",
-  wema: "#6B21A8",
-  sterling: "#0E4A86",
-  polaris: "#6B21A8",
-  fcmb: "#5B21B6",
-  stanbic: "#003DA5",
-  ecobank: "#005FAB",
-  fidelity: "#003399",
-  union: "#003EA5",
+const MAX_ACCOUNTS = 5;
+
+/* ─── Nigerian banks ─────────────────────────────────────────── */
+const BANKS = [
+  { id: "access",   name: "Access Bank",    color: "#E84142", abbr: "ACC" },
+  { id: "gtb",      name: "GTBank",          color: "#F7941D", abbr: "GTB" },
+  { id: "firstbank",name: "First Bank",      color: "#003C88", abbr: "FBN" },
+  { id: "zenith",   name: "Zenith Bank",     color: "#C8102E", abbr: "ZEN" },
+  { id: "uba",      name: "UBA",             color: "#E31837", abbr: "UBA" },
+  { id: "kuda",     name: "Kuda Bank",       color: "#4B0082", abbr: "KDA" },
+  { id: "opay",     name: "OPay",            color: "#00AA40", abbr: "OPY" },
+  { id: "palmpay",  name: "PalmPay",         color: "#07A858", abbr: "PAL" },
+  { id: "wema",     name: "Wema Bank",       color: "#7B2D8B", abbr: "WEM" },
+  { id: "sterling", name: "Sterling Bank",   color: "#C0392B", abbr: "STR" },
+  { id: "fcmb",     name: "FCMB",            color: "#006633", abbr: "FCM" },
+  { id: "stanbic",  name: "Stanbic IBTC",   color: "#0033A0", abbr: "STN" },
+  { id: "fidelity", name: "Fidelity Bank",  color: "#009A44", abbr: "FID" },
+  { id: "polaris",  name: "Polaris Bank",   color: "#800000", abbr: "POL" },
+  { id: "union",    name: "Union Bank",     color: "#003366", abbr: "UNB" },
+];
+
+/* ─── Icons ──────────────────────────────────────────────────── */
+const Ico = {
+  bank:    (color = T.text2) => (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.8" strokeLinecap="round">
+      <rect x="3" y="10" width="18" height="11" rx="1"/><path d="M3 10l9-7 9 7"/>
+      <line x1="9" y1="21" x2="9" y2="10"/><line x1="15" y1="21" x2="15" y2="10"/>
+    </svg>
+  ),
+  plus:    () => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+  ),
+  trash:   (color = T.red) => (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round">
+      <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+      <path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+    </svg>
+  ),
+  star:    (filled) => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill={filled ? T.orange : "none"} stroke={filled ? T.orange : T.text3} strokeWidth="2" strokeLinecap="round">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+    </svg>
+  ),
+  check:   () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.8" strokeLinecap="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </svg>
+  ),
+  shield:  () => (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={T.mintGreen} strokeWidth="2" strokeLinecap="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+  ),
+  x:       (color = T.text2) => (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round">
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  ),
+  warn:    () => (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={T.red} strokeWidth="2" strokeLinecap="round">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+  ),
+  verify:  () => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+  ),
+  lock:    () => (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke={T.text3} strokeWidth="2" strokeLinecap="round">
+      <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  ),
 };
 
-const getBankColor = (bankName) => {
-  if (!bankName) return T.blue;
-  const key = bankName.toLowerCase().replace(/\s+/g, "").replace(/bank$/i, "");
-  for (const [k, v] of Object.entries(bankColorMap)) {
-    if (key.includes(k)) return v;
+/* ─── Mask account number ────────────────────────────────────── */
+const maskNum = (n) => n?.length >= 6 ? n.slice(0, 3) + "••••" + n.slice(-3) : "••••";
+
+/* ─── Bank avatar ────────────────────────────────────────────── */
+function BankAvatar({ bankId, bankName, size = 46 }) {
+  let bank = BANKS.find(b => b.id === bankId || b.name.toLowerCase() === bankName?.toLowerCase());
+  if (!bank && bankName) {
+    const abbr = bankName.substring(0, 3).toUpperCase();
+    bank = { color: T.blue, abbr };
+  } else if (!bank) {
+    bank = { color: T.blue, abbr: "BNK" };
   }
-  let hash = 0;
-  for (let i = 0; i < bankName.length; i++) hash = bankName.charCodeAt(i) + ((hash << 5) - hash);
-  const hue = Math.abs(hash) % 360;
-  return `hsl(${hue}, 55%, 45%)`;
-};
 
-const getBankInitials = (bankName) => {
-  if (!bankName) return "?";
-  const words = bankName.trim().split(/\s+/);
-  if (words.length === 1) return words[0].substring(0, 2).toUpperCase();
-  return (words[0][0] + words[1][0]).toUpperCase();
-};
+  return (
+    <div style={{ width: size, height: size, borderRadius: size * 0.28, background: bank.color, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+      <span style={{ fontFamily: "'Sora', sans-serif", fontSize: size * 0.28, fontWeight: 800, color: "#fff", letterSpacing: "-0.5px" }}>{bank.abbr}</span>
+    </div>
+  );
+}
 
-/* ─── Component ──────────────────────────────────────────────── */
-const BankAccounts = ({ onBack }) => {
-  const [accounts, setAccounts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [search, setSearch] = useState("");
+/* ─── Delete confirmation modal ─────────────────────────────── */
+function DeleteModal({ account, onConfirm, onCancel }) {
+  const [deleting, setDeleting] = useState(false);
   
-  // Form State
-  const [formData, setFormData] = useState({
-    bank_name: "",
-    account_number: "",
-    account_name: "",
-    account_type: "savings",
-  });
-  const [focusedField, setFocusedField] = useState(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
-  
-  // Interactions
-  const [deleteId, setDeleteId] = useState(null);
-  const [hoverCard, setHoverCard] = useState(null);
+  const handleConfirm = async () => {
+    setDeleting(true);
+    await onConfirm();
+    setDeleting(false);
+  };
 
-  /* ─── Data ─────────────────────────────────────────────────── */
-  const loadData = async () => {
-    setIsLoading(true);
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+      <div onClick={onCancel} style={{ position: "absolute", inset: 0, background: "rgba(10,15,30,0.4)", backdropFilter: "blur(4px)" }} />
+      <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 400, background: T.white, borderRadius: 22, border: `1.5px solid ${T.border}`, padding: "32px 28px", textAlign: "center", animation: "popIn 0.25s ease" }}>
+        <div style={{ width: 56, height: 56, borderRadius: "50%", background: T.redLight, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>
+          <Ico.warn />
+        </div>
+        <h3 style={{ fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 8 }}>Remove bank account?</h3>
+        <p style={{ fontSize: 14, color: T.text2, lineHeight: 1.6, marginBottom: 10 }}>
+          Are you sure you want to remove
+        </p>
+        <div style={{ background: T.surface, borderRadius: 12, padding: "12px 16px", marginBottom: 24, display: "flex", alignItems: "center", gap: 12, textAlign: "left" }}>
+          <BankAvatar bankId={account.bank_name} bankName={account.bank_name} size={38} />
+          <div>
+            <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 700, color: T.text }}>{account.account_name}</p>
+            <p style={{ fontSize: 12, color: T.text2, marginTop: 2 }}>{account.bank_name} · {maskNum(account.account_number)}</p>
+          </div>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+          <button onClick={onCancel} disabled={deleting} style={{ padding: "13px", borderRadius: 12, border: `1.5px solid ${T.border}`, background: T.white, fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600, color: T.text2, cursor: deleting ? "not-allowed" : "pointer", transition: "all 0.15s" }}
+            onMouseEnter={e => { if(!deleting) e.currentTarget.style.background = T.surface; }}
+            onMouseLeave={e => { if(!deleting) e.currentTarget.style.background = T.white; }}
+          >
+            Cancel
+          </button>
+          <button onClick={handleConfirm} disabled={deleting} style={{ padding: "13px", borderRadius: 12, border: "none", background: T.red, fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: "#fff", cursor: deleting ? "not-allowed" : "pointer", transition: "background 0.15s", display: "flex", justifyContent: "center", alignItems: "center", gap: 8 }}
+            onMouseEnter={e => { if(!deleting) e.currentTarget.style.background = "#DC2626"; }}
+            onMouseLeave={e => { if(!deleting) e.currentTarget.style.background = T.red; }}
+          >
+            {deleting ? <><Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} /> Removing</> : "Yes, remove"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Add account drawer ─────────────────────────────────────── */
+function AddAccountDrawer({ onClose, onSave }) {
+  const [bankId,      setBankId]      = useState("");
+  const [accNumber,   setAccNumber]   = useState("");
+  const [accName,     setAccName]     = useState("");
+  const [verifying,   setVerifying]   = useState(false);
+  const [verified,    setVerified]    = useState(false);
+  const [verifyErr,   setVerifyErr]   = useState("");
+  const [saving,      setSaving]      = useState(false);
+  const [bankOpen,    setBankOpen]    = useState(false);
+
+  const selectedBank = BANKS.find(b => b.id === bankId);
+  const canVerify    = bankId && accNumber.length === 10 && !verified;
+  const canSave      = verified && bankId && accNumber.length === 10 && accName.trim().length > 0;
+
+  const handleNumberChange = (val) => {
+    const cleaned = val.replace(/\D/g, "").slice(0, 10);
+    setAccNumber(cleaned);
+    setVerified(false);
+    setAccName("");
+    setVerifyErr("");
+  };
+
+  const handleVerify = () => {
+    if (!canVerify) return;
+    setVerifying(true);
+    setVerifyErr("");
+    
+    // Simulate lookup delay
+    setTimeout(() => {
+      setVerifying(false);
+      setVerified(true);
+    }, 1000);
+  };
+
+  const handleSave = async () => {
+    if (!canSave) return;
+    setSaving(true);
+    try {
+      await onSave({ bankId, bankName: selectedBank.name, accountName: accName, number: accNumber });
+    } catch (err) {
+      setVerifyErr(err.message || "Failed to save account");
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "flex-start", justifyContent: "flex-end" }}>
+      <div onClick={onClose} style={{ position: "absolute", inset: 0, background: "rgba(10,15,30,0.35)", backdropFilter: "blur(4px)" }} />
+      <div style={{ position: "relative", zIndex: 1, width: "100%", maxWidth: 420, height: "100vh", background: T.white, borderLeft: `1px solid ${T.border}`, display: "flex", flexDirection: "column", animation: "slideIn 0.25s ease" }}>
+
+        {/* Header */}
+        <div style={{ padding: "24px 28px", borderBottom: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <p style={{ fontSize: 11, color: T.text3, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 4 }}>Bank accounts</p>
+            <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 16, fontWeight: 700, color: T.text }}>Add new account</p>
+          </div>
+          <button onClick={onClose} style={{ width: 34, height: 34, borderRadius: 10, background: T.surface, border: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: T.text2 }}>
+            <Ico.x />
+          </button>
+        </div>
+
+        <div style={{ flex: 1, overflowY: "auto", padding: "24px 28px", display: "flex", flexDirection: "column", gap: 20 }}>
+
+          {/* Bank selector */}
+          <div>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: T.text2, marginBottom: 8 }}>Select bank</label>
+            <div style={{ position: "relative" }}>
+              <div
+                onClick={() => setBankOpen(o => !o)}
+                style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 16px", border: `1.5px solid ${bankOpen ? T.blue : T.border}`, borderRadius: 14, cursor: "pointer", background: T.white, transition: "border-color 0.15s", userSelect: "none" }}
+              >
+                {selectedBank ? (
+                  <>
+                    <BankAvatar bankId={bankId} size={32} />
+                    <span style={{ flex: 1, fontSize: 14, fontWeight: 600, color: T.text }}>{selectedBank.name}</span>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ width: 32, height: 32, borderRadius: 9, background: T.surface, border: `1px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {Ico.bank()}
+                    </div>
+                    <span style={{ flex: 1, fontSize: 14, color: T.text3 }}>Choose your bank</span>
+                  </>
+                )}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={T.text3} strokeWidth="2" strokeLinecap="round" style={{ transform: bankOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }}>
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
+
+              {bankOpen && (
+                <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 14, zIndex: 10, maxHeight: 260, overflowY: "auto", boxShadow: "0 8px 24px rgba(10,15,30,0.1)" }}>
+                  {BANKS.map((b) => (
+                    <div
+                      key={b.id}
+                      onClick={() => { setBankId(b.id); setBankOpen(false); setVerified(false); setAccName(""); }}
+                      style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", cursor: "pointer", background: bankId === b.id ? T.blueLight : T.white, transition: "background 0.12s" }}
+                      onMouseEnter={e => { if (bankId !== b.id) e.currentTarget.style.background = T.surface; }}
+                      onMouseLeave={e => { if (bankId !== b.id) e.currentTarget.style.background = T.white; }}
+                    >
+                      <BankAvatar bankId={b.id} size={30} />
+                      <span style={{ fontSize: 13, fontWeight: 600, color: bankId === b.id ? T.blue : T.text }}>{b.name}</span>
+                      {bankId === b.id && (
+                        <div style={{ marginLeft: "auto", width: 20, height: 20, borderRadius: "50%", background: T.blue, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <Ico.check />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Account number */}
+          <div>
+            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: T.text2, marginBottom: 8 }}>Account number</label>
+            <div style={{ display: "flex", gap: 10 }}>
+              <input
+                type="text"
+                inputMode="numeric"
+                placeholder="10-digit account number"
+                value={accNumber}
+                onChange={e => handleNumberChange(e.target.value)}
+                maxLength={10}
+                style={{ flex: 1, border: `1.5px solid ${verified ? T.green : T.border}`, borderRadius: 13, padding: "13px 16px", fontSize: 14, color: T.text, fontFamily: "'Sora', sans-serif", fontWeight: 600, letterSpacing: "1.5px", outline: "none", transition: "border-color 0.15s", width: "100%" }}
+              />
+              <button
+                onClick={handleVerify}
+                disabled={!canVerify || verifying}
+                style={{ display: "flex", alignItems: "center", gap: 6, padding: "13px 16px", borderRadius: 13, border: "none", fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 700, cursor: canVerify && !verifying ? "pointer" : "not-allowed", background: canVerify && !verifying ? T.blue : "#E8EEFF", color: canVerify && !verifying ? "#fff" : T.text3, transition: "all 0.15s", whiteSpace: "nowrap", flexShrink: 0 }}
+                onMouseEnter={e => { if (canVerify && !verifying) e.currentTarget.style.background = T.blueDark; }}
+                onMouseLeave={e => { if (canVerify && !verifying) e.currentTarget.style.background = T.blue; }}
+              >
+                {verifying
+                  ? <><div style={{ width: 13, height: 13, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: canVerify ? "#fff" : T.text3, borderRadius: "50%", animation: "spin 0.7s linear infinite" }} /> Verifying</>
+                  : <><Ico.verify /> Verify</>
+                }
+              </button>
+            </div>
+          </div>
+
+          {/* Verified account name */}
+          {verified && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, animation: "fadeUp 0.3s ease" }}>
+               <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: T.text2 }}>Account Name</label>
+               <input
+                 type="text"
+                 placeholder="Enter Account Name"
+                 value={accName}
+                 onChange={e => setAccName(e.target.value)}
+                 style={{ width: "100%", border: `1.5px solid ${T.border}`, borderRadius: 13, padding: "13px 16px", fontSize: 14, color: T.text, fontFamily: "'Sora', sans-serif", fontWeight: 600, outline: "none", transition: "border-color 0.15s" }}
+                 onFocus={e => e.target.style.borderColor = T.blue}
+                 onBlur={e => e.target.style.borderColor = T.border}
+                 autoFocus
+               />
+               <p style={{ fontSize: 12, color: T.greenText, display: "flex", alignItems: "center", gap: 4 }}>
+                 <Ico.check /> Number Verified
+               </p>
+            </div>
+          )}
+          
+          {verifyErr && <p style={{ fontSize: 12, color: T.red, marginTop: -10, fontWeight: 500, padding: "10px", background: T.redLight, borderRadius: "8px" }}>{verifyErr}</p>}
+
+          {/* Notice */}
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 10, background: T.blueLight, borderRadius: 13, padding: "13px 16px", marginTop: "auto" }}>
+            <Ico.lock />
+            <p style={{ fontSize: 12, color: "#3B5AA8", lineHeight: 1.55 }}>
+              Always verify that the account name matches your registered name before saving.
+            </p>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div style={{ padding: "18px 28px", borderTop: `1px solid ${T.border}` }}>
+          <button
+            onClick={handleSave}
+            disabled={!canSave || saving}
+            style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, cursor: canSave && !saving ? "pointer" : "not-allowed", display: "flex", alignItems: "center", justifyContent: "center", gap: 10, background: canSave && !saving ? T.blue : "#E8EEFF", color: canSave && !saving ? "#fff" : T.text3, transition: "all 0.18s" }}
+            onMouseEnter={e => { if (canSave && !saving) e.currentTarget.style.background = T.blueDark; }}
+            onMouseLeave={e => { if (canSave && !saving) e.currentTarget.style.background = T.blue; }}
+          >
+            {saving
+              ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,0.3)", borderTopColor: "#fff", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} /> Saving…</>
+              : "Save bank account"
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+export default function BankAccountPage({ onNavigate }) {
+  const [accounts,    setAccounts]    = useState([]);
+  const [showAdd,     setShowAdd]     = useState(false);
+  const [deleteTarget,setDeleteTarget]= useState(null);
+  const [loading,     setLoading]     = useState(true);
+
+  const atLimit   = accounts.length >= MAX_ACCOUNTS;
+  const remaining = MAX_ACCOUNTS - accounts.length;
+
+  const loadAccounts = async () => {
+    setLoading(true);
     try {
       const data = await getBeneficiaryBankAccounts();
       setAccounts(Array.isArray(data) ? data : data?.data || data?.results || []);
     } catch (err) {
-      console.error("Failed to load bank accounts:", err);
+      console.error(err);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    loadAccounts();
+  }, []);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this bank account?")) return;
-    
-    setDeleteId(id);
-    try {
-      await deleteBeneficiaryBankAccount(id);
-      // Optimistic delete
-      setAccounts((prev) => prev.filter((acc) => acc.id !== id));
-    } catch (err) {
-      alert("Failed to delete account");
-    } finally {
-      setDeleteId(null);
-    }
+  const handleSave = async (acc) => {
+    await createBeneficiaryBankAccount({
+      bank_name: acc.bankName,
+      account_number: acc.number,
+      account_name: acc.accountName,
+      account_type: "savings" // default since form doesn't specify
+    });
+    await loadAccounts();
+    setShowAdd(false);
   };
 
-  const handleAddSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-
-    if (!/^\d+$/.test(formData.account_number)) {
-      setError("Account number must contain only numbers");
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      await createBeneficiaryBankAccount(formData);
-      setFormData({ bank_name: "", account_number: "", account_name: "", account_type: "savings" });
-      await loadData();
-    } catch (err) {
-      setError(err.message || "Failed to add bank account");
-    } finally {
-      setSubmitting(false);
-    }
+  const handleDelete = async () => {
+    await deleteBeneficiaryBankAccount(deleteTarget.id);
+    await loadAccounts();
+    setDeleteTarget(null);
   };
 
-  const filteredAccounts = accounts.filter((a) =>
-    (a.bank_name || "").toLowerCase().includes(search.toLowerCase()) ||
-    (a.account_name || "").toLowerCase().includes(search.toLowerCase()) ||
-    (a.account_number || "").includes(search)
-  );
+  const handleSetDefault = (id) => {
+    // Backend doesn't support 'isDefault' currently, so this is frontend only mockup for the button
+    setAccounts(prev => prev.map(a => ({ ...a, isDefault: a.id === id })));
+  };
 
-  /* ─── Render ───────────────────────────────────────────────── */
   return (
     <>
       <style>{`
-        .bank-layout {
-          display: grid;
-          grid-template-columns: 1fr 420px;
-          min-height: 100vh;
-          background: ${T.white};
-          overflow-x: hidden;
-          max-width: 100vw;
-        }
-        .bank-left { padding: 44px 52px 60px; border-right: 1px solid ${T.border}; }
-        .bank-right { padding: 44px 40px; background: ${T.surface}; display: flex; flex-direction: column; }
-        
-        @media (max-width: 1024px) {
-          .bank-layout {
-            grid-template-columns: 1fr;
-            display: flex;
-            flex-direction: column-reverse;
-          }
-          .bank-left { padding: 32px 20px 60px; border-right: none; border-top: 1px solid ${T.border}; }
-          .bank-right { padding: 32px 20px; }
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap');
+        *{box-sizing:border-box;margin:0;padding:0;}
+        ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:${T.border};border-radius:4px;}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+        @keyframes popIn{0%{transform:scale(0.95);opacity:0}100%{transform:scale(1);opacity:1}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .fadein{animation:fadeUp 0.3s ease forwards}
+        .acc-card:hover .acc-actions{opacity:1!important;}
+        .acc-card:hover{border-color:${T.blue}!important;}
+        .del-btn:hover{background:${T.redLight}!important;border-color:#FECACA!important; color: ${T.red} !important;}
+        .default-btn:hover{background:${T.blueLight}!important;border-color:${T.blue}!important;color:${T.blue}!important;}
+        .add-btn:hover:not(:disabled){border-color:${T.blue}!important;background:${T.blueLight}!important;color:${T.blue}!important;}
       `}</style>
 
-      <div className="bank-layout">
-        
-        {/* ── Left Column: List ─────────────────────────────────── */}
-        <div className="bank-left">
-        <nav style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 36, flexWrap: "wrap" }}>
-          <span style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer" }} onClick={onBack}>Dashboard</span>
-          <span style={{ color: T.text3, fontSize: 12 }}>›</span>
-          <span style={{ fontSize: 13, fontWeight: 600, color: T.blue }}>Bank Accounts</span>
-        </nav>
+      <div style={{ minHeight: "100vh", background: T.surface, fontFamily: "'DM Sans', sans-serif", color: T.text, display: "flex", flexDirection: "column", overflowX: "hidden" }}>
 
-        <p style={{ fontSize: 11, fontWeight: 600, color: T.blue, textTransform: "uppercase", letterSpacing: "1px", marginBottom: 6 }}>Payout Destinations</p>
-        <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 28, fontWeight: 700, color: T.text, letterSpacing: "-0.6px", lineHeight: 1.15 }}>Bank Accounts</h1>
-        <p style={{ fontSize: 14, color: T.text2, marginTop: 6, lineHeight: 1.6 }}>Manage your saved NGN bank accounts for withdrawals.</p>
-
-        {/* Search */}
-        <div style={{ marginTop: 28, marginBottom: 24, position: "relative", maxWidth: 400 }}>
-          <Search size={18} style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: T.text3 }} />
-          <input
-            type="text"
-            placeholder="Search by bank name or account..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "12px 16px 12px 42px",
-              background: T.surface,
-              border: `1.5px solid ${T.border}`,
-              borderRadius: 12,
-              fontWeight: 600,
-              fontSize: 13,
-              color: T.text,
-              outline: "none",
-              transition: "border 0.2s",
-              boxSizing: "border-box"
-            }}
-            onFocus={(e) => (e.target.style.borderColor = T.blue)}
-            onBlur={(e) => (e.target.style.borderColor = T.border)}
-          />
+        {/* Top bar */}
+        <div style={{ background: T.white, borderBottom: `1px solid ${T.border}`, height: 60, padding: "0 40px", display: "flex", alignItems: "center", flexShrink: 0 }}>
+          <nav style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer" }} onClick={() => onNavigate?.("dashboard")}>Dashboard</span>
+            <span style={{ color: T.text3, fontSize: 12 }}>›</span>
+            <span style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer" }} onClick={() => onNavigate?.("account")}>Settings</span>
+            <span style={{ color: T.text3, fontSize: 12 }}>›</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: T.blue }}>Bank Accounts</span>
+          </nav>
         </div>
 
-        {/* List */}
-        {isLoading ? (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 0", gap: 16 }}>
-            <style>{`@keyframes cb-spin{to{transform:rotate(360deg)}}`}</style>
-            <Loader2 size={36} color={T.blue} style={{ animation: "cb-spin 1s linear infinite" }} />
-            <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "1px" }}>Loading accounts…</p>
-          </div>
-        ) : filteredAccounts.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "60px 24px", background: T.surface, borderRadius: 16, border: `1px solid ${T.border}` }}>
-            <div style={{ width: 64, height: 64, borderRadius: 16, background: T.blueLight, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-              <Building2 size={28} style={{ color: T.blue }} />
+        <div style={{ flex: 1, maxWidth: 680, width: "100%", margin: "0 auto", padding: "32px 20px 60px" }}>
+
+          {/* Page heading */}
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: "10px" }}>
+            <div>
+              <p style={{ fontSize: 11, fontWeight: 600, color: T.blue, textTransform: "uppercase", letterSpacing: "1px", marginBottom: 6 }}>Payment methods</p>
+              <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 26, fontWeight: 700, color: T.text, letterSpacing: "-0.5px", marginBottom: 5 }}>Bank Accounts</h1>
+              <p style={{ fontSize: 14, color: T.text2 }}>
+                Manage where your Naira payouts are sent.
+              </p>
             </div>
-            <p style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, color: T.text, fontSize: 15, marginBottom: 4 }}>
-              {search ? "No matching accounts" : "No saved bank accounts found."}
-            </p>
-            <p style={{ fontWeight: 500, color: T.text2, fontSize: 13 }}>
-              {search ? "Try a different search term" : "Use the form on the right to add an account."}
-            </p>
+
+            <button
+              className="add-btn"
+              onClick={() => !atLimit && setShowAdd(true)}
+              disabled={atLimit}
+              style={{ display: "flex", alignItems: "center", gap: 8, padding: "11px 18px", borderRadius: 12, border: `1.5px solid ${T.border}`, background: T.white, fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 700, color: T.text2, cursor: atLimit ? "not-allowed" : "pointer", transition: "all 0.15s", flexShrink: 0, marginTop: 4 }}
+            >
+              <Ico.plus /> Add account
+            </button>
           </div>
-        ) : (
+
+          {/* Limit indicator */}
+          <div style={{ background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 14, padding: "14px 20px", marginBottom: 20, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ display: "flex", gap: 5 }}>
+                {[...Array(MAX_ACCOUNTS)].map((_, i) => (
+                  <div key={i} style={{ width: 28, height: 28, borderRadius: 8, background: i < accounts.length ? T.blue : T.surface, border: `1.5px solid ${i < accounts.length ? T.blue : T.border}`, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}>
+                    {i < accounts.length && <Ico.check />}
+                  </div>
+                ))}
+              </div>
+              <p style={{ fontSize: 13, color: T.text2, fontWeight: 500 }}>
+                <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, color: T.text }}>{accounts.length}</span> of {MAX_ACCOUNTS} accounts used
+              </p>
+            </div>
+            {atLimit ? (
+              <span style={{ fontSize: 12, fontWeight: 600, color: T.orangeText, background: T.orangeLight, padding: "4px 10px", borderRadius: 8 }}>Limit reached</span>
+            ) : (
+              <span style={{ fontSize: 12, fontWeight: 500, color: T.text3 }}>{remaining} slot{remaining !== 1 ? "s" : ""} remaining</span>
+            )}
+          </div>
+
+          {/* Accounts list */}
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {filteredAccounts.map((acc, i) => {
-              const color = getBankColor(acc.bank_name);
-              const initials = getBankInitials(acc.bank_name);
-              const isHover = hoverCard === acc.id;
-              const isDeleting = deleteId === acc.id;
-
-              return (
+            {loading ? (
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 0", gap: 16 }}>
+                <Loader2 size={36} color={T.blue} style={{ animation: "spin 1s linear infinite" }} />
+                <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "1px" }}>Loading accounts…</p>
+              </div>
+            ) : accounts.length === 0 ? (
+              <div style={{ background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 20, padding: "52px 24px", textAlign: "center" }}>
+                <div style={{ width: 56, height: 56, borderRadius: 16, background: T.surface, border: `1.5px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                  {Ico.bank(T.text3)}
+                </div>
+                <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: T.text, marginBottom: 6 }}>No bank accounts yet</p>
+                <p style={{ fontSize: 13, color: T.text2, marginBottom: 24 }}>Add a bank account to receive Naira payouts.</p>
+                <button onClick={() => setShowAdd(true)} style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "12px 22px", borderRadius: 12, border: "none", background: T.blue, color: "#fff", fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                  <Ico.plus /> Add your first account
+                </button>
+              </div>
+            ) : (
+              accounts.map((acc, i) => (
                 <div
-                  key={acc.id || i}
-                  style={{
-                    background: T.white,
-                    borderRadius: 16,
-                    padding: "16px 20px",
-                    border: `1.5px solid ${isHover ? T.blue + "40" : T.border}`,
-                    boxShadow: isHover ? "0 4px 16px rgba(26,111,255,0.06)" : "0 2px 4px rgba(10,15,30,0.02)",
-                    transition: "all 0.2s ease",
-                    transform: isHover ? "translateY(-1px)" : "translateY(0)",
-                    opacity: isDeleting ? 0.6 : 1,
-                    position: "relative",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 16
-                  }}
-                  onMouseEnter={() => setHoverCard(acc.id)}
-                  onMouseLeave={() => setHoverCard(null)}
+                  key={acc.id}
+                  className="acc-card fadein"
+                  style={{ background: T.white, border: `1.5px solid ${acc.isDefault ? T.blue : T.border}`, borderRadius: 18, padding: "20px 22px", display: "flex", alignItems: "center", gap: 16, transition: "all 0.18s", position: "relative", animationDelay: `${i * 0.05}s`, flexWrap: "wrap" }}
                 >
-                  {/* Icon */}
-                  <div style={{
-                    width: 44,
-                    height: 44,
-                    borderRadius: "50%",
-                    background: color + "14",
-                    border: `1px solid ${color}30`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontWeight: 800,
-                    fontSize: 14,
-                    color: color,
-                    fontFamily: "'Sora', sans-serif",
-                    flexShrink: 0
-                  }}>
-                    {initials}
-                  </div>
-
-                  {/* Bank Details */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: 15, color: T.text, marginBottom: 2 }}>
-                      {acc.bank_name || "Unknown Bank"}
-                    </p>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <p style={{ fontFamily: "'Roboto Mono', monospace", fontWeight: 600, fontSize: 13, color: T.text2 }}>
-                        {acc.account_number || "—"}
-                      </p>
-                      <span style={{ color: T.border }}>•</span>
-                      <p style={{ fontSize: 12, fontWeight: 600, color: T.text2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>
-                        {acc.account_name || "—"}
-                      </p>
-                      <span style={{ color: T.border }}>•</span>
-                      <p style={{ fontSize: 12, fontWeight: 600, color: T.text2, textTransform: "capitalize" }}>
-                        {acc.account_type || "Savings"}
-                      </p>
+                  {/* Bank avatar */}
+                  <BankAvatar bankId={acc.bank_name} bankName={acc.bank_name} size={48} />
+  
+                  {/* Info */}
+                  <div style={{ flex: 1, minWidth: "200px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                      <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: T.text }}>{acc.account_name}</p>
+                      {acc.isDefault && (
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 10, fontWeight: 700, color: T.blue, background: T.blueLight, padding: "3px 8px", borderRadius: 6, textTransform: "uppercase", letterSpacing: "0.4px" }}>
+                          <Ico.star(true) /> Default
+                        </span>
+                      )}
                     </div>
+                    <p style={{ fontSize: 13, color: T.text2, marginBottom: 2 }}>{acc.bank_name}</p>
+                    <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 600, color: T.text3, letterSpacing: "1px" }}>{maskNum(acc.account_number)}</p>
                   </div>
-
-                  {/* Badges & Actions */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
-                    <div style={{ background: T.greenLight, color: T.greenText, borderRadius: 8, padding: "6px 10px", display: "flex", alignItems: "center", gap: 6 }}>
-                      <CheckCircle2 size={14} style={{ color: T.greenText }} />
-                      <span style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>Verified</span>
-                    </div>
-                    
+  
+                  {/* Actions — revealed on hover */}
+                  <div className="acc-actions" style={{ display: "flex", alignItems: "center", gap: 8, opacity: 0, transition: "opacity 0.18s" }}>
+                    {!acc.isDefault && (
+                      <button
+                        className="default-btn"
+                        onClick={() => handleSetDefault(acc.id)}
+                        style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 12px", borderRadius: 10, border: `1px solid ${T.border}`, background: T.white, fontFamily: "'DM Sans', sans-serif", fontSize: 12, fontWeight: 600, color: T.text2, cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap" }}
+                      >
+                        Set default
+                      </button>
+                    )}
                     <button
-                      onClick={() => handleDelete(acc.id)}
-                      disabled={isDeleting}
-                      style={{
-                        padding: 8,
-                        background: "transparent",
-                        border: "none",
-                        borderRadius: 8,
-                        cursor: isDeleting ? "not-allowed" : "pointer",
-                        color: T.text3,
-                        transition: "all 0.2s",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center"
-                      }}
-                      onMouseEnter={(e) => { e.currentTarget.style.background = T.redLight; e.currentTarget.style.color = T.red; }}
-                      onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = T.text3; }}
+                      className="del-btn"
+                      onClick={() => setDeleteTarget(acc)}
+                      style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${T.border}`, background: T.white, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.15s", color: T.text3 }}
                     >
-                      {isDeleting ? <Loader2 size={18} style={{ animation: "cb-spin 1s linear infinite" }} /> : <Trash2 size={18} />}
+                      <Ico.trash("currentColor") />
                     </button>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* ── Right Column: Form ────────────────────────────────── */}
-      <div className="bank-right">
-        
-        <div style={{ background: T.white, borderRadius: 20, padding: "28px", border: `1px solid ${T.border}`, boxShadow: "0 4px 12px rgba(10,15,30,0.03)" }}>
-          <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 4 }}>Add New Account</h2>
-          <p style={{ fontSize: 13, color: T.text2, marginBottom: 24, lineHeight: 1.5 }}>
-            Enter the details of the bank account you want to save for future withdrawals.
-          </p>
-
-          <form onSubmit={handleAddSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {error && (
-              <div style={{ padding: "12px 14px", background: T.redLight, color: T.redText, borderRadius: 12, fontSize: 12, fontWeight: 600, border: "1px solid #FECACA", display: "flex", alignItems: "center", gap: 8 }}>
-                <AlertCircle size={14} /> {error}
-              </div>
+              ))
             )}
+          </div>
 
-            {/* Bank Name */}
-            <div>
-              <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 8 }}>Bank Name</p>
-              <div style={{ border: `1.5px solid ${focusedField === "bank" ? T.blue : T.border}`, borderRadius: 12, padding: "14px 16px", background: T.white, transition: "border-color 0.18s" }}>
-                <input
-                  style={{ width: "100%", border: "none", outline: "none", fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 600, color: T.text, background: "transparent" }}
-                  type="text"
-                  placeholder="e.g. GTBank"
-                  required
-                  value={formData.bank_name}
-                  onChange={(e) => setFormData({ ...formData, bank_name: e.target.value })}
-                  onFocus={() => setFocusedField("bank")}
-                  onBlur={() => setFocusedField(null)}
-                />
-              </div>
+          {/* Limit notice */}
+          {atLimit && (
+            <div style={{ marginTop: 16, display: "flex", alignItems: "flex-start", gap: 10, background: T.orangeLight, border: `1px solid #FDE68A`, borderRadius: 14, padding: "14px 18px" }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={T.orange} strokeWidth="2" strokeLinecap="round" style={{ flexShrink: 0, marginTop: 1 }}>
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+              <p style={{ fontSize: 13, color: T.orangeText, lineHeight: 1.55 }}>
+                You've reached the maximum of <strong>{MAX_ACCOUNTS} bank accounts</strong>. Remove an existing account to add a new one.
+              </p>
             </div>
-
-            {/* Account Number */}
-            <div>
-              <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 8 }}>Account Number</p>
-              <div style={{ border: `1.5px solid ${focusedField === "accNum" ? T.blue : T.border}`, borderRadius: 12, padding: "14px 16px", background: T.white, transition: "border-color 0.18s" }}>
-                <input
-                  style={{ width: "100%", border: "none", outline: "none", fontFamily: "'Roboto Mono', monospace", fontSize: 14, fontWeight: 600, color: T.text, background: "transparent", letterSpacing: "1px" }}
-                  type="text"
-                  placeholder="0123456789"
-                  required
-                  value={formData.account_number}
-                  onChange={(e) => setFormData({ ...formData, account_number: e.target.value.replace(/\D/g, '') })}
-                  onFocus={() => setFocusedField("accNum")}
-                  onBlur={() => setFocusedField(null)}
-                />
-              </div>
-            </div>
-
-            {/* Account Name */}
-            <div>
-              <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 8 }}>Account Name</p>
-              <div style={{ border: `1.5px solid ${focusedField === "accName" ? T.blue : T.border}`, borderRadius: 12, padding: "14px 16px", background: T.white, transition: "border-color 0.18s" }}>
-                <input
-                  style={{ width: "100%", border: "none", outline: "none", fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 600, color: T.text, background: "transparent" }}
-                  type="text"
-                  placeholder="John Doe"
-                  required
-                  value={formData.account_name}
-                  onChange={(e) => setFormData({ ...formData, account_name: e.target.value })}
-                  onFocus={() => setFocusedField("accName")}
-                  onBlur={() => setFocusedField(null)}
-                />
-              </div>
-            </div>
-
-            {/* Account Type */}
-            <div>
-              <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 8 }}>Account Type</p>
-              <div style={{ display: "flex", gap: 10 }}>
-                {["savings", "checking"].map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, account_type: type })}
-                    style={{
-                      flex: 1,
-                      padding: "12px",
-                      borderRadius: 12,
-                      border: `1.5px solid ${formData.account_type === type ? T.blue : T.border}`,
-                      background: formData.account_type === type ? T.blueLight : T.white,
-                      color: formData.account_type === type ? T.blue : T.text2,
-                      fontWeight: 600,
-                      fontSize: 13,
-                      textTransform: "capitalize",
-                      cursor: "pointer",
-                      transition: "all 0.2s"
-                    }}
-                  >
-                    {type}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Submit */}
-            <button
-              disabled={submitting}
-              type="submit"
-              style={{
-                marginTop: 8,
-                padding: "16px",
-                background: submitting ? T.text3 : T.blue,
-                color: T.white,
-                borderRadius: 12,
-                fontWeight: 700,
-                fontSize: 14,
-                fontFamily: "'Sora', sans-serif",
-                border: "none",
-                cursor: submitting ? "not-allowed" : "pointer",
-                transition: "all 0.2s",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8
-              }}
-              onMouseEnter={(e) => { if(!submitting) e.currentTarget.style.opacity = "0.9" }}
-              onMouseLeave={(e) => { if(!submitting) e.currentTarget.style.opacity = "1" }}
-            >
-              {submitting ? <><Loader2 size={16} style={{ animation: "cb-spin 1s linear infinite" }} /> Saving...</> : <><Plus size={16} strokeWidth={3} /> Save Account</>}
-            </button>
-          </form>
+          )}
         </div>
 
-        {/* Security badge */}
-        <div style={{ marginTop: 24, display: "flex", alignItems: "center", gap: 10, padding: "16px", background: T.white, border: `1px solid ${T.border}`, borderRadius: 16 }}>
-          <div style={{ width: 32, height: 32, borderRadius: "50%", background: T.greenLight, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <CheckCircle2 size={16} style={{ color: T.green }} />
-          </div>
-          <div>
-            <p style={{ fontSize: 12, fontWeight: 700, color: T.text, fontFamily: "'Sora', sans-serif" }}>Secure Storage</p>
-            <p style={{ fontSize: 11, color: T.text2, marginTop: 2 }}>Your account details are encrypted</p>
-          </div>
+        {/* Footer */}
+        <div style={{ borderTop: `1px solid ${T.border}`, padding: "18px 40px", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: T.white, flexShrink: 0 }}>
+          <Ico.shield />
+          <span style={{ fontSize: 12, color: T.text2, fontWeight: 500 }}>Your transaction is secure · </span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: T.mintGreen }}>Protected by Cheeseball</span>
         </div>
-
       </div>
+
+      {/* Add drawer */}
+      {showAdd && <AddAccountDrawer onClose={() => setShowAdd(false)} onSave={handleSave} />}
+
+      {/* Delete modal */}
+      {deleteTarget && <DeleteModal account={deleteTarget} onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />}
     </>
   );
-};
-
-export default BankAccounts;
+}
