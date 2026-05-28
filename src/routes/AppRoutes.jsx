@@ -45,6 +45,7 @@ const AppRoutes = () => (
     <Route path="/buy-crypto" element={<Navigate to={paths.dashboardBuy} replace />} />
     <Route path="/sell-crypto" element={<Navigate to={paths.dashboardSell} replace />} />
     <Route path="/seamless-crypto" element={<Navigate to={paths.dashboardSwap} replace />} />
+    <Route path="/register" element={<AuthSignup />} />
     <Route path="*" element={<Navigate to={paths.home} replace />} />
   </Routes>
 );

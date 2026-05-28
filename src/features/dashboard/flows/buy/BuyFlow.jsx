@@ -45,8 +45,8 @@ const GLOBAL_CSS = `
   @media (max-width: 900px) {
     .buygrid { grid-template-columns: 1fr !important; }
     .buygrid > div { min-width: 0 !important; }
-    .buygrid > div:first-child { border-right: none !important; border-bottom: 1px solid #E8EEFF; padding: 32px 24px 48px !important; }
-    .rightpanel { min-height: auto !important; padding: 32px 24px 60px !important; }
+    .buygrid > div:first-child { border-right: none !important; border-bottom: none !important; padding: 32px 24px 48px !important; }
+    .rightpanel { display: none !important; }
     .s6grid  { grid-template-columns: 1fr !important; }
     .step-content { padding: 32px 24px 48px !important; }
     .responsive-title { font-size: 24px !important; overflow-wrap: break-word; }
@@ -60,7 +60,7 @@ const GLOBAL_CSS = `
     .step-content { padding: 24px 20px 40px !important; }
     .buy-amt-input { font-size: 28px !important; }
     .s6grid  { padding: 0 16px !important; }
-    .rightpanel { padding: 24px 20px 48px !important; }
+    .rightpanel { display: none !important; }
     .csel-info { display: none !important; }
     .preview-header { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
     .preview-amount-wrap { flex-direction: column !important; align-items: center !important; text-align: center !important; }

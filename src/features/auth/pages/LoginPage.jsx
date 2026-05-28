@@ -139,12 +139,7 @@ export default function Auth() {
       const data = await authService.login({ email, password });
       localStorage.setItem("user_email", email);
 
-      setToast({
-        message: "Welcome back! Taking you to your account...",
-        type: "success",
-      });
-
-      setTimeout(() => navigate(paths.dashboardHome), 1000);
+      navigate(paths.dashboardHome);
     } catch (err) {
       const msg = err.message || "Login failed. Please double-check and try again.";
       setError(msg);

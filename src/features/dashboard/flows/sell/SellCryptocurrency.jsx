@@ -708,12 +708,12 @@ export default function SellCryptocurrency({ onNavigate }) {
         @media(max-width:900px){
           .sell-grid{grid-template-columns:1fr!important;}
           .sell-grid > div { min-width: 0 !important; }
-          .sell-grid>div:first-child{padding:28px 20px 32px!important;border-right:none!important;border-bottom:1px solid ${T.border};}
-          .sell-grid>div:last-child{padding:28px 20px 32px!important;}
+          .sell-grid>div:first-child{padding:28px 20px 32px!important;border-right:none!important;border-bottom:none!important;}
+          .sell-grid>div:last-child{display:none!important;}
         }
         @media(max-width:480px){
           .sell-grid>div:first-child{padding:20px 16px 24px!important;}
-          .sell-grid>div:last-child{padding:20px 16px 24px!important;}
+          .sell-grid>div:last-child{display:none!important;}
           .sell-grid h1{font-size:22px!important;}
           .sell-grid .sell-amt-input{font-size:24px!important;}
           .sell-grid .sum-amt{font-size:18px!important;}
@@ -724,7 +724,7 @@ export default function SellCryptocurrency({ onNavigate }) {
         }
         @media(max-width:380px){
           .sell-grid>div:first-child{padding:16px 12px 20px!important;}
-          .sell-grid>div:last-child{padding:16px 12px 20px!important;}
+          .sell-grid>div:last-child{display:none!important;}
           .csel > div { padding: 12px 10px !important; }
           .csel .ddopt { padding: 10px 8px !important; }
           .bank-row { padding: 14px 12px !important; gap: 10px !important; }
