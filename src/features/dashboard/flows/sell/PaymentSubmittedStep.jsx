@@ -74,7 +74,7 @@ export default function PaymentSubmittedStep({ order, onGoHome, onContactSupport
         }
       `}</style>
 
-      <div style={{minHeight:"100vh",background:T.surface,fontFamily:"'DM Sans',sans-serif",color:T.text,overflowX:"hidden",maxWidth:"100vw"}}>
+      <div style={{minHeight:"100%",background:T.surface,fontFamily:"'DM Sans',sans-serif",color:T.text,overflowX:"hidden",maxWidth:"100vw"}}>
 
         {/* Top bar */}
         <div className="ps-topbar" style={{background:T.white,borderBottom:`1px solid ${T.border}`,padding:"0 48px",height:60,display:"flex",alignItems:"center",justifyContent:"space-between"}}>

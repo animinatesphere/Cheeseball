@@ -22,10 +22,12 @@ const Ico = {
 };
 
 import { confirmSellCryptoSent } from "../../../../services/api";
+import Toast from "../../../../shared/components/Toast";
 
 export default function SendCryptoStep({ order, onSent }) {
   const [copied,setCopied] = useState(false);
   const [loading,setLoading] = useState(false);
+  const [toast, setToast] = useState(null);
   const o = order;
   const brokerAddress = o.transaction?.broker_wallet_address || "Awaiting address...";
   const network = o.transaction?.network || o.coin.name;
@@ -40,7 +42,7 @@ export default function SendCryptoStep({ order, onSent }) {
           setLoading(false); 
           onSent?.();
       } catch (e) {
-          alert("Failed to confirm: " + e.message);
+          setToast({ message: "Failed to confirm: " + e.message, type: "error" });
           setLoading(false);
       }
   };
@@ -72,7 +74,7 @@ export default function SendCryptoStep({ order, onSent }) {
           .send-grid .send-amt{font-size:22px!important;}
         }
       `}</style>
-      <div className="send-grid" style={{display:"grid",gridTemplateColumns:"1fr 400px",minHeight:"100vh",fontFamily:"'DM Sans',sans-serif",background:T.white,color:T.text,overflowX:"hidden",maxWidth:"100vw"}}>
+      <div className="send-grid" style={{display:"grid",gridTemplateColumns:"1fr 400px",minHeight:"100%",fontFamily:"'DM Sans',sans-serif",background:T.white,color:T.text,overflowX:"hidden",maxWidth:"100vw"}}>
         <div style={{padding:"44px 52px 60px",borderRight:`1px solid ${T.border}`}}>
           <nav style={{display:"flex",alignItems:"center",gap:6,marginBottom:36,flexWrap:"wrap"}}>
             {["Dashboard","Sell Crypto","Payout Method","Confirm"].map((c,i)=>(<span key={i} style={{display:"flex",alignItems:"center",gap:6}}><span style={{fontSize:13,color:T.text2,fontWeight:500,cursor:"pointer"}}>{c}</span><span style={{color:T.text3,fontSize:12}}>›</span></span>))}
@@ -169,6 +171,7 @@ export default function SendCryptoStep({ order, onSent }) {
           <div style={{marginTop:"auto",display:"flex",flexDirection:"column",alignItems:"center",gap:3}}><span style={{fontSize:12,fontWeight:600,color:T.text2}}>Your transaction is secure</span><span style={{display:"flex",alignItems:"center",gap:5,fontSize:12,fontWeight:500,color:T.mintGreen}}><Ico.shield /> Protected by Cheeseball</span></div>
         </div>
       </div>
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </>
   );
 }

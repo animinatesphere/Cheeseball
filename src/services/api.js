@@ -324,10 +324,10 @@ export const getBuyTransactionStatus = async (transactionId) =>
 
 /* ─── Sell Crypto Flow ─── */
 
-export const getSellQuote = async (asset, cryptoAmount) =>
+export const getSellQuote = async (asset, cryptoAmount, nairaAmount = null) =>
   request("/api/rates/sell-quote", {
     method: "POST",
-    body: JSON.stringify({ asset, crypto_amount: cryptoAmount }),
+    body: JSON.stringify({ asset, crypto_amount: cryptoAmount, naira_amount: nairaAmount }),
   });
 
 export const createSellTransaction = async (payload) =>

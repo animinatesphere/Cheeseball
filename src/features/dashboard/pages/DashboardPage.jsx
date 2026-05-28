@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
-import { Bell, Menu, Search, LayoutDashboard, ShoppingCart, CircleDollarSign, ArrowRightLeft, ArrowDownLeft, Gift, History, HelpCircle, Settings, ChevronRight, X, ShieldCheck, Landmark, LogOut } from "lucide-react";
+import { Bell, Menu, Search, LayoutDashboard, ShoppingCart, CircleDollarSign, ArrowRightLeft, ArrowDownLeft, ArrowUpRight, Gift, History, HelpCircle, Settings, ChevronRight, X, ShieldCheck, Landmark, LogOut } from "lucide-react";
 import { createTransaction, createGiftCardTrade, getCurrentUser } from "@/services/api";
 import authService from "@/services/authService";
 
@@ -19,6 +19,7 @@ import GiftCardUpload from "../flows/gift-card/GiftCardUpload";
 import SettingsPage from "../components/SettingsPage";
 import DepositFlow from "../flows/deposit/DepositFlow";
 import WithdrawalFlow from "../flows/withdrawal/WithdrawalFlow";
+import WithdrawPage from "../flows/withdraw/WithdrawPage";
 import KYCVerification from "../components/KYCVerification";
 
 /* ─── Design tokens ─── */
@@ -51,6 +52,7 @@ const NAV_ITEMS = [
   { id: "sell",          icon: CircleDollarSign, label: "Sell Crypto"},
   { id: "swap",          icon: ArrowRightLeft,   label: "Swap"       },
   { id: "deposit",       icon: ArrowDownLeft,    label: "Deposit"    },
+  { id: "withdraw",      icon: ArrowUpRight,     label: "Withdraw"   },
   { id: "giftcard-swap", icon: Gift,             label: "Gift Cards" },
   { id: "history",       icon: History,          label: "Transactions"},
   { id: "bank-accounts", icon: Landmark,         label: "Bank Accounts"},
@@ -397,6 +399,9 @@ const CurrencyPage = () => {
                 } />
                 <Route path="deposit" element={
                   <DepositFlow onBack={handleBack} onNavigate={handleNavigation} />
+                } />
+                <Route path="withdraw" element={
+                  <WithdrawPage onNavigate={handleNavigation} />
                 } />
                 <Route path="sell" element={
                   <SellCryptocurrency
