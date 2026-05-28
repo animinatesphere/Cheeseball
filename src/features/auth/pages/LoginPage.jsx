@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import authService from "@/services/authService";
 import { getCurrencies } from "@/services/api";
 import { paths } from "@/routes/paths";
-import Toast from "@/shared/components/Toast";
+
 
 /* ─── Tokens ─────────────────────────────────────────────────── */
 const T = {
@@ -83,7 +83,7 @@ export default function Auth() {
   const [error, setError] = useState("");
   const [focused, setFocused] = useState("");
   const [rates, setRates] = useState([]);
-  const [toast, setToast] = useState(null);
+
 
   const onSignUp = () => navigate(paths.signup);
   const onForgotPassword = () => navigate(paths.forgotPassword);
@@ -92,10 +92,6 @@ export default function Auth() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("session_expired") === "true") {
-      setToast({
-        message: "Your session has expired. Please log in again.",
-        type: "info",
-      });
       // Clean up the URL without triggering a navigation
       window.history.replaceState({}, "", window.location.pathname);
     }
@@ -143,7 +139,6 @@ export default function Auth() {
     } catch (err) {
       const msg = err.message || "Login failed. Please double-check and try again.";
       setError(msg);
-      setToast({ message: msg, type: "error" });
     } finally {
       setLoading(false);
     }
@@ -187,13 +182,7 @@ export default function Auth() {
         }
       `}</style>
 
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+
 
       <div className="login-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif" }}>
 

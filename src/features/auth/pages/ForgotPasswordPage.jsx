@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import authService from "@/services/authService";
 import { paths } from "@/routes/paths";
-import Toast from "@/shared/components/Toast";
+
 
 /* ─── Tokens ─────────────────────────────────────────────────── */
 const T = {
@@ -281,7 +281,7 @@ export default function ForgotPassword() {
   const [loading,   setLoading]   = useState(false);
   const [errors,    setErrors]    = useState({});
   const [focused,   setFocused]   = useState("");
-  const [toast,     setToast]     = useState(null);
+
 
   const [countdown, resetCountdown] = useCountdown(60, step === 2);
 
@@ -301,12 +301,10 @@ export default function ForgotPassword() {
     setLoading(true);
     try {
       await authService.forgotPassword(email);
-      setToast({ message: "Reset code sent! Check your inbox.", type: "success" });
       setStep(2);
       resetCountdown();
     } catch (err) {
       setErrors({ email: err.message || "Failed to send reset code. Please try again." });
-      setToast({ message: err.message || "Failed to send reset code.", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -322,7 +320,6 @@ export default function ForgotPassword() {
       setStep(3);
     } catch (err) {
       setErrors({ token: err.message || "Invalid or expired code. Please try again." });
-      setToast({ message: err.message || "Invalid or expired code. Please try again.", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -334,10 +331,9 @@ export default function ForgotPassword() {
     setErrors({});
     try {
       await authService.forgotPassword(email);
-      setToast({ message: "Reset code resent successfully!", type: "success" });
       resetCountdown();
     } catch (err) {
-      setToast({ message: err.message || "Failed to resend code. Please try again.", type: "error" });
+      // Intentionally omitting toast, error handle could be added to errors state if needed
     }
   };
 
@@ -353,7 +349,6 @@ export default function ForgotPassword() {
       setStep(4);
     } catch (err) {
       setErrors({ password: err.message || "Failed to reset password." });
-      setToast({ message: err.message || "Failed to reset password. Please try again.", type: "error" });
     } finally {
       setLoading(false);
     }
@@ -442,13 +437,7 @@ export default function ForgotPassword() {
         }
       `}</style>
 
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
+
 
       <div className="forgot-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif" }}>
         <LeftPanel step={step} />
