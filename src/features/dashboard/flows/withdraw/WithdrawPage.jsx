@@ -157,7 +157,7 @@ export default function WithdrawPage({ onNavigate }) {
     triggerPulse();
   };
 
-  const setQuick = (n) => { setAmount(String(Math.min(n, ngnBalance))); triggerPulse(); };
+  const setQuick = (n) => { setAmount(String(n)); triggerPulse(); };
 
   const handleSubmit = async () => {
     if (!ready) return;

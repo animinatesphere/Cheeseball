@@ -5,7 +5,7 @@ import {
   Gift, ChevronRight, CheckCircle2, BarChart2, Copy,
   Sparkles, History, Eye, EyeOff
 } from "lucide-react";
-import { getWallets, getCurrencies, getUserTransactions } from "@/services/api";
+import { getWallets, getCurrencies, getUserTransactions, getReferralData } from "@/services/api";
 
 /* ─── Design tokens ──────────────────────────────────────────── */
 const T = {
@@ -53,7 +53,7 @@ const QUICK_ACTIONS = [
   { label: "Buy Crypto",  icon: ShoppingCart,     color: "#7C3AED", bg: "#F5F3FF",     page: "buy"              },
   { label: "Sell Crypto", icon: CircleDollarSign, color: T.red,     bg: T.redLight,    page: "sell"             },
   { label: "Swap",        icon: ArrowRightLeft,   color: "#0891B2", bg: "#ECFEFF",     page: "swap"             },
-  { label: "Withdraw",    icon: Wallet,           color: T.green,   bg: T.greenLight,  page: "withdrawal-details"},
+  { label: "Withdraw",    icon: Wallet,           color: T.green,   bg: T.greenLight,  page: "withdraw"         },
   { label: "Gift Cards",  icon: Gift,             color: T.orange,  bg: T.orangeLight, page: "giftcard-swap"    },
 ];
 
@@ -63,6 +63,7 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
   const [assets, setAssets]                 = useState([]);
   const [transactions, setTransactions]     = useState([]);
   const [market, setMarket]                 = useState([]);
+  const [refData, setRefData]               = useState(null);
   const [isLoading, setIsLoading]           = useState(true);
 
   useEffect(() => {
@@ -143,12 +144,15 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
       }
     }
     loadData();
+    getReferralData().then(setRefData).catch(err => console.error("Referral Error:", err));
   }, []);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText("CHEESE2025");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopy = (link) => {
+    if (link) {
+      navigator.clipboard.writeText(link).catch(() => {});
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const ngnAsset = assets.find(a => a.symbol === "NGN");
@@ -258,23 +262,34 @@ const CurrencyRates = ({ onSelectCurrency, onNavigate, searchQuery = "" }) => {
             </div>
           </div>
 
-          {/* Referral card - Mini Version (1/3 size) */}
-          <div className="ref-card-main" style={{ background: T.text, borderRadius: 20, padding: "24px", position: "relative", overflow: "hidden", display: "flex", alignItems: "center", gap: 18 }}>
-            {/* Subtle glow */}
-            <div style={{ position: "absolute", top: -20, right: -20, width: 100, height: 100, borderRadius: "50%", background: `${T.blue}15`, filter: "blur(20px)" }} />
-            
-            <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <Gift size={24} color={T.blue} />
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: "#fff", marginBottom: 4, letterSpacing: "-0.2px" }}>Invite & Earn ₦1k</h2>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: T.blue, letterSpacing: "1px" }}>CHEESE2025</span>
-                <button 
-                  onClick={handleCopy}
-                  style={{ background: T.blueLight, border: "none", borderRadius: 6, cursor: "pointer", fontSize: 10, fontWeight: 800, color: copied ? T.greenText : T.blue, textTransform: "uppercase", padding: "4px 8px", transition: "all 0.15s" }}
+          {/* Referral card (Matched from Settings) */}
+          <div className="ref-card" style={{ background: T.text, borderRadius: 20, padding: "24px 26px", position: "relative", overflow: "hidden", height: "100%" }}>
+            <div style={{ position: "absolute", top: -30, right: -30, width: 140, height: 140, borderRadius: "50%", background: `${T.blue}18`, pointerEvents: "none" }} />
+            <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", height: "100%", justifyContent: "space-between" }}>
+              <div className="ref-header" style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
+                <div>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 4 }}>Referral programme</p>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 700, color: "#fff", letterSpacing: "-0.3px" }}>
+                    Invite friends, earn <span style={{ color: T.blue }}>₦1,000</span> each
+                  </p>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1 }}>{refData?.total_referrals || 0}</p>
+                  <p style={{ fontSize: 11, color: T.text3, marginTop: 2 }}>referrals · ₦0 earned</p>
+                </div>
+              </div>
+
+              {/* Code */}
+              <div className="ref-row" style={{ display: "flex", gap: 8 }}>
+                <div style={{ flex: 1, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "12px 16px" }}>
+                  <p style={{ fontSize: 10, color: T.text3, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.5px", marginBottom: 3 }}>Your code</p>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: T.blue, letterSpacing: "1.5px" }}>{refData?.referral_code || "N/A"}</p>
+                </div>
+                <button
+                  onClick={() => handleCopy(refData?.referral_link)}
+                  style={{ display: "flex", alignItems: "center", gap: 7, padding: "12px 18px", background: copied ? T.greenLight : T.blue, border: "none", borderRadius: 12, cursor: "pointer", fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 700, color: copied ? T.greenText : "#fff", transition: "all 0.18s", whiteSpace: "nowrap" }}
                 >
-                  {copied ? "Copied!" : "Copy"}
+                  {copied ? <><CheckCircle2 size={14} /> Copied!</> : <><Copy size={14} /> Copy Link</>}
                 </button>
               </div>
             </div>

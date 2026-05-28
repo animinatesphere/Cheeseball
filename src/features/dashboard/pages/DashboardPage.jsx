@@ -18,7 +18,6 @@ import SwapGiftCard from "../flows/swap/SwapGiftCard";
 import GiftCardUpload from "../flows/gift-card/GiftCardUpload";
 import SettingsPage from "../components/SettingsPage";
 import DepositFlow from "../flows/deposit/DepositFlow";
-import WithdrawalFlow from "../flows/withdrawal/WithdrawalFlow";
 import WithdrawPage from "../flows/withdraw/WithdrawPage";
 import KYCVerification from "../components/KYCVerification";
 
@@ -252,7 +251,6 @@ const CurrencyPage = () => {
     if (nav) return nav.label;
     if (p === "detail") return "Asset Details";
     if (p === "giftcard-upload") return "Upload Gift Card";
-    if (p === "withdrawal-details") return "Withdrawal";
     return "Dashboard";
   })();
 
@@ -389,7 +387,7 @@ const CurrencyPage = () => {
                     onContinue={(data) => {
                       const updatedData = { ...transactionData, ...data };
                       setTransactionData(updatedData);
-                      if (updatedData.type === 'sell') navigate("/currency-change/withdrawal-details");
+                      if (updatedData.type === 'sell') navigate("/currency-change/withdraw");
                       else handleContinue(updatedData);
                     }}
                   />
@@ -416,13 +414,7 @@ const CurrencyPage = () => {
                   <GiftCardUpload
                     transactionData={transactionData}
                     onBack={() => navigate("/currency-change/giftcard-swap")}
-                    onContinue={(data) => { setTransactionData(prev => ({ ...prev, ...data })); navigate("/currency-change/withdrawal-details"); }}
-                  />
-                } />
-                <Route path="withdrawal-details" element={
-                  <WithdrawalFlow
-                    onBack={handleBack}
-                    onNavigate={handleNavigation}
+                    onContinue={(data) => { setTransactionData(prev => ({ ...prev, ...data })); navigate("/currency-change/withdraw"); }}
                   />
                 } />
                 <Route path="history" element={<HistoryPage onNavigate={handleNavigation} />} />

@@ -354,3 +354,6 @@ export const deleteBeneficiaryBankAccount = async (id) =>
   request(`/api/payouts/beneficiaries/${id}`, {
     method: "DELETE",
   });
+
+export const getReferralData = async () =>
+  request("/api/auth/referral");

@@ -3,7 +3,7 @@ import {
   Copy, CheckCircle2, ChevronRight, Shield, Bell,
   Landmark, LogOut, Camera, Check, Eye, EyeOff,
 } from "lucide-react";
-import { getCurrentUser } from "@/services/api";
+import { getCurrentUser, getReferralData } from "@/services/api";
 import authService from "@/services/authService";
 
 /* ─── Tokens ─────────────────────────────────────────────────── */
@@ -82,9 +82,11 @@ export default function SettingsPage({ onNavigate }) {
   const [copied,  setCopied]  = useState(false);
   const [notifs,  setNotifs]  = useState({ transactions: true, rates: false, promos: true });
   const [user, setUser] = useState(null);
+  const [refData, setRefData] = useState(null);
 
   useEffect(() => {
     getCurrentUser().then(setUser);
+    getReferralData().then(setRefData).catch(err => console.error("Referral Error:", err));
   }, []);
 
   const copyRef = (text) => {
@@ -97,8 +99,9 @@ export default function SettingsPage({ onNavigate }) {
   const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : "CB";
   const verified = !!user?.verified_at;
   const joinedDate = user?.verified_at ? new Date(user.verified_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "Recently";
-  const referralCode = user?.referral_code || "N/A";
-  const referralLink = user?.referral_code ? `https://cheeseball.io/ref/${user.referral_code}` : "";
+  const referralCode = refData?.referral_code || user?.referral_code || "N/A";
+  const referralLink = refData?.referral_link || (user?.referral_code ? `https://cheeseball.io/ref/${user.referral_code}` : "");
+  const totalReferrals = refData?.total_referrals || 0;
 
   return (
     <>
@@ -175,7 +178,7 @@ export default function SettingsPage({ onNavigate }) {
                   </p>
                 </div>
                 <div style={{ textAlign: "right" }}>
-                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1 }}>0</p>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1 }}>{totalReferrals}</p>
                   <p style={{ fontSize: 11, color: T.text3, marginTop: 2 }}>referrals · ₦0 earned</p>
                 </div>
               </div>
