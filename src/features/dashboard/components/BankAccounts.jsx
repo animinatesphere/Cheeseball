@@ -518,7 +518,7 @@ export default function BankAccountPage({ onNavigate }) {
                       <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: T.text }}>{acc.account_name}</p>
                       {acc.isDefault && (
                         <span style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 10, fontWeight: 700, color: T.blue, background: T.blueLight, padding: "3px 8px", borderRadius: 6, textTransform: "uppercase", letterSpacing: "0.4px" }}>
-                          <Ico.star(true) /> Default
+                          {Ico.star(true)} Default
                         </span>
                       )}
                     </div>
@@ -542,7 +542,7 @@ export default function BankAccountPage({ onNavigate }) {
                       onClick={() => setDeleteTarget(acc)}
                       style={{ width: 36, height: 36, borderRadius: 10, border: `1px solid ${T.border}`, background: T.white, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "all 0.15s", color: T.text3 }}
                     >
-                      <Ico.trash("currentColor") />
+                      {Ico.trash("currentColor")}
                     </button>
                   </div>
                 </div>
