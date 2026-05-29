@@ -100,7 +100,7 @@ export default function SettingsPage({ onNavigate }) {
   const verified = !!user?.verified_at;
   const joinedDate = user?.verified_at ? new Date(user.verified_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "Recently";
   const referralCode = refData?.referral_code || user?.referral_code || "N/A";
-  const referralLink = refData?.referral_link || (user?.referral_code ? `https://cheeseball.io/ref/${user.referral_code}` : "");
+  const referralLink = refData?.referral_link || (user?.referral_code ? `https://www.cheeseballapp.com/register?ref=${user.referral_code}` : "");
   const totalReferrals = refData?.total_referrals || 0;
 
   return (

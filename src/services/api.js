@@ -355,5 +355,10 @@ export const deleteBeneficiaryBankAccount = async (id) =>
     method: "DELETE",
   });
 
-export const getReferralData = async () =>
-  request("/api/auth/referral");
+export const getReferralData = async () => {
+  const data = await request("/api/auth/referral");
+  if (data && data.referral_code) {
+    data.referral_link = `https://www.cheeseballapp.com/register?ref=${data.referral_code}`;
+  }
+  return data;
+};
