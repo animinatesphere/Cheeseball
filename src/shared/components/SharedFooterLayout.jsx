@@ -11,7 +11,10 @@ const SharedFooterLayout = ({ title, children }) => {
       {/* Header */}
       <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate("/")}>
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={() => navigate("/")}
+          >
             <img src={logo} alt="Cheeseball" className="h-10 w-auto" />
             <span className="font-black text-xl tracking-tight text-blue-900 hidden sm:block">
               CHEESEBALL
@@ -34,8 +37,8 @@ const SharedFooterLayout = ({ title, children }) => {
           </h1>
           <div className="h-2 w-20 bg-blue-600 rounded-full mt-6"></div>
         </div>
-        
-        <div className="prose prose-blue prose-xl max-w-none text-gray-600 font-medium leading-relaxed animate-fade-in-up delay-[100ms]">
+
+        <div className="prose prose-blue prose-xl max-w-none text-gray-600 font-medium leading-relaxed animate-fade-in-up delay-100">
           {children}
         </div>
       </main>
@@ -53,4 +56,3 @@ const SharedFooterLayout = ({ title, children }) => {
 };
 
 export default SharedFooterLayout;
-

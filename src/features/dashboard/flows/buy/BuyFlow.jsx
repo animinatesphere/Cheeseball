@@ -94,35 +94,45 @@ const BuyFlow = ({ onBack }) => {
 
   // Step 1 state
   const [selectedAsset, setSelectedAsset] = useState(ASSETS[0]);
-  const [payAmount, setPayAmount]         = useState(0);
-  const [searchQuery, setSearchQuery]     = useState("");
+  const [payAmount, setPayAmount] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  // Promo code
+  const [promoCode, setPromoCode] = useState("");
+  const [promoBenefit, setPromoBenefit] = useState(0);
 
   // API data state
-  const [quoteData, setQuoteData]           = useState(null);   // from POST /api/rates/buy-quote
+  const [quoteData, setQuoteData] = useState(null); // from POST /api/rates/buy-quote
   const [transactionData, setTransactionData] = useState(null); // from POST /api/broker/buy
-  const [paymentData, setPaymentData]       = useState(null);   // from POST /api/payments/setup
+  const [paymentData, setPaymentData] = useState(null); // from POST /api/payments/setup
   const [bankInstructions, setBankInstructions] = useState(null);
 
   // Step 3 state
-  const [paymentMethod, setPaymentMethod]   = useState("ngn_wallet");
+  const [paymentMethod, setPaymentMethod] = useState("ngn_wallet");
 
   // Step 4 state
-  const [proofFile, setProofFile]           = useState(null);
-  const [hasPaid, setHasPaid]               = useState(false);
+  const [proofFile, setProofFile] = useState(null);
+  const [hasPaid, setHasPaid] = useState(false);
 
   // Quote expiry
-  const [expiryTime, setExpiryTime]         = useState(0);
-  const [isExpired, setIsExpired]           = useState(false);
+  const [expiryTime, setExpiryTime] = useState(0);
+  const [isExpired, setIsExpired] = useState(false);
 
   // Derived values from quote
-  const receiveAmount = quoteData?.crypto_amount ? parseFloat(quoteData.crypto_amount) : 0;
-  const finalRate     = quoteData?.final_rate    ? parseFloat(quoteData.final_rate)    : 0;
+  const receiveAmount = quoteData?.crypto_amount
+    ? parseFloat(quoteData.crypto_amount)
+    : 0;
+  const finalRate = quoteData?.final_rate
+    ? parseFloat(quoteData.final_rate)
+    : 0;
 
   // Countdown timer driven from quoteData.expires_at
   useEffect(() => {
     if (!quoteData?.expires_at || step < 2 || step >= 5) return;
     const tick = () => {
-      const remaining = Math.max(0, Math.round((new Date(quoteData.expires_at) - Date.now()) / 1000));
+      const remaining = Math.max(
+        0,
+        Math.round((new Date(quoteData.expires_at) - Date.now()) / 1000),
+      );
       setExpiryTime(remaining);
       if (remaining === 0) setIsExpired(true);
     };
@@ -131,14 +141,20 @@ const BuyFlow = ({ onBack }) => {
     return () => clearInterval(t);
   }, [quoteData, step]);
 
-  const resetExpiry = () => { setIsExpired(false); setStep(1); setQuoteData(null); };
-  const nextStep    = () => setStep(p => Math.min(p + 1, 5));
-  const prevStep    = () => setStep(p => Math.max(p - 1, 1));
+  const resetExpiry = () => {
+    setIsExpired(false);
+    setStep(1);
+    setQuoteData(null);
+  };
+  const nextStep = () => setStep((p) => Math.min(p + 1, 5));
+  const prevStep = () => setStep((p) => Math.max(p - 1, 1));
 
   const breadcrumbs = (
     <BuyCryptoBreadcrumbs
       currentStep={step}
-      onStepClick={s => { if (s < step) setStep(s); }}
+      onStepClick={(s) => {
+        if (s < step) setStep(s);
+      }}
       onBackToDashboard={onBack}
     />
   );
@@ -153,10 +169,16 @@ const BuyFlow = ({ onBack }) => {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: T.white, overflowX: "hidden", width: "100%" }}>
+    <div
+      style={{
+        minHeight: "100vh",
+        background: T.white,
+        overflowX: "hidden",
+        width: "100%",
+      }}
+    >
       <style>{GLOBAL_CSS}</style>
       <div style={{ animation: "fadeUp 0.25s ease forwards" }}>
-
         {step === 1 && (
           <BuyFlowStep1
             selectedAsset={selectedAsset}
@@ -166,7 +188,15 @@ const BuyFlow = ({ onBack }) => {
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             breadcrumbs={breadcrumbs}
-            onQuoteFetched={(quote) => { setQuoteData(quote); setIsExpired(false); nextStep(); }}
+            onQuoteFetched={(quote) => {
+              setQuoteData(quote);
+              setIsExpired(false);
+              nextStep();
+            }}
+            promoCode={promoCode}
+            setPromoCode={setPromoCode}
+            promoBenefit={promoBenefit}
+            setPromoBenefit={setPromoBenefit}
           />
         )}
 
@@ -208,6 +238,8 @@ const BuyFlow = ({ onBack }) => {
             setHasPaid={setHasPaid}
             prevStep={prevStep}
             onSuccess={() => setStep(5)}
+            promoCode={promoCode}
+            promoBenefit={promoBenefit}
           />
         )}
 
@@ -223,7 +255,6 @@ const BuyFlow = ({ onBack }) => {
             breadcrumbs={breadcrumbs}
           />
         )}
-
       </div>
     </div>
   );
