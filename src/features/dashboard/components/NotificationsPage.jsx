@@ -260,7 +260,7 @@ export default function NotificationsPage({ onNavigate }) {
                   </div>
                   <div
                     className="meta"
-                    style={{ color: T.text3, fontSize: 12, textAlign: 'right' }}
+                    style={{ color: T.text3, fontSize: 12, textAlign: "right" }}
                   >
                     <div>{n.time}</div>
                     <div
