@@ -35,7 +35,7 @@ const SharedFooterLayout = ({ title, children }) => {
           <div className="h-2 w-20 bg-blue-600 rounded-full mt-6"></div>
         </div>
         
-        <div className="prose prose-blue prose-xl max-w-none text-gray-600 font-medium leading-relaxed animate-fade-in-up delay-[100ms]">
+        <div className="prose prose-blue prose-xl max-w-none text-gray-600 font-medium leading-relaxed animate-fade-in-up delay-100">
           {children}
         </div>
       </main>
