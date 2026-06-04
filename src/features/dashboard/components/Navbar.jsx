@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Bell } from "lucide-react";
+import { useNotifications } from "@/services/useNotifications";
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const { unreadCount } = useNotifications();
   const linkClass = ({ isActive }) =>
     `font-black text-sm uppercase tracking-widest transition-all ${
       isActive ? "text-blue-600" : "text-slate-500 hover:text-gray-600"
@@ -30,8 +32,28 @@ const Navbar = () => {
           <NavLink to="/seamless-crypto" className={linkClass}>
             Swap
           </NavLink>
+          <NavLink to="/dashboard/notifications" className="relative">
+            <button className="p-2 rounded-md hover:bg-gray-100 relative">
+              <Bell size={18} />
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </button>
+          </NavLink>
         </div>
-        <div className="sm:hidden flex items-center">
+        <div className="sm:hidden flex items-center gap-2">
+          <NavLink to="/dashboard/notifications" className="relative">
+            <button className="p-2 rounded-md hover:bg-gray-100 relative">
+              <Bell size={18} />
+              {unreadCount > 0 && (
+                <span className="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </button>
+          </NavLink>
           <button
             onClick={() => setOpen((v) => !v)}
             className="p-2 rounded-md bg-white/0 hover:bg-gray-100"

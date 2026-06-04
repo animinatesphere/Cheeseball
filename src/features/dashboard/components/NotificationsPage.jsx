@@ -1,7 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle2, X, Bell, RefreshCcw } from "lucide-react";
-import { fetchMockNotifications } from "@/services/mockNotifications";
+import { X, Bell, RefreshCcw } from "lucide-react";
+import { useNotifications } from "@/services/useNotifications";
+import {
+  getNotificationConfig,
+  getReferenceRoute,
+} from "@/services/notificationConfig";
 
 const T = {
   blue: "#1A6FFF",
@@ -51,18 +55,20 @@ function NavBar({ onBack }) {
   );
 }
 
-function ActionButton({ children, onClick, primary }) {
+function ActionButton({ children, onClick, primary, disabled }) {
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
       style={{
         padding: "10px 14px",
         borderRadius: 12,
         border: primary ? "none" : `1px solid ${T.border}`,
         background: primary ? T.blue : T.white,
         color: primary ? "#fff" : T.text,
-        cursor: "pointer",
+        cursor: disabled ? "not-allowed" : "pointer",
         fontWeight: 700,
+        opacity: disabled ? 0.5 : 1,
       }}
     >
       {children}
@@ -72,41 +78,59 @@ function ActionButton({ children, onClick, primary }) {
 
 export default function NotificationsPage({ onNavigate }) {
   const navigate = useNavigate();
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const {
+    notifications,
+    unreadCount,
+    loading,
+    markAsRead,
+    markAllAsRead,
+    refetch,
+  } = useNotifications();
 
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      setLoading(true);
-      try {
-        const data = await fetchMockNotifications();
-        if (mounted) setItems(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    })();
-    return () => (mounted = false);
-  }, []);
-
-  const markAllRead = () =>
-    setItems((s) => s.map((i) => ({ ...i, read: true })));
-  const markRead = (id) =>
-    setItems((s) => s.map((i) => (i.id === id ? { ...i, read: true } : i)));
-  const removeItem = (id) => setItems((s) => s.filter((i) => i.id !== id));
-
-  const reload = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchMockNotifications();
-      setItems(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+  const handleNotificationClick = async (notification) => {
+    // Mark as read
+    if (!notification.is_read) {
+      await markAsRead(notification.id);
     }
+
+    // Deep-link to reference if available
+    if (notification.reference_type && notification.reference_id) {
+      const route = getReferenceRoute(
+        notification.reference_type,
+        notification.reference_id,
+      );
+      if (route) {
+        navigate(route);
+        return;
+      }
+    }
+
+    // Navigate back if no deep-link available
+    navigate(-1);
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      await markAllAsRead();
+    } catch (err) {
+      console.error("Error marking all as read:", err);
+    }
+  };
+
+  const formatTime = (isoDate) => {
+    if (!isoDate) return "";
+    const date = new Date(isoDate);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
   };
 
   return (
@@ -132,7 +156,11 @@ export default function NotificationsPage({ onNavigate }) {
           alignItems: "center",
         }}
       >
-        <ActionButton onClick={markAllRead} primary>
+        <ActionButton
+          onClick={handleMarkAllAsRead}
+          primary
+          disabled={unreadCount === 0 || loading}
+        >
           Mark all as read
         </ActionButton>
         <ActionButton onClick={() => onNavigate?.("support")}>
@@ -140,24 +168,32 @@ export default function NotificationsPage({ onNavigate }) {
         </ActionButton>
         <div style={{ marginLeft: 8 }}>
           <button
-            onClick={reload}
+            onClick={refetch}
+            disabled={loading}
             style={{
               border: "none",
               background: "transparent",
-              cursor: "pointer",
+              cursor: loading ? "not-allowed" : "pointer",
               color: T.text2,
+              opacity: loading ? 0.5 : 1,
               display: "flex",
               alignItems: "center",
               gap: 8,
             }}
           >
-            <RefreshCcw size={16} /> Refresh
+            <RefreshCcw
+              size={16}
+              style={{
+                animation: loading ? "spin 1s linear infinite" : "none",
+              }}
+            />{" "}
+            Refresh
           </button>
         </div>
       </div>
 
       <div style={{ maxWidth: 760 }}>
-        {loading ? (
+        {loading && notifications.length === 0 ? (
           <div
             style={{
               padding: 18,
@@ -168,145 +204,163 @@ export default function NotificationsPage({ onNavigate }) {
           >
             <p style={{ margin: 0, color: T.text2 }}>Loading notifications…</p>
           </div>
+        ) : notifications.length === 0 ? (
+          <div
+            style={{
+              background: T.white,
+              border: `1px solid ${T.border}`,
+              borderRadius: 16,
+              padding: 28,
+              textAlign: "center",
+            }}
+          >
+            <Bell size={36} color={T.text3} />
+            <p
+              style={{
+                marginTop: 12,
+                fontSize: 16,
+                fontWeight: 700,
+                color: T.text,
+              }}
+            >
+              No notifications yet
+            </p>
+            <p style={{ marginTop: 6, color: T.text2 }}>
+              We'll show important updates here.
+            </p>
+          </div>
         ) : (
-          items.length === 0 && (
-            <div
-              style={{
-                background: T.white,
-                border: `1px solid ${T.border}`,
-                borderRadius: 16,
-                padding: 28,
-                textAlign: "center",
-              }}
-            >
-              <Bell size={36} color={T.text3} />
-              <p
-                style={{
-                  marginTop: 12,
-                  fontSize: 16,
-                  fontWeight: 700,
-                  color: T.text,
-                }}
-              >
-                No notifications yet
-              </p>
-              <p style={{ marginTop: 6, color: T.text2 }}>
-                We'll show important updates here.
-              </p>
-            </div>
-          )
-        )}
+          <div style={{ display: "grid", gap: 12 }}>
+            {notifications.map((n) => {
+              const config = getNotificationConfig(n.type);
+              const Icon = config.icon;
 
-        <div style={{ display: "grid", gap: 12 }}>
-          {items.map((n) => (
-            <div
-              key={n.id}
-              className="notification-card"
-              style={{
-                background: T.white,
-                border: `1px solid ${T.border}`,
-                borderRadius: 14,
-                padding: 16,
-                display: "flex",
-                gap: 12,
-                alignItems: "flex-start",
-              }}
-            >
-              <div style={{ width: 10, height: 10, marginTop: 6 }}>
-                {!n.read && (
-                  <div
-                    style={{
-                      width: 10,
-                      height: 10,
-                      borderRadius: 10,
-                      background: T.blue,
-                    }}
-                  />
-                )}
-              </div>
-
-              <div style={{ flex: 1, minWidth: 0 }}>
+              return (
                 <div
+                  key={n.id}
+                  className="notification-card"
+                  onClick={() => handleNotificationClick(n)}
                   style={{
+                    background: T.white,
+                    border: `1px solid ${T.border}`,
+                    borderRadius: 14,
+                    padding: 16,
                     display: "flex",
-                    justifyContent: "space-between",
                     gap: 12,
+                    alignItems: "flex-start",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                    opacity: n.is_read ? 0.7 : 1,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "#F0F4FF";
+                    e.currentTarget.style.borderColor = config.color;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = T.white;
+                    e.currentTarget.style.borderColor = T.border;
                   }}
                 >
-                  <div style={{ minWidth: 0 }}>
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: 14,
-                        fontWeight: 700,
-                        color: T.text,
-                        textOverflow: "ellipsis",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {n.title}
-                    </p>
-                    <p
-                      style={{
-                        margin: 0,
-                        marginTop: 8,
-                        color: T.text2,
-                        fontSize: 13,
-                      }}
-                    >
-                      {n.body}
-                    </p>
-                  </div>
                   <div
-                    className="meta"
-                    style={{ color: T.text3, fontSize: 12, textAlign: "right" }}
+                    style={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 10,
+                      background: `${config.color}15`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      flexShrink: 0,
+                    }}
                   >
-                    <div>{n.time}</div>
+                    <Icon size={20} color={config.color} />
+                  </div>
+
+                  <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                       style={{
-                        marginTop: 8,
                         display: "flex",
-                        gap: 8,
-                        justifyContent: "flex-end",
+                        justifyContent: "space-between",
+                        gap: 12,
                       }}
                     >
-                      {!n.read && (
-                        <button
-                          onClick={() => markRead(n.id)}
+                      <div style={{ minWidth: 0 }}>
+                        <p
                           style={{
-                            border: "none",
-                            background: T.blueLight,
-                            color: T.blue,
-                            padding: "6px 8px",
-                            borderRadius: 10,
-                            cursor: "pointer",
+                            margin: 0,
+                            fontSize: 14,
                             fontWeight: 700,
+                            color: T.text,
+                            textOverflow: "ellipsis",
+                            overflow: "hidden",
+                            whiteSpace: "nowrap",
                           }}
                         >
-                          <CheckCircle2 size={14} />
-                        </button>
-                      )}
-                      <button
-                        onClick={() => removeItem(n.id)}
+                          {n.title || config.label}
+                        </p>
+                        <p
+                          style={{
+                            margin: 0,
+                            marginTop: 8,
+                            color: T.text2,
+                            fontSize: 13,
+                            lineHeight: 1.4,
+                          }}
+                        >
+                          {n.message}
+                        </p>
+                      </div>
+                      <div
+                        className="meta"
                         style={{
-                          border: "none",
-                          background: "transparent",
                           color: T.text3,
-                          cursor: "pointer",
+                          fontSize: 12,
+                          textAlign: "right",
+                          whiteSpace: "nowrap",
                         }}
                       >
-                        <X size={14} />
-                      </button>
+                        <div>{formatTime(n.created_at)}</div>
+                        {!n.is_read && (
+                          <div
+                            style={{
+                              marginTop: 8,
+                              width: 8,
+                              height: 8,
+                              borderRadius: "50%",
+                              background: T.blue,
+                              margin: "8px auto 0",
+                            }}
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    style={{
+                      border: "none",
+                      background: "transparent",
+                      color: T.text3,
+                      cursor: "pointer",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
       <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
         @media (max-width: 430px) {
           .notifications-container { padding: 14px 12px !important; }
           .notifications-container h2 { font-size: 18px !important; }

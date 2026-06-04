@@ -460,3 +460,25 @@ export const getReferralData = async () => {
   }
   return data;
 };
+
+/* ─── Notifications ─── */
+
+export const getNotifications = async () =>
+  withFallback(
+    async () =>
+      normalizeListResponse(
+        await request("/api/notifications", { method: "GET" }),
+        [],
+      ),
+    [],
+  );
+
+export const markNotificationAsRead = async (notificationId) =>
+  request(`/api/notifications/${notificationId}/read`, {
+    method: "POST",
+  });
+
+export const markAllNotificationsAsRead = async () =>
+  request("/api/notifications/read-all", {
+    method: "POST",
+  });

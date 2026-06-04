@@ -27,7 +27,7 @@ const T = {
 const ASSET_META = {
   BTC: { icon: "₿", color: "#F7931A", bg: "#FEF3E2" },
   ETH: { icon: "Ξ", color: "#627EEA", bg: "#EEEFFE" },
-  USDT: { icon: "₮", color: "#26A17B", bg: "#E6F7F2" },
+  USDT: { icon: "₮", color: "#000100", bg: "#E6F7F2" },
   SOL: { icon: "◎", color: "#9945FF", bg: "#F3EEFF" },
   BNB: { icon: "B", color: "#F0B90B", bg: "#FFFBEB" },
   XRP: { icon: "✕", color: "#00AAE4", bg: "#E8F7FE" },
@@ -430,13 +430,6 @@ export default function LandingPage() {
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <button
-              className="btn-primary"
-              style={{ padding: "10px 24px", fontSize: 13 }}
-              onClick={onGetStarted}
-            >
-              Get started
-            </button>
-            <button
               className="btn-ghost"
               style={{ padding: "10px 18px", fontSize: 13 }}
               onClick={onLogin}
@@ -530,7 +523,7 @@ export default function LandingPage() {
                 onClick={onGetStarted}
                 style={{ fontSize: 15, padding: "16px 32px" }}
               >
-                Start exchanging free <ArrowRight color="#fff" />
+                Get started <ArrowRight color="#fff" />
               </button>
               <a
                 href="#rates"
