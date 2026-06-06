@@ -190,7 +190,14 @@ export const getAccountStats = async () =>
 export const getCurrencies = async () =>
   withFallback(
     async () => normalizeListResponse(await request("/api/currencies"), []),
-    [],
+    [
+      { symbol: "BTC", name: "Bitcoin", sell_rate: 52000000 },
+      { symbol: "ETH", name: "Ethereum", sell_rate: 2800000 },
+      { symbol: "USDT", name: "Tether", sell_rate: 1540 },
+      { symbol: "SOL", name: "Solana", sell_rate: 180000 },
+      { symbol: "BNB", name: "Binance Coin", sell_rate: 620000 },
+      { symbol: "XRP", name: "Ripple", sell_rate: 2800 },
+    ],
   );
 
 export const getUserPortfolio = async () =>

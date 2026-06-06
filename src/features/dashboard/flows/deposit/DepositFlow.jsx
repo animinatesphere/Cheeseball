@@ -1,222 +1,602 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { T, Ico, ASSETS, CTA, GhostBtn } from "../swap/ConvertFlowShared";
 
-const LAUNCH_DATE = new Date(Date.now() + 47 * 24 * 60 * 60 * 1000);
+const DEPOSIT_CSS = `
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
 
-const pad = (n) => String(n).padStart(2, "0");
+  .ctabtn:hover  { background: ${T.blueDark} !important; }
+  .ctabtn:active { transform: scale(0.985); }
+  .ghostbtn:hover { background: ${T.blueLight} !important; color: ${T.blue} !important; }
+  .method-card:hover { border-color: ${T.blue} !important; box-shadow: 0 4px 12px rgba(26, 111, 255, 0.1) !important; }
 
-function useCountdown(target) {
-  const [time, setTime] = useState({ d: "00", h: "00", m: "00", s: "00" });
+  @keyframes fadeUp  { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes popIn   { 0% { transform:scale(0.95); opacity:0; } 100% { transform:scale(1); opacity:1; } }
+  .fadein  { animation: fadeUp 0.25s ease forwards; }
+  .popIn   { animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275) forwards; }
+`;
 
-  useEffect(() => {
-    const tick = () => {
-      const diff = Math.max(0, target - new Date());
-      setTime({
-        d: pad(Math.floor(diff / 864e5)),
-        h: pad(Math.floor((diff % 864e5) / 36e5)),
-        m: pad(Math.floor((diff % 36e5) / 6e4)),
-        s: pad(Math.floor((diff % 6e4) / 1e3)),
-      });
-    };
-    tick();
-    const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
-  }, [target]);
+export default function DepositFlow({ onClose }) {
+  const [depositType, setDepositType] = useState(null); // "crypto" or "ngn"
+  const [selectedAsset, setSelectedAsset] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  return time;
-}
+  const cryptoAssets = ASSETS.filter((a) => a.symbol !== "NGN");
+  const ngnOption = ASSETS.find((a) => a.symbol === "NGN");
 
-const T = {
-  blue:      "#1A6FFF",
-  blueDark:  "#1259D9",
-  blueLight: "#EEF3FF",
-  text:      "#0A0F1E",
-  text2:     "#6B7A99",
-  text3:     "#A8B4CC",
-  border:    "#E8EEFF",
-  white:     "#FFFFFF",
-  green:     "#00C48C",
-  greenLight:"#E6FAF4",
-  greenText: "#00966B",
-  mintGreen: "#4ADE80",
-};
+  const handleSelectCrypto = (asset) => {
+    setSelectedAsset(asset);
+  };
 
-const FEATURES = [
-  "Buy & Sell Crypto",
-  "Instant NGN Payouts",
-  "Bank & Wallet Transfer",
-];
+  const handleSelectNGN = () => {
+    setSelectedAsset(ngnOption);
+  };
 
-const Ico = {
-  shield: () => (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={T.mintGreen} strokeWidth="2" strokeLinecap="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-    </svg>
-  ),
-  check: () => (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={T.green} strokeWidth="2.5" strokeLinecap="round">
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  ),
-};
-
-function CounterBlock({ value, label, sep }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6, minWidth: 72 }}>
-        <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 44, fontWeight: 700, color: T.text, letterSpacing: "-2px", lineHeight: 1 }}>
-          {value}
-        </span>
-        <span style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px" }}>
-          {label}
-        </span>
-      </div>
-      {sep && (
-        <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 36, fontWeight: 700, color: T.border, lineHeight: 1, paddingBottom: 18 }}>
-          :
-        </span>
-      )}
-    </div>
-  );
-}
-
-export default function DepositFlow({ onBack }) {
-  const [email, setEmail]       = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError]       = useState(false);
-  const { d, h, m, s }          = useCountdown(LAUNCH_DATE);
-
-  const handleSubmit = () => {
-    if (!email.trim() || !email.includes("@")) {
-      setError(true);
-      setTimeout(() => setError(false), 2000);
-      return;
+  const handleContinue = async () => {
+    setLoading(true);
+    try {
+      // TODO: Implement deposit logic
+      // If crypto: Generate wallet address
+      // If NGN: Create bank account via Paystack
+      console.log("Deposit type:", depositType, "Asset:", selectedAsset);
+    } catch (err) {
+      console.error("Deposit failed:", err);
+    } finally {
+      setLoading(false);
     }
-    setSubmitted(true);
-    // TODO: call your API here with `email`
+  };
+
+  const handleBack = () => {
+    if (depositType) {
+      setDepositType(null);
+      setSelectedAsset(null);
+    } else if (onClose) {
+      onClose();
+    } else {
+      window.history.back();
+    }
   };
 
   return (
     <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap');
-        *{box-sizing:border-box;margin:0;padding:0;}
-        body{background:#fff;}
-        @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
-        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-        @keyframes popIn{0%{transform:scale(0.92);opacity:0}100%{transform:scale(1);opacity:1}}
-        .fadein{animation:fadeUp 0.5s ease forwards;}
-        .popin{animation:popIn 0.35s cubic-bezier(0.34,1.56,0.64,1) forwards;}
-        .blink{animation:blink 1.8s ease-in-out infinite;}
-        .notify-btn:hover{background:#1259D9!important;}
-        .notify-btn:active{transform:scale(0.97)!important;}
-        .input-wrap:focus-within{border-color:#1A6FFF!important;}
-      `}</style>
+      <style>{DEPOSIT_CSS}</style>
 
-      <div style={{ minHeight: "100vh", background: T.white, fontFamily: "'DM Sans', sans-serif", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 24px", position: "relative", overflow: "hidden" }}>
-
-        {onBack && (
-          <button 
-            onClick={onBack}
-            style={{ position: "absolute", top: 24, left: 24, padding: "10px 16px", background: "transparent", border: "1px solid " + T.border, borderRadius: 8, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, zIndex: 10 }}
+      <div
+        style={{
+          minHeight: "100vh",
+          background: T.surface,
+          padding: "40px 20px",
+          fontFamily: "'DM Sans', sans-serif",
+        }}
+      >
+        {/* Back Button */}
+        {(depositType || true) && (
+          <button
+            onClick={handleBack}
+            style={{
+              padding: "10px 16px",
+              background: "transparent",
+              border: `1.5px solid ${T.border}`,
+              borderRadius: 10,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              marginBottom: 32,
+              transition: "all 0.2s",
+            }}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.background = T.blueLight)
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.background = "transparent")
+            }
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.text} strokeWidth="2" strokeLinecap="round">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={T.text}
+              strokeWidth="2.5"
+              strokeLinecap="round"
+            >
               <path d="M19 12H5M12 19l-7-7 7-7" />
             </svg>
-            <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 600, color: T.text }}>Back</span>
+            <span
+              style={{
+                fontFamily: "'Sora', sans-serif",
+                fontSize: 14,
+                fontWeight: 600,
+                color: T.text,
+              }}
+            >
+              Back
+            </span>
           </button>
         )}
 
-        {/* Background blobs */}
-        <div style={{ position: "absolute", top: -180, right: -160, width: 500, height: 500, borderRadius: "50%", background: T.blueLight, opacity: 0.5, pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -120, left: -100, width: 320, height: 320, borderRadius: "50%", background: T.blueLight, opacity: 0.4, pointerEvents: "none" }} />
-
-        <div className="fadein" style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", width: "100%", maxWidth: 580, position: "relative", zIndex: 1 }}>
-
-          {/* Logo */}
-          <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: T.text, letterSpacing: "-0.5px", marginBottom: 36 }}>
-            Cheese<span style={{ color: T.blue }}>ball</span>
-          </p>
-
-          {/* Status pill */}
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 7, background: T.blueLight, borderRadius: 20, padding: "6px 14px", marginBottom: 24 }}>
-            <div className="blink" style={{ width: 7, height: 7, borderRadius: "50%", background: T.blue, flexShrink: 0 }} />
-            <span style={{ fontSize: 12, fontWeight: 600, color: T.blue }}>In development</span>
-          </div>
-
-          {/* Headline */}
-          <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 52, fontWeight: 700, color: T.text, letterSpacing: "-2px", lineHeight: 1.08, marginBottom: 18 }}>
-            Something big<br />is coming.
-          </h1>
-          <p style={{ fontSize: 16, color: T.text2, lineHeight: 1.7, maxWidth: 400, marginBottom: 0 }}>
-            We're building something you'll love. Be the first to know when we launch.
-          </p>
-
-          {/* Countdown */}
-          <div style={{ display: "flex", alignItems: "center", gap: 0, margin: "40px 0" }}>
-            <CounterBlock value={d} label="Days"  sep />
-            <CounterBlock value={h} label="Hours" sep />
-            <CounterBlock value={m} label="Mins"  sep />
-            <CounterBlock value={s} label="Secs"  sep={false} />
-          </div>
-
-          {/* Email capture */}
-          {!submitted ? (
-            <div style={{ width: "100%", maxWidth: 440 }}>
-              <div
-                className="input-wrap"
-                style={{ display: "flex", border: `1.5px solid ${error ? "#EF4444" : T.border}`, borderRadius: 14, overflow: "hidden", transition: "border-color 0.18s", background: T.white }}
+        <div style={{ maxWidth: 800, margin: "0 auto" }}>
+          {!depositType ? (
+            <div className="fadein">
+              <p
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: T.blue,
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  marginBottom: 8,
+                  fontFamily: "'DM Sans',sans-serif",
+                }}
               >
-                <input
-                  type="email"
-                  placeholder="Enter your email address"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-                  style={{ flex: 1, border: "none", outline: "none", padding: "15px 18px", fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: T.text, background: "transparent" }}
-                />
+                Deposit
+              </p>
+              <h1
+                style={{
+                  fontFamily: "'Sora',sans-serif",
+                  fontSize: 32,
+                  fontWeight: 700,
+                  color: T.text,
+                  letterSpacing: "-0.6px",
+                  marginBottom: 12,
+                }}
+              >
+                How would you like to deposit?
+              </h1>
+              <p
+                style={{
+                  fontSize: 15,
+                  color: T.text2,
+                  marginBottom: 40,
+                  lineHeight: 1.6,
+                }}
+              >
+                Select your preferred deposit method. You can receive
+                cryptocurrency directly to your wallet or NGN via bank transfer.
+              </p>
+
+              {/* Option Cards */}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+                  gap: 20,
+                  marginBottom: 32,
+                }}
+              >
+                {/* Crypto Option */}
                 <button
-                  className="notify-btn"
-                  onClick={handleSubmit}
-                  style={{ padding: "15px 24px", background: T.blue, border: "none", cursor: "pointer", fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: "#fff", transition: "background 0.18s", whiteSpace: "nowrap" }}
+                  onClick={() => setDepositType("crypto")}
+                  className="method-card"
+                  style={{
+                    padding: 28,
+                    background: T.white,
+                    border: `2px solid ${T.border}`,
+                    borderRadius: 16,
+                    cursor: "pointer",
+                    transition: "all 0.3s",
+                    textAlign: "left",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 16,
+                  }}
                 >
-                  Notify me
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div>
+                      <p
+                        style={{
+                          fontFamily: "'Sora',sans-serif",
+                          fontSize: 18,
+                          fontWeight: 700,
+                          color: T.text,
+                          marginBottom: 4,
+                        }}
+                      >
+                        Receive Crypto
+                      </p>
+                      <p
+                        style={{
+                          fontSize: 13,
+                          color: T.text2,
+                          fontFamily: "'DM Sans',sans-serif",
+                        }}
+                      >
+                        Instant deposit to your wallet
+                      </p>
+                    </div>
+                    <div
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 12,
+                        background: "#9945FF",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                        fontSize: 24,
+                      }}
+                    >
+                      ◎
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "10px 12px",
+                      background: T.blueLight,
+                      borderRadius: 10,
+                    }}
+                  >
+                    {Ico.check(T.blue)}
+                    <span
+                      style={{
+                        fontSize: 12,
+                        color: T.blue,
+                        fontWeight: 600,
+                        fontFamily: "'DM Sans',sans-serif",
+                      }}
+                    >
+                      Multiple assets supported
+                    </span>
+                  </div>
+                </button>
+
+                {/* NGN Option */}
+                <button
+                  onClick={() => setDepositType("ngn")}
+                  className="method-card"
+                  style={{
+                    padding: 28,
+                    background: T.white,
+                    border: `2px solid ${T.border}`,
+                    borderRadius: 16,
+                    cursor: "pointer",
+                    transition: "all 0.3s",
+                    textAlign: "left",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 16,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <div>
+                      <p
+                        style={{
+                          fontFamily: "'Sora',sans-serif",
+                          fontSize: 18,
+                          fontWeight: 700,
+                          color: T.text,
+                          marginBottom: 4,
+                        }}
+                      >
+                        Receive NGN
+                      </p>
+                      <p
+                        style={{
+                          fontSize: 13,
+                          color: T.text2,
+                          fontFamily: "'DM Sans',sans-serif",
+                        }}
+                      >
+                        Direct bank deposit
+                      </p>
+                    </div>
+                    <div
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: 12,
+                        background: T.green,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                        fontSize: 24,
+                      }}
+                    >
+                      ₦
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "10px 12px",
+                      background: T.greenLight,
+                      borderRadius: 10,
+                    }}
+                  >
+                    {Ico.check(T.green)}
+                    <span
+                      style={{
+                        fontSize: 12,
+                        color: T.greenText,
+                        fontWeight: 600,
+                        fontFamily: "'DM Sans',sans-serif",
+                      }}
+                    >
+                      Powered by Paystack
+                    </span>
+                  </div>
                 </button>
               </div>
-              {error && (
-                <p style={{ fontSize: 12, color: "#EF4444", marginTop: 8, textAlign: "left", paddingLeft: 4 }}>
-                  Please enter a valid email address.
-                </p>
-              )}
-              <p style={{ fontSize: 12, color: T.text3, marginTop: 10 }}>No spam. Unsubscribe anytime.</p>
+            </div>
+          ) : depositType === "crypto" ? (
+            <div className="fadein">
+              <p
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: T.blue,
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  marginBottom: 8,
+                  fontFamily: "'DM Sans',sans-serif",
+                }}
+              >
+                Deposit
+              </p>
+              <h1
+                style={{
+                  fontFamily: "'Sora',sans-serif",
+                  fontSize: 32,
+                  fontWeight: 700,
+                  color: T.text,
+                  letterSpacing: "-0.6px",
+                  marginBottom: 12,
+                }}
+              >
+                Select Cryptocurrency
+              </h1>
+              <p
+                style={{
+                  fontSize: 15,
+                  color: T.text2,
+                  marginBottom: 32,
+                  lineHeight: 1.6,
+                }}
+              >
+                Choose which cryptocurrency you'd like to deposit. We'll
+                generate a wallet address for you.
+              </p>
+
+              {/* Crypto Assets Grid */}
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
+                  gap: 16,
+                  marginBottom: 32,
+                }}
+              >
+                {cryptoAssets.map((asset) => (
+                  <button
+                    key={asset.id}
+                    onClick={() => handleSelectCrypto(asset)}
+                    className="method-card popIn"
+                    style={{
+                      padding: 20,
+                      background:
+                        selectedAsset?.id === asset.id ? T.blueLight : T.white,
+                      border: `2px solid ${selectedAsset?.id === asset.id ? T.blue : T.border}`,
+                      borderRadius: 14,
+                      cursor: "pointer",
+                      transition: "all 0.3s",
+                      textAlign: "left",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 14,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: "50%",
+                        background: asset.color,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontFamily: "'Sora',sans-serif",
+                        fontSize: 18,
+                        fontWeight: 700,
+                        color: "#fff",
+                        flexShrink: 0,
+                      }}
+                    >
+                      {asset.icon}
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <p
+                        style={{
+                          fontFamily: "'Sora',sans-serif",
+                          fontSize: 15,
+                          fontWeight: 700,
+                          color: T.text,
+                        }}
+                      >
+                        {asset.name}
+                      </p>
+                      <p
+                        style={{
+                          fontSize: 12,
+                          color: T.text2,
+                          marginTop: 2,
+                          fontFamily: "'DM Sans',sans-serif",
+                        }}
+                      >
+                        {asset.symbol}
+                      </p>
+                    </div>
+                    {selectedAsset?.id === asset.id && Ico.check(T.blue)}
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ display: "flex", gap: 12 }}>
+                <CTA
+                  onClick={handleContinue}
+                  disabled={loading || !selectedAsset}
+                >
+                  {loading ? "Processing..." : "Continue"}
+                </CTA>
+              </div>
             </div>
           ) : (
-            <div className="popin" style={{ display: "flex", alignItems: "center", gap: 10, padding: "14px 22px", background: T.greenLight, borderRadius: 14, border: `1.5px solid #A7F3D0` }}>
-              <Ico.check />
-              <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: T.greenText }}>
-                You're on the list! We'll be in touch.
-              </span>
+            <div className="fadein">
+              <p
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: T.blue,
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                  marginBottom: 8,
+                  fontFamily: "'DM Sans',sans-serif",
+                }}
+              >
+                Deposit
+              </p>
+              <h1
+                style={{
+                  fontFamily: "'Sora',sans-serif",
+                  fontSize: 32,
+                  fontWeight: 700,
+                  color: T.text,
+                  letterSpacing: "-0.6px",
+                  marginBottom: 12,
+                }}
+              >
+                Deposit Nigerian Naira
+              </h1>
+              <p
+                style={{
+                  fontSize: 15,
+                  color: T.text2,
+                  marginBottom: 32,
+                  lineHeight: 1.6,
+                }}
+              >
+                We'll connect you with Paystack to securely transfer NGN to your
+                Cheeseball wallet.
+              </p>
+
+              {/* NGN Selection Card */}
+              <button
+                onClick={handleSelectNGN}
+                className="method-card"
+                style={{
+                  width: "100%",
+                  maxWidth: 500,
+                  padding: 28,
+                  background:
+                    selectedAsset?.symbol === "NGN" ? T.greenLight : T.white,
+                  border: `2px solid ${selectedAsset?.symbol === "NGN" ? T.green : T.border}`,
+                  borderRadius: 16,
+                  cursor: "pointer",
+                  transition: "all 0.3s",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 20,
+                  marginBottom: 32,
+                }}
+              >
+                <div
+                  style={{
+                    width: 64,
+                    height: 64,
+                    borderRadius: "50%",
+                    background: T.green,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontFamily: "'Sora',sans-serif",
+                    fontSize: 32,
+                    fontWeight: 700,
+                    color: "#fff",
+                    flexShrink: 0,
+                  }}
+                >
+                  ₦
+                </div>
+                <div style={{ flex: 1, textAlign: "left" }}>
+                  <p
+                    style={{
+                      fontFamily: "'Sora',sans-serif",
+                      fontSize: 20,
+                      fontWeight: 700,
+                      color: T.text,
+                    }}
+                  >
+                    Nigerian Naira
+                  </p>
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: T.text2,
+                      marginTop: 4,
+                      fontFamily: "'DM Sans',sans-serif",
+                    }}
+                  >
+                    Secure bank transfer via Paystack
+                  </p>
+                </div>
+                {selectedAsset?.symbol === "NGN" && Ico.check(T.green)}
+              </button>
+
+              {/* Info Box */}
+              <div
+                style={{
+                  background: T.blueLight,
+                  borderRadius: 12,
+                  padding: "16px",
+                  marginBottom: 32,
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 12,
+                }}
+              >
+                <Ico.info />
+                <span
+                  style={{
+                    fontSize: 13,
+                    color: T.text2,
+                    fontFamily: "'DM Sans',sans-serif",
+                  }}
+                >
+                  You'll be redirected to Paystack to complete the secure bank
+                  transfer process.
+                </span>
+              </div>
+
+              <div style={{ display: "flex", gap: 12 }}>
+                <CTA
+                  onClick={handleContinue}
+                  disabled={loading || !selectedAsset}
+                >
+                  {loading ? "Processing..." : "Connect Paystack"}
+                </CTA>
+              </div>
             </div>
           )}
-
-          {/* Feature hints */}
-          <div style={{ display: "flex", gap: 24, justifyContent: "center", flexWrap: "wrap", marginTop: 44 }}>
-            {FEATURES.map((f) => (
-              <div key={f} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: T.text2, fontWeight: 500 }}>
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: T.blue, flexShrink: 0 }} />
-                {f}
-              </div>
-            ))}
-          </div>
-
-          {/* Footer */}
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 48 }}>
-            <Ico.shield />
-            <span style={{ fontSize: 12, color: T.text3, fontWeight: 500 }}>
-              Your transaction is secure ·{" "}
-              <span style={{ color: T.mintGreen, fontWeight: 600 }}>Protected by Cheeseball</span>
-            </span>
-          </div>
-
         </div>
       </div>
     </>

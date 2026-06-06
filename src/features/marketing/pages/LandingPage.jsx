@@ -218,8 +218,8 @@ export default function LandingPage() {
     const fetchRates = async () => {
       try {
         const res = await getCurrencies();
-        if (res.data) {
-          const mapped = res.data
+        if (Array.isArray(res)) {
+          const mapped = res
             .filter((c) => c.symbol !== "NGN")
             .map((c) => ({
               sym: c.symbol,
@@ -231,7 +231,7 @@ export default function LandingPage() {
               change:
                 (Math.random() > 0.5 ? "+" : "-") +
                 (Math.random() * 5).toFixed(1) +
-                "%", // Simulated change
+                "%",
             }));
           setRates(mapped);
         }
