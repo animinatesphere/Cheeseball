@@ -3,6 +3,7 @@ import {
   Upload, X, CheckCircle2, Clock, AlertCircle,
   Shield, RotateCcw, ChevronRight, Eye,
 } from "lucide-react";
+import { uploadFile, submitKYC } from "@/services/api";
 
 /* ─── Tokens ─────────────────────────────────────────────────── */
 const T = {
@@ -219,29 +220,33 @@ export default function KYCVerification({ onNavigate, kycStatus: initialStatus =
 
   /* In production, kycStatus comes from your backend/API */
   const [kycStatus, setKycStatus] = useState(initialStatus);
-  const [frontFile,  setFrontFile]  = useState(null);
-  const [backFile,   setBackFile]   = useState(null);
-  const [draggingFront, setDraggingFront] = useState(false);
-  const [draggingBack,  setDraggingBack]  = useState(false);
+  const [documentFile, setDocumentFile] = useState(null);
+  const [idType, setIdType] = useState("nin");
+  const [dragging, setDragging] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const canSubmit = frontFile && backFile && !submitting;
+  const canSubmit = documentFile && !submitting;
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!canSubmit) return;
     setSubmitting(true);
-    /**
-     * TODO: Upload to Cloudinary, get URLs, send to backend
-     * const formData = new FormData();
-     * formData.append("front", frontFile);
-     * formData.append("back", backFile);
-     * const res = await uploadToCloudinary(formData);
-     * await api.submitKYC({ frontUrl: res.frontUrl, backUrl: res.backUrl });
-     */
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      // 1. Upload the file
+      const documentUrl = await uploadFile(documentFile, "kyc_documents");
+      
+      // 2. Submit KYC data
+      await submitKYC({
+        id_type: idType,
+        document_url: documentUrl,
+      });
+
       setKycStatus("in_review");
-    }, 1800);
+    } catch (error) {
+      console.error("KYC submission failed:", error);
+      alert(error.message || "Failed to submit KYC documents.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const showUploadForm = kycStatus === "unverified" || (kycStatus === "rejected" && false);
@@ -331,25 +336,37 @@ export default function KYCVerification({ onNavigate, kycStatus: initialStatus =
               {kycStatus === "unverified" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
 
+                  <div style={{ background: T.redLight, border: `1px solid #FECACA`, borderRadius: 14, padding: "16px 20px" }}>
+                    <p style={{ fontSize: 13, color: T.redText, lineHeight: 1.6 }}>
+                      <strong style={{ fontWeight: 700 }}>IMPORTANT:</strong> Your document name <strong style={{ fontWeight: 700 }}>MUST exactly match</strong> the name on your registered account.
+                    </p>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <label style={{ fontSize: 13, fontWeight: 600, color: T.text }}>Document Type</label>
+                    <select 
+                      value={idType} 
+                      onChange={(e) => setIdType(e.target.value)}
+                      style={{ padding: "12px 16px", borderRadius: 12, border: `1px solid ${T.border}`, background: T.surface, fontFamily: "'DM Sans', sans-serif", fontSize: 14, color: T.text, outline: "none", cursor: "pointer" }}
+                    >
+                      <option value="nin">NIN (National Identity Number)</option>
+                      <option value="drivers_license">Driver's License</option>
+                      <option value="passport">Passport</option>
+                      <option value="voters_card">Voter's Card</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
                   {/* Upload row */}
                   <div className="kyc-upload-row" style={{ display: "flex", gap: 14 }}>
                     <UploadCard
-                      label="Front of ID"
-                      sub="National ID, driver's licence or passport"
-                      file={frontFile}
-                      onFile={setFrontFile}
-                      onRemove={() => setFrontFile(null)}
-                      dragging={draggingFront}
-                      setDragging={setDraggingFront}
-                    />
-                    <UploadCard
-                      label="Back of ID"
-                      sub="Clear photo of the back side"
-                      file={backFile}
-                      onFile={setBackFile}
-                      onRemove={() => setBackFile(null)}
-                      dragging={draggingBack}
-                      setDragging={setDraggingBack}
+                      label="Identity Document"
+                      sub="Upload a clear photo of your selected ID document"
+                      file={documentFile}
+                      onFile={setDocumentFile}
+                      onRemove={() => setDocumentFile(null)}
+                      dragging={dragging}
+                      setDragging={setDragging}
                     />
                   </div>
 

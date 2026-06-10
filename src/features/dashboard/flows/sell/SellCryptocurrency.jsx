@@ -408,12 +408,12 @@ function SellStep({ onContinue }) {
   };
 
   const ASSET_ICONS = {
-    BTC: { icon: "₿", color: "#F7931A" },
-    ETH: { icon: "Ξ", color: "#627EEA" },
-    USDT: { icon: "₮", color: "#26A17B" },
-    SOL: { icon: "◎", color: "#9945FF" },
-    BNB: { icon: "⬡", color: "#F0B90B" },
-    XRP: { icon: "✕", color: "#000000" },
+    BTC: { icon: "₿", color: "#F7931A", network: "Bitcoin" },
+    ETH: { icon: "Ξ", color: "#627EEA", network: "ERC20" },
+    USDT: { icon: "₮", color: "#26A17B", network: "TRC20" },
+    USDC: { icon: "$", color: "#2775CA", network: "ERC20" },
+    BNB: { icon: "⬡", color: "#F0B90B", network: "BEP20" },
+    SOL: { icon: "◎", color: "#9945FF", network: "Solana" },
   };
 
   useEffect(() => {
@@ -442,6 +442,7 @@ function SellStep({ onContinue }) {
             return {
               sym: symbol,
               name: a.name || symbol,
+              network: a.network || meta.network,
               icon: meta.icon,
               color: meta.color,
               bal: w ? w.available_balance || w.balance || 0 : 0,
@@ -449,7 +450,7 @@ function SellStep({ onContinue }) {
           });
 
         if (merged.length === 0) {
-          merged = ["BTC", "ETH", "USDT"].map((sym, i) => {
+          merged = ["BTC", "ETH", "USDT", "USDC", "BNB", "SOL"].map((sym, i) => {
             const w = walletsList.find((w) => w.asset === sym);
             const meta = ASSET_ICONS[sym] || {
               icon: sym[0],
@@ -458,6 +459,7 @@ function SellStep({ onContinue }) {
             return {
               sym,
               name: sym,
+              network: meta.network,
               icon: meta.icon,
               color: meta.color,
               bal: w ? w.available_balance || w.balance || 0 : 0,
@@ -468,13 +470,17 @@ function SellStep({ onContinue }) {
         if (merged.length > 0) setCoin(merged[0]);
       } catch (err) {
         console.error("Failed to load sell crypto data:", err);
-        const fallback = ["BTC", "ETH", "USDT"].map((sym, i) => ({
-          sym,
-          name: sym,
-          icon: sym[0],
-          color: COLORS[i],
-          bal: 0,
-        }));
+        const fallback = ["BTC", "ETH", "USDT", "USDC", "BNB", "SOL"].map((sym, i) => {
+          const meta = ASSET_ICONS[sym] || { icon: sym[0], color: COLORS[i % COLORS.length] };
+          return {
+            sym,
+            name: sym,
+            network: meta.network,
+            icon: meta.icon,
+            color: meta.color,
+            bal: 0,
+          };
+        });
         setCoins(fallback);
         setCoin(fallback[0]);
       }
@@ -1770,7 +1776,7 @@ function SellStep({ onContinue }) {
 /* ═══════════════════════════════════════════════════════ */
 /* ── STEP 2: PAYOUT METHOD ── */
 function PayoutStep({ order: s, onContinue, onBack, onNavigate }) {
-  const [method, setMethod] = useState(null);
+  const [method, setMethod] = useState("wallet");
   const [selectedBank, setSelectedBank] = useState(null);
   const [banks, setBanks] = useState([]);
   const [banksLoading, setBanksLoading] = useState(true);
@@ -1878,18 +1884,12 @@ function PayoutStep({ order: s, onContinue, onBack, onNavigate }) {
           className="method-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 1fr",
+            gridTemplateColumns: "1fr",
             gap: 14,
             marginTop: 32,
           }}
         >
           {[
-            {
-              key: "bank",
-              label: "Bank Account",
-              sub: "Send to your registered bank",
-              Icon: Ico.bank,
-            },
             {
               key: "wallet",
               label: "NGN Wallet",
@@ -2461,43 +2461,7 @@ function PayoutStep({ order: s, onContinue, onBack, onNavigate }) {
                   </p>
                 </div>
               </div>
-            ) : selectedBank ? (
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div
-                  style={{
-                    width: 34,
-                    height: 34,
-                    borderRadius: 10,
-                    background: T.blueLight,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    color: T.blue,
-                  }}
-                >
-                  <Ico.bank />
-                </div>
-                <div>
-                  <p
-                    style={{
-                      fontFamily: "'Sora', sans-serif",
-                      fontSize: 13,
-                      fontWeight: 700,
-                      color: T.text,
-                    }}
-                  >
-                    {selectedBank.name}
-                  </p>
-                  <p style={{ fontSize: 12, color: T.text2, marginTop: 1 }}>
-                    {selectedBank.bank} · {selectedBank.number}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <p style={{ fontSize: 13, color: T.text3, fontStyle: "italic" }}>
-                Select a bank account above
-              </p>
-            )}
+            ) : null}
           </div>
         )}
         <div
@@ -2536,7 +2500,6 @@ function ConfirmStep({ order: o, onConfirm, onBack }) {
   const [agreed, setAgreed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState(null);
-  const isBank = o.method === "bank";
 
   const handleConfirm = async () => {
     if (!agreed || loading) return;
@@ -2545,19 +2508,10 @@ function ConfirmStep({ order: o, onConfirm, onBack }) {
       const payload = {
         quote_id: o.quote.id,
         crypto_source: o.cryptoSource,
-        payout_method: isBank ? "beneficiary_bank" : "ngn_wallet",
-        beneficiary_id: isBank ? o.bank.id : null,
-        promo_code: o.promoCode || null,
-        promo_benefit: o.promoBenefit || 0,
+        payout_method: "ngn_wallet",
+        network: o.coin?.network || null,
       };
-      const res = await fetch(`${API_BASE}/api/broker/sell`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) throw new Error("Failed to create transaction");
-      const data = await res.json();
+      const data = await createSellTransaction(payload);
       onConfirm(data);
     } catch (e) {
       setToast({
@@ -2642,7 +2596,7 @@ function ConfirmStep({ order: o, onConfirm, onBack }) {
               lineHeight: 1.6,
             }}
           >
-            Review your order carefully before confirming.
+            Review your order. Once confirmed, a unique deposit wallet will be generated for you to send your crypto.
           </p>
 
           <div
@@ -2787,31 +2741,7 @@ function ConfirmStep({ order: o, onConfirm, onBack }) {
                     gap: 6,
                   }}
                 >
-                  {isBank ? <Ico.bank /> : <Ico.wallet />}
-                  {isBank ? "Bank Account" : "NGN Wallet"}
-                </span>
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "13px 0",
-                  borderBottom: `1px solid ${T.border}`,
-                }}
-              >
-                <span style={{ fontSize: 13, color: T.text2 }}>
-                  {isBank ? "Paid to" : "Credited to"}
-                </span>
-                <span
-                  style={{
-                    fontFamily: "'Sora', sans-serif",
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: T.text,
-                  }}
-                >
-                  {isBank ? `${o.bank.name} · ${o.bank.bank}` : "NGN Wallet"}
+                  <Ico.wallet /> NGN Wallet
                 </span>
               </div>
               <div
@@ -2824,7 +2754,7 @@ function ConfirmStep({ order: o, onConfirm, onBack }) {
                 }}
               >
                 <span style={{ fontSize: 13, color: T.text2 }}>
-                  Crypto Source
+                  Credited to
                 </span>
                 <span
                   style={{
@@ -2834,32 +2764,39 @@ function ConfirmStep({ order: o, onConfirm, onBack }) {
                     color: T.text,
                   }}
                 >
-                  {o.cryptoSource === "cheeseball_wallet"
-                    ? "Internal Wallet"
-                    : "External Wallet"}
+                  NGN Wallet
                 </span>
               </div>
             </div>
           </div>
 
+          {/* How it works */}
           <div
             style={{
-              marginTop: 16,
+              marginTop: 20,
+              background: T.blueLight,
+              borderRadius: 14,
+              padding: "16px 18px",
               display: "flex",
-              alignItems: "flex-start",
+              flexDirection: "column",
               gap: 10,
-              background: T.orangeLight,
-              border: `1px solid #FDE68A`,
-              borderRadius: 12,
-              padding: "12px 14px",
             }}
           >
-            <Ico.warn />
-            <p style={{ fontSize: 12, color: "#92400E", lineHeight: 1.55 }}>
-              This action is <strong>irreversible</strong>. Please double-check
-              all details above.
+            <p style={{ fontSize: 12, fontWeight: 700, color: T.blue, textTransform: "uppercase", letterSpacing: "0.7px" }}>
+              How it works
             </p>
+            {[
+              ["1", "Click the button below — a unique deposit wallet is generated for you."],
+              ["2", "Send your crypto to that address on the correct network."],
+              ["3", "Once detected, your NGN is automatically credited to your wallet."],
+            ].map(([num, text]) => (
+              <div key={num} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                <div style={{ width: 22, height: 22, borderRadius: "50%", background: T.blue, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{num}</div>
+                <p style={{ fontSize: 13, color: "#1A3A8A", lineHeight: 1.5 }}>{text}</p>
+              </div>
+            ))}
           </div>
+
           <div
             className="chkwrap"
             style={{
@@ -2933,12 +2870,17 @@ function ConfirmStep({ order: o, onConfirm, onBack }) {
                     animation: "spin 0.7s linear infinite",
                   }}
                 />{" "}
-                Processing…
+                Generating wallet…
               </>
             ) : (
               <>
-                <Ico.lock /> Confirm & Sell{" "}
-                {fmtCoin(o.quote.crypto_amount, o.coin.sym)}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <rect x="2" y="7" width="20" height="14" rx="2"/>
+                  <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+                  <line x1="12" y1="12" x2="12" y2="16"/>
+                  <line x1="10" y1="14" x2="14" y2="14"/>
+                </svg>{" "}
+                Generate Deposit Wallet
               </>
             )}
           </button>
@@ -3079,84 +3021,39 @@ function ConfirmStep({ order: o, onConfirm, onBack }) {
               >
                 Paid to
               </p>
-              {isBank ? (
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 10,
+                    background: T.greenLight,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                    color: T.green,
+                  }}
+                >
+                  <Ico.wallet />
+                </div>
+                <div>
+                  <p
                     style={{
-                      width: 38,
-                      height: 38,
-                      borderRadius: 10,
-                      background: T.blueLight,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                      color: T.blue,
+                      fontFamily: "'Sora', sans-serif",
+                      fontSize: 13,
+                      fontWeight: 700,
+                      color: T.text,
                     }}
                   >
-                    <Ico.bank />
-                  </div>
-                  <div>
-                    <p
-                      style={{
-                        fontFamily: "'Sora', sans-serif",
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: T.text,
-                      }}
-                    >
-                      {o.bank.name}
-                    </p>
-                    <p style={{ fontSize: 12, color: T.text2, marginTop: 2 }}>
-                      {o.bank.bank}
-                    </p>
-                    <p
-                      style={{
-                        fontFamily: "'Sora', sans-serif",
-                        fontSize: 13,
-                        fontWeight: 600,
-                        color: T.text,
-                        marginTop: 1,
-                      }}
-                    >
-                      {o.bank.number}
-                    </p>
-                  </div>
+                    NGN Wallet
+                  </p>
+                  <p style={{ fontSize: 12, color: T.text2, marginTop: 2 }}>
+                    Instant credit
+                  </p>
                 </div>
-              ) : (
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div
-                    style={{
-                      width: 38,
-                      height: 38,
-                      borderRadius: 10,
-                      background: T.greenLight,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      flexShrink: 0,
-                      color: T.green,
-                    }}
-                  >
-                    <Ico.wallet />
-                  </div>
-                  <div>
-                    <p
-                      style={{
-                        fontFamily: "'Sora', sans-serif",
-                        fontSize: 13,
-                        fontWeight: 700,
-                        color: T.text,
-                      }}
-                    >
-                      NGN Wallet
-                    </p>
-                    <p style={{ fontSize: 12, color: T.text2, marginTop: 2 }}>
-                      Instant credit
-                    </p>
-                  </div>
-                </div>
-              )}
+              </div>
+
             </div>
           </div>
         </div>
@@ -3233,8 +3130,8 @@ export default function SellCryptocurrency({ onNavigate }) {
       {step === 1 && (
         <SellStep
           onContinue={(data) => {
-            setOrder(data);
-            setStep(2);
+            setOrder({ ...data, method: "wallet" });
+            setStep(3);
           }}
         />
       )}
@@ -3259,11 +3156,8 @@ export default function SellCryptocurrency({ onNavigate }) {
               submittedAt: new Date(),
               transaction: apiResp,
             }));
-            if (order.cryptoSource === "external_wallet") {
-              setStep(4);
-            } else {
-              setStep(5);
-            }
+            // Always go to deposit wallet step — webhook fires automatically
+            setStep(4);
           }}
         />
       )}

@@ -1,18 +1,21 @@
 import React from "react";
 
 export const ASSETS = [
-  { id:"bitcoin", symbol:"BTC", name:"Bitcoin", network:"Bitcoin Network", price:108280523, change:2.14, icon:"₿", color:"#F7931A", bg:"#FEF3E2" },
-  { id:"ethereum", symbol:"ETH", name:"Ethereum", network:"Ethereum Network", price:4236420, change:-0.87, icon:"Ξ", color:"#627EEA", bg:"#EEEFFE" },
-  { id:"tether", symbol:"USDT", name:"Tether", network:"Tron Network (TRC20)", price:1412, change:0.01, icon:"₮", color:"#26A17B", bg:"#E6F7F2" },
-  { id:"solana", symbol:"SOL", name:"Solana", network:"Solana Network", price:211821, change:4.56, icon:"◎", color:"#9945FF", bg:"#F1E9FF" },
-  { id:"bnb", symbol:"BNB", name:"BNB", network:"BSC (BEP20)", price:847284, change:1.33, icon:"⬡", color:"#F0B90B", bg:"#FEF8E6" },
-  { id:"xrp", symbol:"XRP", name:"XRP", network:"Ripple Network", price:847, change:-1.08, icon:"✕", color:"#000000", bg:"#E6E6E6" },
+  { id:"bitcoin", symbol:"BTC", name:"Bitcoin", network:"Bitcoin", price:108280523, change:2.14, icon:"₿", color:"#F7931A", bg:"#FEF3E2" },
+  { id:"ethereum", symbol:"ETH", name:"Ethereum", network:"ERC20", price:4236420, change:-0.87, icon:"Ξ", color:"#627EEA", bg:"#EEEFFE" },
+  { id:"tether", symbol:"USDT", name:"Tether", network:"TRC20", price:1412, change:0.01, icon:"₮", color:"#26A17B", bg:"#E6F7F2" },
+  { id:"usd-coin", symbol:"USDC", name:"USD Coin", network:"ERC20", price:1412, change:0.00, icon:"$", color:"#2775CA", bg:"#E6F0FA" },
+  { id:"bnb", symbol:"BNB", name:"BNB", network:"BEP20", price:847284, change:1.33, icon:"⬡", color:"#F0B90B", bg:"#FEF8E6" },
+  { id:"solana", symbol:"SOL", name:"Solana", network:"Solana", price:211821, change:4.56, icon:"◎", color:"#9945FF", bg:"#F1E9FF" },
 ];
 
 export const NETWORKS = {
-  BTC:["Bitcoin Network"],ETH:["Ethereum Network","Arbitrum","Optimism"],
-  USDT:["Tron (TRC20)","Ethereum (ERC20)","BSC (BEP20)"],SOL:["Solana Network"],
-  BNB:["BSC (BEP20)"],XRP:["Ripple Network"],
+  BTC:["Bitcoin"],
+  ETH:["ERC20"],
+  USDT:["TRC20"],
+  USDC:["ERC20"],
+  BNB:["BEP20"],
+  SOL:["Solana"],
 };
 
 export const PRICE_EXPIRY_TIME = 900;
@@ -45,7 +48,7 @@ export const Ico = {
 };
 
 export const NGN_RATE = 1412.14; // approx NGN per 1 USD — used for display only
-export const formatNGN = v=>new Intl.NumberFormat("en-NG",{style:"currency",currency:"NGN",minimumFractionDigits:0}).format(v);
+export const formatNGN = v=>new Intl.NumberFormat("en-NG",{style:"currency",currency:"NGN",minimumFractionDigits:0}).format(Number(String(v).replace(/,/g, '')));
 export const formatUSD = v => {
   if (v >= 100) return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(v);
   if (v >= 1)   return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2}).format(v);
@@ -79,9 +82,17 @@ export const GhostBtn = ({onClick,children,style={}})=>(
   </button>
 );
 
-export const RightPanel = ({payAmount,receiveAmount,selectedAsset,expiryTime,step})=>{
+export const RightPanel = ({payAmount,receiveAmount,selectedAsset,expiryTime,step,rate})=>{
   const isUrgent = expiryTime<=60;
-  const rows=[["You pay",payAmount>0?formatNGN(payAmount):"—"],["You receive",receiveAmount>0?`${receiveAmount} ${selectedAsset.symbol}`:"—"],["Asset",`${selectedAsset.name} (${selectedAsset.symbol})`],["Delivery","Internal Wallet"]];
+  const numPayAmount = Number((payAmount || "").toString().replace(/,/g, ""));
+  const rows=[
+    ["You pay", numPayAmount > 0 ? formatNGN(numPayAmount) : "—"],
+    ["You receive", receiveAmount > 0 ? `${receiveAmount} ${selectedAsset.symbol}` : "—"],
+    ["Exchange Rate", rate ? `${formatNGN(rate)} / $ - ${selectedAsset.symbol}` : "—"],
+    ["Asset", `${selectedAsset.name} (${selectedAsset.symbol})`],
+    ["Network", selectedAsset.network],
+    ["Delivery","Internal Wallet"]
+  ];
   return(
     <div className="rightpanel" style={{padding:"44px 28px 60px",background:T.surface,display:"flex",flexDirection:"column",minHeight:"100vh"}}>
       <p style={{fontSize:11,fontWeight:600,color:T.text3,textTransform:"uppercase",letterSpacing:"0.8px",marginBottom:16,fontFamily:"'DM Sans',sans-serif"}}>Order Summary</p>
@@ -102,7 +113,7 @@ export const RightPanel = ({payAmount,receiveAmount,selectedAsset,expiryTime,ste
 
         <div style={{ background: T.blue, borderRadius: 16, padding: "18px 20px" }}>
           <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>You will pay</p>
-          <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 24, fontWeight: 700, color: payAmount > 0 ? "#fff" : "rgba(255,255,255,0.3)", letterSpacing: "-1px", lineHeight: 1, overflowWrap: "break-word" }}>{payAmount > 0 ? formatNGN(payAmount) : "₦0.00"}</p>
+          <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 24, fontWeight: 700, color: numPayAmount > 0 ? "#fff" : "rgba(255,255,255,0.3)", letterSpacing: "-1px", lineHeight: 1, overflowWrap: "break-word" }}>{numPayAmount > 0 ? formatNGN(numPayAmount) : "₦0.00"}</p>
           <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,0.15)"}}>
             <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:"rgba(255,255,255,0.55)"}}>Delivery</span><span style={{fontFamily:"'Sora',sans-serif",fontSize:11,fontWeight:700,color:"rgba(255,255,255,0.9)"}}>Internal Wallet</span></div>
           </div>

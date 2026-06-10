@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   T,
   Ico,
@@ -29,6 +29,29 @@ export default function BuyFlowStep1({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const ddRef = useRef(null);
+
+  const [liveQuote, setLiveQuote] = useState(null);
+  const debounceRef = useRef(null);
+
+  const fetchLiveQuote = useCallback(async () => {
+    const numericAmount = Number((payAmount || "").toString().replace(/,/g, ""));
+    if (!numericAmount || numericAmount < 1000) {
+      setLiveQuote(null);
+      return;
+    }
+    try {
+      const q = await getBuyQuote(selectedAsset.symbol, numericAmount);
+      setLiveQuote(q);
+    } catch (e) {
+      setLiveQuote(null);
+    }
+  }, [payAmount, selectedAsset.symbol]);
+
+  useEffect(() => {
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(fetchLiveQuote, 600);
+    return () => clearTimeout(debounceRef.current);
+  }, [payAmount, selectedAsset.symbol, fetchLiveQuote]);
 
   useEffect(() => {
     const h = (e) => {
@@ -224,9 +247,14 @@ export default function BuyFlowStep1({
                   >
                     {selectedAsset.name}
                   </p>
-                  <p style={{ fontSize: 12, color: T.text2, marginTop: 3 }}>
-                    {selectedAsset.symbol}
-                  </p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 3 }}>
+                    <p style={{ fontSize: 12, color: T.text2 }}>
+                      {selectedAsset.symbol}
+                    </p>
+                    <div style={{ padding: "2px 6px", borderRadius: 4, background: T.surface, border: `1px solid ${T.border}`, fontSize: 10, color: T.text2, fontWeight: 600 }}>
+                      {selectedAsset.network}
+                    </div>
+                  </div>
                 </div>
               </div>
               <span
@@ -302,9 +330,14 @@ export default function BuyFlowStep1({
                       >
                         {asset.name}
                       </p>
-                      <p style={{ fontSize: 11, color: T.text2, marginTop: 1 }}>
-                        {asset.symbol}
-                      </p>
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 3 }}>
+                        <p style={{ fontSize: 11, color: T.text2 }}>
+                          {asset.symbol}
+                        </p>
+                        <div style={{ padding: "2px 6px", borderRadius: 4, background: T.white, border: `1px solid ${T.border}`, fontSize: 9, color: T.text2, fontWeight: 600 }}>
+                          {asset.network}
+                        </div>
+                      </div>
                     </div>
 
                     {asset.id === selectedAsset.id && (
@@ -614,7 +647,8 @@ export default function BuyFlowStep1({
       </div>
       <RightPanel
         payAmount={payAmount}
-        receiveAmount={0}
+        receiveAmount={liveQuote?.crypto_amount ? parseFloat(liveQuote.crypto_amount) : 0}
+        rate={liveQuote?.final_rate}
         selectedAsset={selectedAsset}
         expiryTime={0}
         step={1}

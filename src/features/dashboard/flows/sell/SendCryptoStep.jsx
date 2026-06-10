@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const T = {
   blue:"#1A6FFF",blueDark:"#1259D9",blueLight:"#EEF3FF",
@@ -21,23 +21,40 @@ const Ico = {
   send:()=><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>,
 };
 
-import { confirmSellCryptoSent } from "../../../../services/api";
+import { confirmSellCryptoSent, getBuyTransactionStatus } from "../../../../services/api";
 import Toast from "../../../../shared/components/Toast";
 
 export default function SendCryptoStep({ order, onSent }) {
   const [copied,setCopied] = useState(false);
   const [loading,setLoading] = useState(false);
   const [toast, setToast] = useState(null);
+  const [txDetails, setTxDetails] = useState(order.transaction || {});
   const o = order;
-  const brokerAddress = o.transaction?.broker_wallet_address || "Awaiting address...";
-  const network = o.transaction?.network || o.coin.name;
+  const brokerAddress = txDetails?.broker_wallet_address || "Awaiting address...";
+  const network = txDetails?.network || o.coin.name;
+
+  useEffect(() => {
+    if (txDetails?.broker_wallet_address || !txDetails?.id) return;
+    const interval = setInterval(async () => {
+      try {
+        const updated = await getBuyTransactionStatus(txDetails.id);
+        setTxDetails(updated);
+        if (updated.broker_wallet_address) {
+          clearInterval(interval);
+        }
+      } catch (err) {
+        console.error("Failed to poll tx status:", err);
+      }
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [txDetails?.broker_wallet_address, txDetails?.id]);
 
   const copyAddress = () => { navigator.clipboard.writeText(brokerAddress).catch(()=>{}); setCopied(true); setTimeout(()=>setCopied(false),2000); };
   const handleSent = async () => { 
       setLoading(true); 
       try {
-          if (o.transaction?.id) {
-              await confirmSellCryptoSent(o.transaction.id);
+          if (txDetails?.id) {
+              await confirmSellCryptoSent(txDetails.id);
           }
           setLoading(false); 
           onSent?.();
@@ -118,10 +135,63 @@ export default function SendCryptoStep({ order, onSent }) {
             </div>
           </div>
 
-          <button className="ctaon4" onClick={handleSent} disabled={loading} style={{width:"100%",marginTop:24,padding:"18px",borderRadius:14,border:"none",fontFamily:"'Sora',sans-serif",fontSize:15,fontWeight:700,cursor:loading?"not-allowed":"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,background:T.blue,color:"#fff",transition:"all 0.2s",letterSpacing:"0.2px"}}>
-            {loading?<><div style={{width:16,height:16,border:"2px solid rgba(255,255,255,0.3)",borderTopColor:"#fff",borderRadius:"50%",animation:"spin 0.7s linear infinite"}}/> Submitting…</>:<><Ico.send /> I Have Sent Crypto</>}
-          </button>
-          <p style={{fontSize:12,color:T.text3,textAlign:"center",marginTop:12,lineHeight:1.5}}>Only tap this after you have completed the transfer from your external wallet.</p>
+          {/* Awaiting deposit status */}
+          <div
+            style={{
+              marginTop: 24,
+              background: "linear-gradient(135deg, #EEF3FF 0%, #F7F9FF 100%)",
+              border: `1.5px solid ${T.border}`,
+              borderRadius: 16,
+              padding: "20px 22px",
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 14,
+            }}
+          >
+            <div
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                background: T.blueLight,
+                border: `2px solid ${T.blue}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <div
+                className="blink"
+                style={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: "50%",
+                  background: T.blue,
+                }}
+              />
+            </div>
+            <div>
+              <p
+                style={{
+                  fontFamily: "'Sora', sans-serif",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: T.text,
+                  marginBottom: 4,
+                }}
+              >
+                Awaiting your deposit
+              </p>
+              <p style={{ fontSize: 13, color: T.text2, lineHeight: 1.6 }}>
+                Once your transfer arrives on-chain, it will be detected automatically and your{" "}
+                <strong style={{ color: T.blue }}>NGN wallet</strong> will be credited — no further action needed.
+              </p>
+            </div>
+          </div>
+          <p style={{ fontSize: 12, color: T.text3, textAlign: "center", marginTop: 14, lineHeight: 1.5 }}>
+            You can safely close this page. Your payout will process automatically when the transfer is confirmed.
+          </p>
           <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:3,marginTop:20}}><span style={{fontSize:12,fontWeight:600,color:T.text2}}>Your transaction is secure</span><span style={{display:"flex",alignItems:"center",gap:5,fontSize:12,fontWeight:500,color:T.mintGreen}}><Ico.shield /> Protected by Cheeseball</span></div>
         </div>
 

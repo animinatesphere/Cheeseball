@@ -20,19 +20,19 @@ async function parseResponse(response) {
   return { __raw: await response.text() };
 }
 
-/* ─── In-Memory Token Store ─── */
-
-let _accessToken = null;
-let _refreshToken = null;
+/* ─── LocalStorage Token Store ─── */
 
 export function setTokens(access, refresh) {
-  _accessToken = access || null;
-  _refreshToken = refresh || null;
+  if (access) localStorage.setItem("accessToken", access);
+  else localStorage.removeItem("accessToken");
+  
+  if (refresh) localStorage.setItem("refreshToken", refresh);
+  else localStorage.removeItem("refreshToken");
 }
 
 export function clearTokens() {
-  _accessToken = null;
-  _refreshToken = null;
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
   localStorage.removeItem("user_email");
 }
 
@@ -54,9 +54,10 @@ async function refreshAccessToken() {
         "Content-Type": "application/json",
         accept: "application/json",
       };
+      const refreshToken = localStorage.getItem("refreshToken");
       // Attach refresh token as Bearer if we have it in memory
-      if (_refreshToken) {
-        headers["Authorization"] = `Bearer ${_refreshToken}`;
+      if (refreshToken) {
+        headers["Authorization"] = `Bearer ${refreshToken}`;
       }
 
       const response = await fetch(`${API_BASE}/api/auth/token/refresh`, {
@@ -64,7 +65,7 @@ async function refreshAccessToken() {
         headers,
         credentials: "include",
         body: JSON.stringify(
-          _refreshToken ? { refresh_token: _refreshToken } : {},
+          refreshToken ? { refresh_token: refreshToken } : {},
         ),
       });
 
@@ -76,7 +77,7 @@ async function refreshAccessToken() {
       const data = await parseResponse(response);
       // Store new tokens from response body
       if (data?.access) {
-        setTokens(data.access, data.refresh || _refreshToken);
+        setTokens(data.access, data.refresh || refreshToken);
       }
       return true;
     } finally {
@@ -107,9 +108,10 @@ function shouldAttemptRefresh(path, data) {
 
 async function request(path, options = {}, _isRetry = false) {
   const authHeaders = {};
+  const accessToken = localStorage.getItem("accessToken");
   // Attach access token via Authorization header if available
-  if (_accessToken) {
-    authHeaders["Authorization"] = `Bearer ${_accessToken}`;
+  if (accessToken) {
+    authHeaders["Authorization"] = `Bearer ${accessToken}`;
   }
 
   const response = await fetch(`${API_BASE}${path}`, {
@@ -189,7 +191,7 @@ export const getAccountStats = async () =>
 
 export const getCurrencies = async () =>
   withFallback(
-    async () => normalizeListResponse(await request("/api/currencies"), []),
+    async () => normalizeListResponse(await request("/api/rates/assets"), []),
     [
       { symbol: "BTC", name: "Bitcoin", sell_rate: 52000000 },
       { symbol: "ETH", name: "Ethereum", sell_rate: 2800000 },
@@ -438,7 +440,7 @@ export const createSellTransaction = async (payload) =>
   });
 
 export const confirmSellCryptoSent = async (transactionId) =>
-  request(`/api/broker/transactions/${transactionId}/sell-crypto-sent`, {
+  request(`/api/broker/transactions/${transactionId}/confirm-crypto-sent`, {
     method: "POST",
   });
 
@@ -467,6 +469,14 @@ export const getReferralData = async () => {
   }
   return data;
 };
+
+/* ─── KYC Verification ─── */
+
+export const submitKYC = async (payload) =>
+  request("/api/kyc/submit", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
 
 /* ─── Notifications ─── */
 

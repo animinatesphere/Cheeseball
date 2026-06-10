@@ -33,6 +33,7 @@ function WalletVariant({
   breadcrumbs,
   promoCode,
   promoBenefit,
+  rate,
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -396,6 +397,7 @@ function WalletVariant({
         selectedAsset={selectedAsset}
         expiryTime={expiryTime}
         step={4}
+        rate={rate}
       />
     </div>
   );
@@ -415,6 +417,7 @@ function PaystackVariant({
   breadcrumbs,
   promoCode,
   promoBenefit,
+  rate,
 }) {
   const [loading, setLoading] = useState(false);
   const [setupDone, setSetupDone] = useState(false);
@@ -1466,6 +1469,7 @@ export default function BuyFlowStep4({
   breadcrumbs,
   promoCode,
   promoBenefit,
+  finalRate,
 }) {
   if (paymentMethod === "ngn_wallet")
     return (
@@ -1481,6 +1485,7 @@ export default function BuyFlowStep4({
         breadcrumbs={breadcrumbs}
         promoCode={promoCode}
         promoBenefit={promoBenefit}
+        rate={finalRate}
       />
     );
   if (paymentMethod === "paystack")
@@ -1498,6 +1503,7 @@ export default function BuyFlowStep4({
         breadcrumbs={breadcrumbs}
         promoCode={promoCode}
         promoBenefit={promoBenefit}
+        rate={finalRate}
       />
     );
   return (
@@ -1518,6 +1524,7 @@ export default function BuyFlowStep4({
       breadcrumbs={breadcrumbs}
       promoCode={promoCode}
       promoBenefit={promoBenefit}
+      rate={finalRate}
     />
   );
 }

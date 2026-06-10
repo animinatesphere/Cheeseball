@@ -35,7 +35,7 @@ export default function PaymentSubmittedStep({ order, onGoHome, onContactSupport
   const o = order;
   const txRef = o.txRef || "CHB-2024-"+String(Date.now()).slice(-5);
   const submittedAt = o.submittedAt || new Date();
-  const network = o.coin.name === "Ethereum" ? "ERC-20" : o.coin.name === "BNB" ? "BEP-20" : o.coin.name;
+  const network = o.coin.network || o.coin.name;
 
   const copyRef = () => { navigator.clipboard.writeText(txRef).catch(()=>{}); setCopied(true); setTimeout(()=>setCopied(false),2000); };
 

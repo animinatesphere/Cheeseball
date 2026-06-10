@@ -496,6 +496,14 @@ const CurrencyPage = () => {
     : "CB";
   const username = user?.email?.split("@")[0] || "User";
 
+  // Derive KYC status from user object (field name may vary by backend)
+  const kycStatus =
+    user?.kyc_status ||
+    user?.kyc?.status ||
+    user?.verification_status ||
+    "unverified";
+  const kycRejectionReason = user?.kyc_rejection_reason || user?.kyc?.rejection_reason || undefined;
+
   // Dynamic routing display
   const currentPageTitle = (() => {
     const p = location.pathname.split("/").pop();
@@ -775,6 +783,8 @@ const CurrencyPage = () => {
                       <CurrencyRates
                         searchQuery={searchQuery}
                         onNavigate={handleNavigation}
+                        kycStatus={kycStatus}
+                        kycRejectionReason={kycRejectionReason}
                       />
                     </div>
                   }

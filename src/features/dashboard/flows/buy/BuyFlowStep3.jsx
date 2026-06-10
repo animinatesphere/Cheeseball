@@ -2,7 +2,7 @@ import React from "react";
 import { T, Ico, formatNGN, CTA, GhostBtn, RightPanel } from "./BuyFlowShared";
 
 export default function BuyFlowStep3({
-  payAmount, receiveAmount, selectedAsset, expiryTime,
+  payAmount, receiveAmount, selectedAsset, expiryTime, finalRate,
   paymentMethod, setPaymentMethod,
   nextStep, prevStep, breadcrumbs,
 }) {
@@ -85,7 +85,7 @@ export default function BuyFlowStep3({
         </div>
         <p style={{fontSize:12,textAlign:"center",color:T.text3,marginTop:14,fontFamily:"'DM Sans',sans-serif"}}>Prices may change slightly before the transaction is completed.</p>
       </div>
-      <RightPanel payAmount={payAmount} receiveAmount={receiveAmount} selectedAsset={selectedAsset} expiryTime={expiryTime} step={3}/>
+      <RightPanel payAmount={payAmount} receiveAmount={receiveAmount} rate={finalRate} selectedAsset={selectedAsset} expiryTime={expiryTime} step={3}/>
     </div>
   );
 }

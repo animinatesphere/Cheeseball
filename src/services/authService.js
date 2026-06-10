@@ -73,7 +73,7 @@ const authService = {
       { email, password },
       "Login failed",
     );
-    // Store tokens in memory for Authorization header usage
+    // Store tokens in localStorage for Authorization header usage
     if (data?.access) {
       setTokens(data.access, data.refresh);
     }
@@ -93,7 +93,7 @@ const authService = {
       { email, token },
       "Verification failed",
     );
-    // Store tokens in memory after verification (auto-login)
+    // Store tokens in localStorage after verification (auto-login)
     if (data?.access) {
       setTokens(data.access, data.refresh);
     }

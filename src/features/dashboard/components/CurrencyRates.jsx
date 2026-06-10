@@ -22,6 +22,7 @@ import {
   getUserTransactions,
   getReferralData,
 } from "@/services/api";
+import KYCStatusBanner from "./KYCStatusBanner";
 
 /* ─── Design tokens ──────────────────────────────────────────── */
 const T = {
@@ -141,7 +142,7 @@ const QUICK_ACTIONS = [
   },
 ];
 
-const CurrencyRates = ({ onNavigate, searchQuery = "" }) => {
+const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified", kycRejectionReason }) => {
   const [balanceVisible, setBalanceVisible] = useState(true);
   const [copied, setCopied] = useState(false);
   const [assets, setAssets] = useState([]);
@@ -363,6 +364,13 @@ const CurrencyRates = ({ onNavigate, searchQuery = "" }) => {
           gap: 24,
         }}
       >
+        {/* ── KYC Status Banner ── */}
+        <KYCStatusBanner
+          status={kycStatus}
+          rejectionReason={kycRejectionReason}
+          onNavigate={onNavigate}
+        />
+
         {/* ── ROW 1: Balance + Referral ── */}
         <div
           className="dash-grid-top"
