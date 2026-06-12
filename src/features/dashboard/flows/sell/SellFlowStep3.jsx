@@ -39,52 +39,172 @@ function ExternalWalletVariant({ payAmount, receiveAmount, selectedAsset, transa
     const txRef = transactionData?.id || "CHB-2024-" + String(Date.now()).slice(-5);
     const submittedAt = new Date();
 
-    return (
-      <div style={{ height: "100vh", background: "linear-gradient(135deg, #F6F8FD 0%, #FFFFFF 100%)", fontFamily: "'DM Sans',sans-serif", color: T.text, overflow: "hidden", width: "100vw", display: "flex", alignItems: "center", justifyContent: "center", position: "relative" }}>
-        
-        {/* Subtle decorative blurs for premium feel */}
-        <div style={{ position: "absolute", top: "-10%", left: "-5%", width: 400, height: 400, background: "rgba(245, 158, 11, 0.08)", filter: "blur(80px)", borderRadius: "50%", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: "-10%", right: "-5%", width: 500, height: 500, background: "rgba(59, 130, 246, 0.06)", filter: "blur(100px)", borderRadius: "50%", pointerEvents: "none" }} />
+    const steps = [
+      { label: "Order placed", done: true },
+      { label: "Payment sent", done: true },
+      { label: "Blockchain confirming", active: true },
+      { label: "NGN credited", done: false },
+    ];
 
-        <div style={{ maxWidth: 520, width: "100%", padding: "0 24px", position: "relative", zIndex: 1 }}>
-          <div className="fadein" style={{ background: "rgba(255, 255, 255, 0.85)", backdropFilter: "blur(20px)", border: `1px solid rgba(255, 255, 255, 0.5)`, borderRadius: 32, padding: "56px 48px", textAlign: "center", boxShadow: "0 24px 64px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.6)" }}>
-            
-            <div style={{ position: "relative", width: 96, height: 96, margin: "0 auto 32px" }}>
-              <div className="pulsing" style={{ position: "absolute", inset: -8, borderRadius: "50%", background: "rgba(245, 158, 11, 0.15)", filter: "blur(8px)" }} />
-              <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: T.orangeLight, border: `2px solid rgba(245, 158, 11, 0.3)` }} />
-              <div style={{ position: "relative", width: 96, height: 96, borderRadius: "50%", background: "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 12px 24px rgba(245, 158, 11, 0.25), inset 0 2px 0 rgba(255,255,255,0.2)" }}>
+    return (
+      <div className="sellgrid fadein" style={{ display: "grid", gridTemplateColumns: "1fr 360px", height: "100vh", fontFamily: "'DM Sans',sans-serif", background: T.white, color: T.text, overflowX: "hidden", maxWidth: "100vw" }}>
+
+        {/* ── LEFT PANEL ── */}
+        <div style={{ padding: "28px 36px 28px", borderRight: `1px solid ${T.border}`, display: "flex", flexDirection: "column", overflow: "hidden" }} className="step-content">
+
+          {/* Status icon + headline */}
+          <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
+            <div style={{ position: "relative", width: 48, height: 48, flexShrink: 0 }}>
+              <div className="ripple" style={{ position: "absolute", inset: -5, borderRadius: "50%", border: `2px solid rgba(245,158,11,0.35)` }} />
+              <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "linear-gradient(135deg,#F59E0B 0%,#D97706 100%)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 6px 14px rgba(245,158,11,0.28), inset 0 1px 0 rgba(255,255,255,0.2)" }}>
                 {Ico.clock("#fff")}
               </div>
             </div>
-            
-            <h1 style={{ fontFamily: "'Sora',sans-serif", fontSize: 32, fontWeight: 700, color: T.text, letterSpacing: "-0.8px", marginBottom: 16 }}>Payment Processing</h1>
-            <p style={{ fontSize: 16, color: T.text2, lineHeight: 1.6, maxWidth: 380, margin: "0 auto 36px" }}>
-              Confirming transaction on the blockchain. Your NGN wallet will be credited with <strong style={{ color: T.text }}>{formatNGN(receiveAmount)}</strong> shortly.
+            <div>
+              <p style={{ fontSize: 10, fontWeight: 600, color: T.blue, textTransform: "uppercase", letterSpacing: "1px", marginBottom: 2, fontFamily: "'DM Sans',sans-serif" }}>Transaction Status</p>
+              <h1 className="responsive-title" style={{ fontFamily: "'Sora',sans-serif", fontSize: 22, fontWeight: 700, color: T.text, letterSpacing: "-0.5px", lineHeight: 1.15 }}>Payment Processing</h1>
+            </div>
+          </div>
+
+          {/* Amount highlight */}
+          <div style={{ background: "linear-gradient(135deg,#FFFBEB 0%,#FEF3C7 100%)", border: "1.5px solid #FDE68A", borderRadius: 14, padding: "14px 18px", marginBottom: 12 }}>
+            <p style={{ fontSize: 10, fontWeight: 600, color: "#92400E", textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 4, fontFamily: "'DM Sans',sans-serif" }}>You will receive</p>
+            <p style={{ fontFamily: "'Sora',sans-serif", fontSize: 28, fontWeight: 700, color: "#92400E", letterSpacing: "-1px", lineHeight: 1 }}>{formatNGN(receiveAmount)}</p>
+            <p style={{ fontSize: 12, color: "#B45309", marginTop: 5, lineHeight: 1.4 }}>
+              Confirming on the blockchain — your NGN wallet will be credited shortly.
             </p>
-            
-            <div style={{ background: "rgba(248, 250, 252, 0.7)", border: `1px solid rgba(226, 232, 240, 0.8)`, borderRadius: 20, padding: "24px", textAlign: "left", marginBottom: 40, boxShadow: "inset 0 2px 4px rgba(0,0,0,0.01)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 16, borderBottom: `1px dashed rgba(203, 213, 225, 0.6)`, marginBottom: 16 }}>
-                <span style={{ fontSize: 14, color: T.text3, fontWeight: 500 }}>Reference</span>
-                <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 14, fontWeight: 700, color: T.text }}>{txRef}</span>
+          </div>
+
+          {/* Transaction detail card */}
+          <div style={{ background: T.surface, border: `1.5px solid ${T.border}`, borderRadius: 14, overflow: "hidden", marginBottom: 12 }}>
+            {[
+              { label: "Reference", value: txRef, mono: true },
+              { label: "Date", value: `${fmtDate(submittedAt)} • ${fmtTime(submittedAt)}`, mono: true },
+              { label: "Asset sent", value: `${payAmount} ${selectedAsset.symbol}`, mono: true },
+            ].map(({ label, value, mono }, i, arr) => (
+              <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 16px", borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : "none" }}>
+                <span style={{ fontSize: 12, color: T.text2, fontFamily: "'DM Sans',sans-serif" }}>{label}</span>
+                <span style={{ fontFamily: mono ? "'Sora',sans-serif" : "'DM Sans',sans-serif", fontSize: 12, fontWeight: 700, color: T.text }}>{value}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 16, borderBottom: `1px dashed rgba(203, 213, 225, 0.6)`, marginBottom: 16 }}>
-                <span style={{ fontSize: 14, color: T.text3, fontWeight: 500 }}>Date</span>
-                <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 14, fontWeight: 700, color: T.text }}>{fmtDate(submittedAt)} • {fmtTime(submittedAt)}</span>
+            ))}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 16px" }}>
+              <span style={{ fontSize: 12, color: T.text2, fontFamily: "'DM Sans',sans-serif" }}>Status</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, background: T.orangeLight, border: "1px solid #FDE68A", padding: "3px 10px", borderRadius: 20 }}>
+                <div className="pulsing" style={{ width: 5, height: 5, borderRadius: "50%", background: T.orange, flexShrink: 0 }} />
+                <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 11, fontWeight: 700, color: "#92400E" }}>Processing</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontSize: 14, color: T.text3, fontWeight: 500 }}>Status</span>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, background: "rgba(245, 158, 11, 0.1)", padding: "4px 10px", borderRadius: 12 }}>
-                  <div className="pulsing" style={{ width: 6, height: 6, borderRadius: "50%", background: T.orange }} />
-                  <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: "#B45309" }}>Processing</span>
+            </div>
+          </div>
+
+          {/* Step progress tracker */}
+          <div style={{ background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 14, padding: "12px 16px", marginBottom: 16 }}>
+            <p style={{ fontSize: 10, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 10, fontFamily: "'DM Sans',sans-serif" }}>Progress</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+              {steps.map((s, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
+                    <div style={{
+                      width: 22, height: 22, borderRadius: "50%",
+                      background: s.done ? T.green : s.active ? "linear-gradient(135deg,#F59E0B,#D97706)" : T.surface,
+                      border: s.done ? `2px solid ${T.green}` : s.active ? "2px solid #D97706" : `2px solid ${T.border}`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      boxShadow: s.active ? "0 3px 8px rgba(245,158,11,0.3)" : "none",
+                      transition: "all 0.3s",
+                    }}>
+                      {s.done
+                        ? <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        : s.active
+                          ? <div className="pulsing" style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />
+                          : <div style={{ width: 6, height: 6, borderRadius: "50%", background: T.border }} />
+                      }
+                    </div>
+                    {i < steps.length - 1 && (
+                      <div style={{ width: 2, height: 14, background: s.done ? T.green : T.border, borderRadius: 2, margin: "2px 0" }} />
+                    )}
+                  </div>
+                  <p style={{ fontSize: 12, fontWeight: s.active ? 700 : s.done ? 600 : 500, color: s.active ? "#92400E" : s.done ? T.greenText : T.text3, paddingTop: 3, fontFamily: s.active || s.done ? "'Sora',sans-serif" : "'DM Sans',sans-serif", marginBottom: i < steps.length - 1 ? 10 : 0 }}>
+                    {s.label}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="actions-wrap" style={{ display: "flex", gap: 10, marginTop: 0 }}>
+            <GhostBtn onClick={onBack} style={{ flex: 1, padding: "13px 16px", fontSize: 13 }}>Return to Dashboard</GhostBtn>
+            <CTA onClick={() => onNavigate("history")} style={{ flex: 1, padding: "13px 16px", fontSize: 13, boxShadow: "0 6px 16px rgba(26,111,255,0.25)" }}>View History</CTA>
+          </div>
+        </div>
+
+        {/* ── RIGHT PANEL ── */}
+        <div style={{ padding: "28px 20px 24px", background: T.surface, display: "flex", flexDirection: "column", overflow: "hidden" }} className="rightpanel">
+          <p style={{ fontSize: 10, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 12, fontFamily: "'DM Sans',sans-serif" }}>Transaction Summary</p>
+
+          {/* Asset swap visual */}
+          <div style={{ background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 14, overflow: "hidden", marginBottom: 10 }}>
+            <div style={{ padding: "12px 14px" }}>
+              {/* Sent */}
+              <div style={{ display: "flex", alignItems: "center", padding: "10px 12px", background: T.surface, borderRadius: 10, marginBottom: 6 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: selectedAsset.color, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora',sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{selectedAsset.icon}</div>
+                  <div>
+                    <p style={{ fontSize: 10, color: T.text3, marginBottom: 1, fontFamily: "'DM Sans',sans-serif" }}>You sent</p>
+                    <p style={{ fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: T.text }}>{payAmount} {selectedAsset.symbol}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Arrow */}
+              <div style={{ display: "flex", justifyContent: "center", margin: "3px 0" }}>
+                <div style={{ width: 22, height: 22, borderRadius: "50%", background: T.blueLight, border: `1.5px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Ico.arrowDn />
+                </div>
+              </div>
+
+              {/* Receive */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 12px", background: "linear-gradient(135deg,#F59E0B 0%,#D97706 100%)", borderRadius: 10, marginTop: 6 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(255,255,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 10, color: "rgba(255,255,255,0.65)", marginBottom: 1, fontFamily: "'DM Sans',sans-serif" }}>You receive</p>
+                    <p style={{ fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: "#fff" }}>{formatNGN(receiveAmount)}</p>
+                  </div>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,0.2)", padding: "3px 8px", borderRadius: 20 }}>
+                  <div className="pulsing" style={{ width: 4, height: 4, borderRadius: "50%", background: "#fff" }} />
+                  <span style={{ fontSize: 10, fontWeight: 700, color: "#fff", fontFamily: "'Sora',sans-serif" }}>Processing</span>
                 </div>
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: 16 }}>
-              <GhostBtn onClick={onBack} style={{ flex: 1, height: 52, borderRadius: 16, fontSize: 15 }}>Dashboard</GhostBtn>
-              <CTA onClick={() => onNavigate("history")} style={{ flex: 1, height: 52, borderRadius: 16, fontSize: 15, boxShadow: "0 8px 20px rgba(59,130,246,0.25)" }}>View History</CTA>
+            {/* Detail rows */}
+            <div style={{ borderTop: `1.5px dashed ${T.border}`, margin: "0 14px" }} />
+            <div style={{ padding: "4px 14px 6px" }}>
+              {[
+                ["Asset", `${selectedAsset.name} (${selectedAsset.symbol})`],
+                ["Network", selectedAsset.network],
+                ["Payout to", "NGN Wallet"],
+              ].map(([label, val], i, arr) => (
+                <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : "none" }}>
+                  <span style={{ fontSize: 11, color: T.text2, fontFamily: "'DM Sans',sans-serif" }}>{label}</span>
+                  <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 11, fontWeight: 700, color: T.text }}>{val}</span>
+                </div>
+              ))}
             </div>
           </div>
+
+          {/* Info note */}
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 8, background: T.blueLight, border: `1px solid ${T.border}`, borderRadius: 12, padding: "10px 12px", marginBottom: 10 }}>
+            <Ico.info />
+            <p style={{ fontSize: 12, color: T.blue, lineHeight: 1.5, fontFamily: "'DM Sans',sans-serif" }}>
+              Once the blockchain confirms your deposit, funds are credited to your NGN wallet automatically — no action needed.
+            </p>
+          </div>
+
+          <SecureFooter />
         </div>
       </div>
     );

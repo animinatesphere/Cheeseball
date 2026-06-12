@@ -33,6 +33,7 @@ import {
   getCurrentUser,
 } from "@/services/api";
 import authService from "@/services/authService";
+import { useNotifications } from "@/services/useNotifications";
 
 import CurrencyRates from "../components/CurrencyRates";
 import ConvertFlow from "../flows/swap/ConvertFlow";
@@ -426,6 +427,8 @@ const CurrencyPage = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const { unreadCount } = useNotifications();
+
   useEffect(() => {
     getCurrentUser().then(setUser);
   }, []);
@@ -574,19 +577,16 @@ const CurrencyPage = () => {
         </div>
 
         {/* MAIN LAYOUT */}
-        <div
-          className="flex-1 flex flex-col overflow-hidden transition-all duration-250 ease-in-out"
-          style={{ lg: { marginLeft: sidebarWidth } }}
-        >
+        <div className="flex-1 flex flex-col overflow-hidden">
           {/* Workaround for inline style margin left for desktop view */}
           <style>{`
             @media (min-width: 1024px) {
-              .main-layout { margin-left: ${sidebarWidth}px; }
+              .main-layout { margin-left: ${sidebarWidth}px; transition: margin-left 0.3s ease; }
             }
             .nav-btn:hover:not(.active){background:${T.surface}!important;color:${T.text}!important;}
           `}</style>
 
-          <div className="main-layout flex-1 flex flex-col overflow-hidden transition-all duration-300">
+          <div className="main-layout flex-1 flex flex-col overflow-hidden">
             {/* TOP BAR */}
             <header
               className="dash-header"
@@ -670,44 +670,11 @@ const CurrencyPage = () => {
               </div>
 
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div
-                  className="hidden md:flex"
-                  style={{ position: "relative", alignItems: "center" }}
-                >
-                  <Search
-                    size={14}
-                    style={{ position: "absolute", left: 12, color: T.text3 }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Search assets…"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    style={{
-                      background: T.surface,
-                      border: `1px solid ${T.border}`,
-                      borderRadius: 10,
-                      paddingLeft: 34,
-                      paddingRight: 14,
-                      paddingTop: 9,
-                      paddingBottom: 9,
-                      fontSize: 13,
-                      color: T.text,
-                      fontFamily: "'DM Sans', sans-serif",
-                      outline: "none",
-                      width: 220,
-                      transition: "border-color 0.15s",
-                    }}
-                    onFocus={(e) => (e.target.style.borderColor = T.blue)}
-                    onBlur={(e) => (e.target.style.borderColor = T.border)}
-                  />
-                </div>
                 <button
                   title="Notifications"
                   onClick={() => handleNavigation("notifications")}
                   style={{
                     position: "relative",
-                    width: 38,
                     height: 38,
                     borderRadius: 10,
                     background: T.surface,
@@ -716,6 +683,7 @@ const CurrencyPage = () => {
                     alignItems: "center",
                     justifyContent: "center",
                     cursor: "pointer",
+                    padding: "0 16px",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = T.blueLight;
@@ -724,50 +692,38 @@ const CurrencyPage = () => {
                     e.currentTarget.style.background = T.surface;
                   }}
                 >
-                  <Bell size={17} color={T.text2} />
+                  <span className="hidden md:block" style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 700, color: T.text, letterSpacing: "-0.2px" }}>
+                    Notifications
+                  </span>
+                  <Bell className="block md:hidden" size={17} color={T.text} />
+                  
                   <span
                     style={{
                       position: "absolute",
-                      top: 9,
-                      right: 9,
-                      width: 7,
-                      height: 7,
-                      borderRadius: "50%",
-                      background: T.blue,
+                      top: -6,
+                      right: -6,
+                      minWidth: 20,
+                      height: 20,
+                      borderRadius: 10,
+                      background: T.red,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                       border: "2px solid #fff",
-                    }}
-                  />
-                </button>
-                <button
-                  onClick={() => handleNavigation("account")}
-                  style={{
-                    width: 38,
-                    height: 38,
-                    borderRadius: 10,
-                    background: T.blue,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  <span
-                    style={{
-                      fontFamily: "'Sora', sans-serif",
+                      fontSize: 10,
                       fontWeight: 700,
-                      fontSize: 12,
                       color: "#fff",
+                      padding: "0 5px"
                     }}
                   >
-                    {initials}
+                    {unreadCount || 0}
                   </span>
                 </button>
               </div>
             </header>
 
             {/* ROUTE CONTENT WRAPPER */}
-            <main style={{ flex: 1, overflowY: "auto", position: "relative" }}>
+            <main style={{ flex: 1, overflowY: "auto", position: "relative", WebkitOverflowScrolling: "touch", transform: "translateZ(0)" }}>
               <Routes>
                 <Route index element={<Navigate to="dashboard" replace />} />
                 <Route

@@ -48,16 +48,23 @@ export default function ConvertFlowStep1({
   };
 
   const selectFromAsset = (asset) => {
+    setError(null);
     setSelectedFromAsset(asset);
     setDdFromOpen(false);
     setSearchFrom("");
-    // Auto-clear toAsset if it's the same
-    if (selectedToAsset?.symbol === asset.symbol) {
-      setSelectedToAsset(null);
+    // Auto-clear toAsset if it's invalid (same asset, or crypto-to-crypto)
+    if (selectedToAsset) {
+      if (
+        asset.symbol === selectedToAsset.symbol ||
+        (asset.symbol !== "NGN" && selectedToAsset.symbol !== "NGN")
+      ) {
+        setSelectedToAsset(null);
+      }
     }
   };
 
   const selectToAsset = (asset) => {
+    setError(null);
     setSelectedToAsset(asset);
     setDdToOpen(false);
     setSearchTo("");
@@ -74,8 +81,12 @@ export default function ConvertFlowStep1({
 
     const availableBalance = getAvailableBalance(selectedFromAsset?.symbol);
     if (numericAmount > availableBalance) {
+      const formattedBalance =
+        selectedFromAsset?.symbol === "NGN"
+          ? formatNGN(availableBalance)
+          : `${availableBalance.toFixed(8)} ${selectedFromAsset?.symbol}`;
       setError(
-        `Insufficient balance. Available: ${formatNGN(availableBalance)}`,
+        `Insufficient ${selectedFromAsset?.symbol} balance. Available: ${formattedBalance}`,
       );
       return;
     }
@@ -107,12 +118,20 @@ export default function ConvertFlowStep1({
       a.symbol.toLowerCase().includes((searchFrom || "").toLowerCase()),
   );
 
-  const filteredToAssets = ASSETS.filter(
-    (a) =>
-      a.symbol !== selectedFromAsset?.symbol &&
-      (a.name.toLowerCase().includes((searchTo || "").toLowerCase()) ||
-        a.symbol.toLowerCase().includes((searchTo || "").toLowerCase())),
-  );
+  const filteredToAssets = ASSETS.filter((a) => {
+    if (a.symbol === selectedFromAsset?.symbol) return false;
+    if (
+      selectedFromAsset &&
+      selectedFromAsset.symbol !== "NGN" &&
+      a.symbol !== "NGN"
+    ) {
+      return false;
+    }
+    return (
+      a.name.toLowerCase().includes((searchTo || "").toLowerCase()) ||
+      a.symbol.toLowerCase().includes((searchTo || "").toLowerCase())
+    );
+  });
 
   const availableBalance = getAvailableBalance(selectedFromAsset?.symbol);
   const maxAmountDisplay =
@@ -393,10 +412,24 @@ export default function ConvertFlowStep1({
                 transition: "all 0.2s",
               }}
             >
+              {selectedFromAsset?.symbol === "NGN" && (
+                <span
+                  style={{
+                    paddingLeft: "16px",
+                    fontWeight: 700,
+                    fontSize: 16,
+                    color: T.text,
+                    fontFamily: "'Sora',sans-serif",
+                  }}
+                >
+                  ₦
+                </span>
+              )}
               <input
                 type="number"
                 value={fromAmount}
                 onChange={(e) => {
+                  setError(null);
                   const val = e.target.value;
                   if (val === "" || !isNaN(val)) {
                     setFromAmount(val);
@@ -405,7 +438,7 @@ export default function ConvertFlowStep1({
                 placeholder="0"
                 style={{
                   flex: 1,
-                  padding: "14px 16px",
+                  padding: selectedFromAsset?.symbol === "NGN" ? "14px 16px 14px 4px" : "14px 16px",
                   border: "none",
                   outline: "none",
                   fontSize: 16,
@@ -415,6 +448,19 @@ export default function ConvertFlowStep1({
                   color: T.text,
                 }}
               />
+              {selectedFromAsset && selectedFromAsset.symbol !== "NGN" && (
+                <span
+                  style={{
+                    paddingRight: "12px",
+                    fontWeight: 700,
+                    fontSize: 14,
+                    color: T.text3,
+                    fontFamily: "'DM Sans',sans-serif",
+                  }}
+                >
+                  {selectedFromAsset.symbol}
+                </span>
+              )}
               {selectedFromAsset && (
                 <button
                   onClick={() => setFromAmount(availableBalance.toString())}

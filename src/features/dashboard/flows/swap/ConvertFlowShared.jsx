@@ -2,12 +2,27 @@ import React from "react";
 
 export const ASSETS = [
   { id: "ngn", symbol: "NGN", name: "Nigerian Naira", icon: "₦", color: "#00C48C", bg: "#E6FAF4" },
-  { id: "bitcoin", symbol: "BTC", name: "Bitcoin", network: "Bitcoin", icon: "₿", color: "#F7931A", bg: "#FEF3E2" },
-  { id: "ethereum", symbol: "ETH", name: "Ethereum", network: "ERC20", icon: "Ξ", color: "#627EEA", bg: "#EEEFFE" },
-  { id: "tether", symbol: "USDT", name: "Tether", network: "TRC20", icon: "₮", color: "#26A17B", bg: "#E6F7F2" },
-  { id: "usd-coin", symbol: "USDC", name: "USD Coin", network: "ERC20", icon: "$", color: "#2775CA", bg: "#E6F0FA" },
-  { id: "bnb", symbol: "BNB", name: "BNB", network: "BEP20", icon: "⬡", color: "#F0B90B", bg: "#FEF8E6" },
-  { id: "solana", symbol: "SOL", name: "Solana", network: "Solana", icon: "◎", color: "#9945FF", bg: "#F1E9FF" },
+  { id:"bitcoin", symbol:"BTC", name:"Bitcoin", network:"Bitcoin", price:108280523, change:2.14, icon:"₿", color:"#F7931A", bg:"#FEF3E2" },
+  { id:"ethereum", symbol:"ETH", name:"Ethereum", network:"ERC20", price:4236420, change:-0.87, icon:"Ξ", color:"#627EEA", bg:"#EEEFFE" },
+  { id:"tether", symbol:"USDT", name:"Tether", network:"TRC20", price:1412, change:0.01, icon:"₮", color:"#26A17B", bg:"#E6F7F2" },
+  { id:"usd-coin", symbol:"USDC", name:"USD Coin", network:"ERC20", price:1412, change:0.00, icon:"$", color:"#2775CA", bg:"#E6F0FA" },
+  { id:"bnb", symbol:"BNB", name:"BNB", network:"BEP20", price:847284, change:1.33, icon:"⬡", color:"#F0B90B", bg:"#FEF8E6" },
+  { id:"solana", symbol:"SOL", name:"Solana", network:"Solana", price:211821, change:4.56, icon:"◎", color:"#9945FF", bg:"#F1E9FF" },
+  { id:"ripple", symbol:"XRP", name:"XRP", network:"Ripple", price:847, change:0.5, icon:"✕", color:"#23292F", bg:"#E9EBEF" },
+  { id:"tron", symbol:"TRX", name:"TRON", network:"TRC20", price:169, change:-1.2, icon:"▼", color:"#FF0013", bg:"#FFE5E7" },
+  { id:"litecoin", symbol:"LTC", name:"Litecoin", network:"Litecoin", price:115000, change:2.1, icon:"Ł", color:"#345D9D", bg:"#EAF0F7" },
+  { id:"dogecoin", symbol:"DOGE", name:"Dogecoin", network:"Dogecoin", price:250, change:5.5, icon:"Ð", color:"#C2A633", bg:"#F9F6EB" },
+  { id:"bitcoin-cash", symbol:"BCH", name:"Bitcoin Cash", network:"Bitcoin Cash", price:650000, change:1.1, icon:"Ƀ", color:"#8DC351", bg:"#F3F9EC" },
+  { id:"cardano", symbol:"ADA", name:"Cardano", network:"Cardano", price:850, change:0.8, icon:"₳", color:"#0033AD", bg:"#E5EBF6" },
+  { id:"polygon", symbol:"MATIC", name:"Polygon", network:"Polygon", price:1200, change:-0.4, icon:"M", color:"#8247E5", bg:"#F2EDFC" },
+  { id:"polkadot", symbol:"DOT", name:"Polkadot", network:"Polkadot", price:10500, change:1.8, icon:"P", color:"#E6007A", bg:"#FCE5F1" },
+  { id:"chainlink", symbol:"LINK", name:"Chainlink", network:"ERC20", price:25000, change:3.2, icon:"L", color:"#2A5ADA", bg:"#EAEFFE" },
+  { id:"avalanche", symbol:"AVAX", name:"Avalanche", network:"Avalanche", price:52000, change:-1.5, icon:"A", color:"#E84142", bg:"#FCECEC" },
+  { id:"uniswap", symbol:"UNI", name:"Uniswap", network:"ERC20", price:14000, change:2.4, icon:"U", color:"#FF007A", bg:"#FFE5F1" },
+  { id:"stellar", symbol:"XLM", name:"Stellar", network:"Stellar", price:155, change:0.2, icon:"*", color:"#14B6E7", bg:"#E7F7FD" },
+  { id:"cosmos", symbol:"ATOM", name:"Cosmos", network:"Cosmos", price:12500, change:1.1, icon:"C", color:"#2E3148", bg:"#EAEAEF" },
+  { id:"ethereum-classic", symbol:"ETC", name:"Ethereum Classic", network:"Ethereum Classic", price:38000, change:-0.9, icon:"⟠", color:"#328332", bg:"#EAF2EA" },
+  { id:"toncoin", symbol:"TON", name:"Toncoin", network:"TON", price:9800, change:4.1, icon:"T", color:"#0098EA", bg:"#E5F4FD" },
 ];
 
 export const T = {

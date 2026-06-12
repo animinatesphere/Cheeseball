@@ -11,10 +11,12 @@ import {
   CheckCircle2,
   BarChart2,
   Copy,
-  Sparkles,
-  History,
   Eye,
   EyeOff,
+  Send,
+  Landmark,
+  ShieldCheck,
+  HelpCircle,
 } from "lucide-react";
 import {
   getWallets,
@@ -22,7 +24,7 @@ import {
   getUserTransactions,
   getReferralData,
 } from "@/services/api";
-import { useRates, MARKET_ASSETS } from "@/context/RatesContext";
+import { useRates } from "@/context/RatesContext";
 import KYCStatusBanner from "./KYCStatusBanner";
 
 /* ─── Design tokens ──────────────────────────────────────────── */
@@ -100,32 +102,11 @@ const STATUS = {
 
 const QUICK_ACTIONS = [
   {
-    label: "Deposit",
-    icon: ArrowDownLeft,
+    label: "Send Crypto",
+    icon: Send,
     color: T.blue,
     bg: T.blueLight,
-    page: "deposit",
-  },
-  {
-    label: "Buy Crypto",
-    icon: ShoppingCart,
-    color: "#7C3AED",
-    bg: "#F5F3FF",
-    page: "buy",
-  },
-  {
-    label: "Sell Crypto",
-    icon: CircleDollarSign,
-    color: T.red,
-    bg: T.redLight,
-    page: "sell",
-  },
-  {
-    label: "Swap",
-    icon: ArrowRightLeft,
-    color: "#0891B2",
-    bg: "#ECFEFF",
-    page: "swap",
+    page: "send",
   },
   {
     label: "Withdraw",
@@ -141,6 +122,27 @@ const QUICK_ACTIONS = [
     bg: T.orangeLight,
     page: "giftcard-swap",
   },
+  {
+    label: "KYC Verify",
+    icon: ShieldCheck,
+    color: "#7C3AED",
+    bg: "#F5F3FF",
+    page: "kyc",
+  },
+  {
+    label: "Bank Accounts",
+    icon: Landmark,
+    color: "#0891B2",
+    bg: "#ECFEFF",
+    page: "bank-accounts",
+  },
+  {
+    label: "Support",
+    icon: HelpCircle,
+    color: T.text2,
+    bg: "#F1F5F9",
+    page: "support",
+  },
 ];
 
 const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified", kycRejectionReason }) => {
@@ -151,8 +153,7 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
   const [refData, setRefData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Live rates from the global context (fetched once on app load, cached 5 min)
-  const { rates: liveRates, isLoading: ratesLoading } = useRates();
+  const { rates: liveRates } = useRates();
 
   useEffect(() => {
     async function loadData() {
@@ -296,12 +297,11 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
   const ngnAsset = assets.find((a) => a.symbol === "NGN");
   const ngnBalance = ngnAsset ? ngnAsset.valueNGN : 0;
 
-  // Build the market list from the global rates context, filtered by search
-  const filteredMarket = MARKET_ASSETS.filter(
-    (a) =>
-      a.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  ).map((a) => ({ ...a, rate: liveRates[a.symbol] || null }));
+  const totalReferrals = refData?.total_referrals || 0;
+  const nextMilestone = 5;
+  const milestoneProgress = Math.min((totalReferrals % nextMilestone) / nextMilestone, 1);
+  const rewardPerRef = 1000;
+  const totalEarned = refData?.total_earned || refData?.earnings || 0;
 
   if (isLoading) {
     return (
@@ -401,10 +401,10 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
           onNavigate={onNavigate}
         />
 
-        {/* ── ROW 1: Balance + Referral ── */}
+        {/* ── ROW 1: Balance (full width) ── */}
         <div
           className="dash-grid-top"
-          style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: 20 }}
+          style={{ display: "grid", gridTemplateColumns: "1fr", gap: 20 }}
         >
           {/* Balance card */}
           <div
@@ -610,160 +610,6 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
             </div>
           </div>
 
-          {/* Referral card (Matched from Settings) */}
-          <div
-            className="ref-card"
-            style={{
-              background: T.text,
-              borderRadius: 20,
-              padding: "24px 26px",
-              position: "relative",
-              overflow: "hidden",
-              height: "100%",
-            }}
-          >
-            <div
-              style={{
-                position: "absolute",
-                top: -30,
-                right: -30,
-                width: 140,
-                height: 140,
-                borderRadius: "50%",
-                background: `${T.blue}18`,
-                pointerEvents: "none",
-              }}
-            />
-            <div
-              style={{
-                position: "relative",
-                zIndex: 1,
-                display: "flex",
-                flexDirection: "column",
-                height: "100%",
-                justifyContent: "space-between",
-              }}
-            >
-              <div
-                className="ref-header"
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  justifyContent: "space-between",
-                  marginBottom: 16,
-                }}
-              >
-                <div>
-                  <p
-                    style={{
-                      fontSize: 11,
-                      fontWeight: 600,
-                      color: T.text3,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.8px",
-                      marginBottom: 4,
-                    }}
-                  >
-                    Referral programme
-                  </p>
-                  <p
-                    style={{
-                      fontFamily: "'Sora', sans-serif",
-                      fontSize: 18,
-                      fontWeight: 700,
-                      color: "#fff",
-                      letterSpacing: "-0.3px",
-                    }}
-                  >
-                    Invite friends, earn{" "}
-                    <span style={{ color: T.blue }}>₦1,000</span> each
-                  </p>
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <p
-                    style={{
-                      fontFamily: "'Sora', sans-serif",
-                      fontSize: 22,
-                      fontWeight: 700,
-                      color: "#fff",
-                      lineHeight: 1,
-                    }}
-                  >
-                    {refData?.total_referrals || 0}
-                  </p>
-                  <p style={{ fontSize: 11, color: T.text3, marginTop: 2 }}>
-                    referrals · ₦0 earned
-                  </p>
-                </div>
-              </div>
-
-              {/* Code */}
-              <div className="ref-row" style={{ display: "flex", gap: 8 }}>
-                <div
-                  style={{
-                    flex: 1,
-                    background: "rgba(255,255,255,0.06)",
-                    border: "1px solid rgba(255,255,255,0.1)",
-                    borderRadius: 12,
-                    padding: "12px 16px",
-                  }}
-                >
-                  <p
-                    style={{
-                      fontSize: 10,
-                      color: T.text3,
-                      fontWeight: 600,
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
-                      marginBottom: 3,
-                    }}
-                  >
-                    Your code
-                  </p>
-                  <p
-                    style={{
-                      fontFamily: "'Sora', sans-serif",
-                      fontSize: 15,
-                      fontWeight: 700,
-                      color: T.blue,
-                      letterSpacing: "1.5px",
-                    }}
-                  >
-                    {refData?.referral_code || "N/A"}
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleCopy(refData?.referral_link)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 7,
-                    padding: "12px 18px",
-                    background: copied ? T.greenLight : T.blue,
-                    border: "none",
-                    borderRadius: 12,
-                    cursor: "pointer",
-                    fontFamily: "'Sora', sans-serif",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    color: copied ? T.greenText : "#fff",
-                    transition: "all 0.18s",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {copied ? (
-                    <>
-                      <CheckCircle2 size={14} /> Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy size={14} /> Copy Link
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* ── ROW 2: Quick Actions ── */}
@@ -1013,157 +859,92 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
             </div>
           </div>
 
-          {/* Market card */}
+          {/* ── Referral & Earnings Spotlight ── */}
           <div
             style={{
-              background: T.blue,
+              background: T.text,
               borderRadius: 24,
-              padding: "28px 24px",
+              padding: "28px 26px",
               position: "relative",
               overflow: "hidden",
-              cursor: "pointer",
               height: "100%",
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            <div
-              style={{
-                position: "absolute",
-                top: -40,
-                right: -40,
-                width: 180,
-                height: 180,
-                borderRadius: "50%",
-                background: "rgba(255,255,255,0.06)",
-                pointerEvents: "none",
-              }}
-            />
-            <div style={{ position: "relative", zIndex: 1 }}>
-              <h3
-                style={{
-                  fontFamily: "'Sora', sans-serif",
-                  fontSize: 20,
-                  fontWeight: 700,
-                  color: "#fff",
-                  lineHeight: 1.2,
-                  marginBottom: 6,
-                }}
-              >
-                Cheeseball Rates
-              </h3>
-              <p
-                style={{
-                  fontSize: 12,
-                  color: "rgba(255,255,255,0.5)",
-                  marginBottom: 20,
-                  fontWeight: 500,
-                }}
-              >
-                Real-time data for prominent pairs
-              </p>
+            {/* Decorative blobs */}
+            <div style={{ position: "absolute", top: -40, right: -40, width: 160, height: 160, borderRadius: "50%", background: `${T.blue}20`, pointerEvents: "none" }} />
+            <div style={{ position: "absolute", bottom: -30, left: -20, width: 100, height: 100, borderRadius: "50%", background: `${T.green}15`, pointerEvents: "none" }} />
 
-              {/* Market rows — Nigerian format: ₦X,XXX/$ rate + per-unit NGN price */}
-              <style>{`
-                @keyframes cb-rate-spin { to { transform: rotate(360deg); } }
-                .cb-rate-spinner {
-                  width: 14px;
-                  height: 14px;
-                  border: 2px solid rgba(255,255,255,0.2);
-                  border-top-color: rgba(255,255,255,0.8);
-                  border-radius: 50%;
-                  animation: cb-rate-spin 0.7s linear infinite;
-                  display: inline-block;
-                  flex-shrink: 0;
-                }
-              `}</style>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {filteredMarket.map((m) => {
-                  const r = m.rate;
-                  // While rates are still loading and we have no data yet for this asset
-                  const isRowLoading = ratesLoading && !r;
-                  // Nigerian display: ₦X,XXX/$ means buyRate (NGN per $1)
-                  const rateDisplay = r?.buyRate
-                    ? `₦${fmt(r.buyRate)}/$`
-                    : "—";
-                  // Secondary line: full NGN price of 1 unit, e.g. ₦86M for BTC
-                  const unitDisplay = r?.buyNGN
-                    ? `1 ${m.symbol} ≈ ₦${fmtCompact(r.buyNGN)}`
-                    : !ratesLoading && r?.buyNGN === null
-                    ? "Not available"
-                    : "—";
+            <div style={{ position: "relative", zIndex: 1, display: "flex", flexDirection: "column", height: "100%", gap: 20 }}>
 
-                  return (
-                    <div
-                      key={m.symbol}
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 10,
-                        padding: "10px 14px",
-                        background: "rgba(255,255,255,0.08)",
-                        borderRadius: 12,
-                        border: "1px solid rgba(255,255,255,0.08)",
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: 30,
-                          height: 30,
-                          borderRadius: "50%",
-                          background: m.color,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          fontFamily: "'Sora', sans-serif",
-                          fontSize: 11,
-                          fontWeight: 700,
-                          color: "#fff",
-                          flexShrink: 0,
-                        }}
-                      >
-                        {m.icon}
+              {/* Header */}
+              <div>
+                <p style={{ fontSize: 10, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "1px", marginBottom: 6 }}>Referral Programme</p>
+                <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 20, fontWeight: 700, color: "#fff", letterSpacing: "-0.4px", lineHeight: 1.2 }}>
+                  Invite friends,<br />earn <span style={{ color: T.blue }}>₦{(rewardPerRef).toLocaleString()}</span> each
+                </p>
+              </div>
+
+              {/* Stats pills */}
+              <div style={{ display: "flex", gap: 10 }}>
+                <div style={{ flex: 1, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1 }}>{totalReferrals}</p>
+                  <p style={{ fontSize: 10, color: T.text3, marginTop: 4, fontWeight: 500 }}>Friends invited</p>
+                </div>
+                <div style={{ flex: 1, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 14, padding: "12px 14px", textAlign: "center" }}>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 22, fontWeight: 700, color: T.green, lineHeight: 1 }}>₦{totalEarned > 0 ? (totalEarned).toLocaleString() : "0"}</p>
+                  <p style={{ fontSize: 10, color: T.text3, marginTop: 4, fontWeight: 500 }}>Total earned</p>
+                </div>
+              </div>
+
+              {/* Milestone progress */}
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                  <p style={{ fontSize: 11, color: T.text3, fontWeight: 500 }}>Next milestone</p>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 11, fontWeight: 700, color: T.blue }}>
+                    {totalReferrals % nextMilestone}/{nextMilestone} friends
+                  </p>
+                </div>
+                <div style={{ height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 99, overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${milestoneProgress * 100}%`, background: `linear-gradient(90deg, ${T.blue}, ${T.green})`, borderRadius: 99, transition: "width 0.6s ease" }} />
+                </div>
+                <p style={{ fontSize: 10, color: T.text3, marginTop: 6, fontWeight: 500 }}>
+                  Reach {nextMilestone} referrals → unlock <span style={{ color: T.green, fontWeight: 700 }}>₦{(nextMilestone * rewardPerRef).toLocaleString()}</span> bonus
+                </p>
+              </div>
+
+              {/* Referral code + copy */}
+              <div style={{ display: "flex", gap: 8 }}>
+                <div style={{ flex: 1, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "11px 14px" }}>
+                  <p style={{ fontSize: 9, color: T.text3, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.6px", marginBottom: 3 }}>Your code</p>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 16, fontWeight: 700, color: T.blue, letterSpacing: "2px" }}>{refData?.referral_code || "—"}</p>
+                </div>
+                <button
+                  onClick={() => handleCopy(refData?.referral_link)}
+                  style={{ display: "flex", alignItems: "center", gap: 7, padding: "11px 16px", background: copied ? T.green : T.blue, border: "none", borderRadius: 12, cursor: "pointer", fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", transition: "all 0.18s", whiteSpace: "nowrap" }}
+                >
+                  {copied ? <><CheckCircle2 size={13} /> Copied!</> : <><Copy size={13} /> Copy Link</>}
+                </button>
+              </div>
+
+              {/* How it works */}
+              <div style={{ borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 16, marginTop: "auto" }}>
+                <p style={{ fontSize: 10, color: T.text3, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 12 }}>How it works</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {[
+                    { step: "1", text: "Share your referral link with a friend" },
+                    { step: "2", text: "They sign up and complete their first trade" },
+                    { step: "3", text: "You both earn ₦1,000 credited instantly" },
+                  ].map(({ step, text }) => (
+                    <div key={step} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                      <div style={{ width: 20, height: 20, borderRadius: "50%", background: T.blue, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
+                        <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 9, fontWeight: 700, color: "#fff" }}>{step}</span>
                       </div>
-
-                      {/* Symbol + name */}
-                      <div style={{ flex: 1 }}>
-                        <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff" }}>
-                          {m.symbol}
-                        </p>
-                        <p style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}>
-                          {m.name}
-                        </p>
-                      </div>
-
-                      {/* Rate — Nigerian format or spinner */}
-                      <div style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3 }}>
-                        {isRowLoading ? (
-                          <span className="cb-rate-spinner" />
-                        ) : (
-                          <>
-                            <p
-                              style={{
-                                fontFamily: "'Sora', sans-serif",
-                                fontSize: 13,
-                                fontWeight: 700,
-                                color: "#fff",
-                              }}
-                            >
-                              {rateDisplay}
-                            </p>
-                            <p
-                              style={{
-                                fontSize: 10,
-                                fontWeight: 500,
-                                color: "rgba(255,255,255,0.45)",
-                              }}
-                            >
-                              {unitDisplay}
-                            </p>
-                          </>
-                        )}
-                      </div>
+                      <p style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", lineHeight: 1.4, fontWeight: 500 }}>{text}</p>
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
             </div>
           </div>

@@ -42,7 +42,6 @@ let isRefreshing = false;
 let refreshPromise = null;
 
 async function refreshAccessToken() {
-  // Mutex: if a refresh is already in flight, wait for it
   if (isRefreshing && refreshPromise) {
     return refreshPromise;
   }
@@ -55,7 +54,6 @@ async function refreshAccessToken() {
         accept: "application/json",
       };
       const refreshToken = localStorage.getItem("refreshToken");
-      // Attach refresh token as Bearer if we have it in memory
       if (refreshToken) {
         headers["Authorization"] = `Bearer ${refreshToken}`;
       }
@@ -75,7 +73,6 @@ async function refreshAccessToken() {
       }
 
       const data = await parseResponse(response);
-      // Store new tokens from response body
       if (data?.access) {
         setTokens(data.access, data.refresh || refreshToken);
       }
@@ -89,7 +86,6 @@ async function refreshAccessToken() {
   return refreshPromise;
 }
 
-// Paths where a 401 means "bad credentials", NOT "expired token".
 const AUTH_CREDENTIAL_PATHS = [
   "/api/auth/token/pair",
   "/api/auth/register",
@@ -101,7 +97,6 @@ const AUTH_CREDENTIAL_PATHS = [
 ];
 
 function shouldAttemptRefresh(path, data) {
-  // Never auto-refresh for auth credential endpoints (login, register, etc.)
   if (AUTH_CREDENTIAL_PATHS.some((p) => path.startsWith(p))) return false;
   return true;
 }
@@ -109,7 +104,6 @@ function shouldAttemptRefresh(path, data) {
 export async function request(path, options = {}, _isRetry = false) {
   const authHeaders = {};
   const accessToken = localStorage.getItem("accessToken");
-  // Attach access token via Authorization header if available
   if (accessToken) {
     authHeaders["Authorization"] = `Bearer ${accessToken}`;
   }
@@ -135,7 +129,7 @@ export async function request(path, options = {}, _isRetry = false) {
   ) {
     try {
       await refreshAccessToken();
-      return request(path, options, true); // retry with fresh token
+      return request(path, options, true);
     } catch {
       clearTokens();
       if (window.location.pathname !== "/login") {
@@ -145,7 +139,6 @@ export async function request(path, options = {}, _isRetry = false) {
     }
   }
 
-  // If a protected route returns 401 even after retry (or without retry attempt), log the user out
   if (response.status === 401 && shouldAttemptRefresh(path, data)) {
     clearTokens();
     if (window.location.pathname !== "/login") {
@@ -300,29 +293,13 @@ export const getBeneficiaries = async () =>
   );
 
 export const createDeposit = async (asset, amount) =>
-  withFallback(
-    async () =>
-      request("/api/wallets/deposits/create", {
-        method: "POST",
-        body: JSON.stringify({ asset, expected_amount: amount }),
-      }),
-    {
-      id: `dep-${Date.now()}`,
-      asset,
-      expected_amount: amount,
-      platform_address: "TCheeseballDemoWallet000000000000000",
-      reference_code: `CB${Date.now().toString().slice(-6)}`,
-      network: asset === "BTC" ? "Bitcoin" : "TRC20",
-      memo_supported: false,
-      status: "pending",
-    },
-  );
+  request("/api/wallets/deposits/create", {
+    method: "POST",
+    body: JSON.stringify({ asset, expected_amount: amount }),
+  });
 
 export const getDepositStatus = async (depositId) =>
-  withFallback(async () => request(`/api/wallets/deposits/${depositId}`), {
-    id: depositId,
-    status: "pending",
-  });
+  request(`/api/wallets/deposits/${depositId}`);
 
 export const createWithdrawal = async (payload) =>
   withFallback(
@@ -505,3 +482,13 @@ export const markAllNotificationsAsRead = async () =>
   request("/api/notifications/read-all", {
     method: "POST",
   });
+
+export const fundNGNWallet = async (amount) =>
+  withFallback(
+    async () =>
+      request("/api/wallets/fund/ngn", {
+        method: "POST",
+        body: JSON.stringify({ amount }),
+      }),
+    { success: false },
+  );
