@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { ASSETS, T } from "./BuyFlowShared";
-import BuyCryptoBreadcrumbs from "./BuyCryptoBreadcrumbs";
-import BuyFlowStep1 from "./BuyFlowStep1";
-import BuyFlowStep2 from "./BuyFlowStep2";
-import BuyFlowStep3 from "./BuyFlowStep3";
-import BuyFlowStep4 from "./BuyFlowStep4";
+import { ASSETS, T } from "./SellFlowShared";
+import SellCryptoBreadcrumbs from "./SellCryptoBreadcrumbs";
+import SellFlowStep1 from "./SellFlowStep1";
+import SellFlowStep2 from "./SellFlowStep2";
+import SellFlowStep3 from "./SellFlowStep3";
 
 const GLOBAL_CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
@@ -38,13 +37,13 @@ const GLOBAL_CSS = `
 
   /* Responsive Utilities */
   @media (max-width: 1024px) {
-    .buygrid { grid-template-columns: 1fr 360px !important; }
+    .sellgrid { grid-template-columns: 1fr 360px !important; }
   }
 
   @media (max-width: 900px) {
-    .buygrid { grid-template-columns: 1fr !important; }
-    .buygrid > div { min-width: 0 !important; }
-    .buygrid > div:first-child { border-right: none !important; border-bottom: none !important; padding: 32px 24px 48px !important; }
+    .sellgrid { grid-template-columns: 1fr !important; }
+    .sellgrid > div { min-width: 0 !important; }
+    .sellgrid > div:first-child { border-right: none !important; border-bottom: none !important; padding: 32px 24px 48px !important; }
     .rightpanel { display: none !important; }
     .s6grid  { grid-template-columns: 1fr !important; }
     .step-content { padding: 32px 24px 48px !important; }
@@ -55,9 +54,9 @@ const GLOBAL_CSS = `
   }
 
   @media (max-width: 540px) {
-    .buygrid > div { padding: 24px 20px 36px !important; }
+    .sellgrid > div { padding: 24px 20px 36px !important; }
     .step-content { padding: 24px 20px 40px !important; }
-    .buy-amt-input { font-size: 28px !important; }
+    .sell-amt-input { font-size: 28px !important; }
     .s6grid  { padding: 0 16px !important; }
     .rightpanel { display: none !important; }
     .csel-info { display: none !important; }
@@ -71,30 +70,31 @@ const GLOBAL_CSS = `
   }
 
   @media (max-width: 480px) {
-    .buygrid > div:first-child { padding: 20px 16px 24px !important; }
-    .buygrid > div:last-child { padding: 20px 16px 24px !important; }
+    .sellgrid > div:first-child { padding: 20px 16px 24px !important; }
+    .sellgrid > div:last-child { padding: 20px 16px 24px !important; }
     .responsive-title { font-size: 22px !important; }
-    .buy-amt-input { font-size: 24px !important; }
+    .sell-amt-input { font-size: 24px !important; }
     .csel > div { padding: 12px 14px !important; }
     .amtwrap { padding: 16px 18px !important; }
   }
 
   @media (max-width: 380px) {
-    .buygrid > div:first-child { padding: 16px 12px 20px !important; }
-    .buygrid > div:last-child { padding: 16px 12px 20px !important; }
+    .sellgrid > div:first-child { padding: 16px 12px 20px !important; }
+    .sellgrid > div:last-child { padding: 16px 12px 20px !important; }
     .csel > div { padding: 12px 10px !important; }
     .ddopt { padding: 10px 8px !important; }
   }
 `;
 
-const BuyFlow = ({ onBack }) => {
+const SellFlow = ({ onBack, onNavigate }) => {
   // Navigation
   const [step, setStep] = useState(1);
 
   // Step 1 state
   const [selectedAsset, setSelectedAsset] = useState(ASSETS[0]);
+  const [cryptoSource, setCryptoSource] = useState("external_wallet"); // external_wallet, cheeseball_wallet
   const [payAmount, setPayAmount] = useState(0); // This will hold the numeric value, either crypto or NGN
-  const [inputCurrency, setInputCurrency] = useState("NGN"); // "NGN" or "CRYPTO"
+  const [inputCurrency, setInputCurrency] = useState("CRYPTO"); // "NGN" or "CRYPTO"
   const [searchQuery, setSearchQuery] = useState("");
   
   // Promo code
@@ -102,15 +102,11 @@ const BuyFlow = ({ onBack }) => {
   const [promoBenefit, setPromoBenefit] = useState(0);
 
   // API data state
-  const [quoteData, setQuoteData] = useState(null); // from POST /api/rates/buy-quote
-  const [transactionData, setTransactionData] = useState(null); // from POST /api/broker/buy
-  const [paymentData, setPaymentData] = useState(null); // from POST /api/payments/setup
-  const [bankInstructions, setBankInstructions] = useState(null);
+  const [quoteData, setQuoteData] = useState(null); // from POST /api/rates/sell-quote
+  const [transactionData, setTransactionData] = useState(null); // from POST /api/broker/sell
+  const [depositAddressData, setDepositAddressData] = useState(null); // address/memo details if external
 
-  // Step 2 state
-  const [paymentMethod, setPaymentMethod] = useState("ngn_wallet");
-
-  // Step 3 state
+  // Step 2/3 state
   const [hasPaid, setHasPaid] = useState(false);
 
   // Quote expiry
@@ -118,8 +114,8 @@ const BuyFlow = ({ onBack }) => {
   const [isExpired, setIsExpired] = useState(false);
 
   // Derived values from quote
-  const receiveAmount = quoteData?.crypto_amount
-    ? parseFloat(quoteData.crypto_amount)
+  const receiveAmount = quoteData?.naira_amount
+    ? parseFloat(quoteData.naira_amount)
     : 0;
   // NGN-per-crypto rate — matches what RightPanel displays as "₦X / BTC"
   const finalRate =
@@ -129,7 +125,7 @@ const BuyFlow = ({ onBack }) => {
 
   // Countdown timer driven from quoteData.expires_at
   useEffect(() => {
-    if (!quoteData?.expires_at || step < 2 || step >= 4) return;
+    if (!quoteData?.expires_at || step < 2 || step >= 3) return;
     const tick = () => {
       const remaining = Math.max(
         0,
@@ -148,11 +144,11 @@ const BuyFlow = ({ onBack }) => {
     setStep(1);
     setQuoteData(null);
   };
-  const nextStep = () => setStep((p) => Math.min(p + 1, 4));
+  const nextStep = () => setStep((p) => Math.min(p + 1, 3));
   const prevStep = () => setStep((p) => Math.max(p - 1, 1));
 
   const breadcrumbs = (
-    <BuyCryptoBreadcrumbs
+    <SellCryptoBreadcrumbs
       currentStep={step}
       onStepClick={(s) => {
         if (s < step) setStep(s);
@@ -162,7 +158,7 @@ const BuyFlow = ({ onBack }) => {
   );
 
   const commonProps = {
-    payAmount: quoteData?.naira_amount || payAmount,
+    payAmount: quoteData?.crypto_amount || payAmount,
     receiveAmount,
     selectedAsset,
     expiryTime,
@@ -182,9 +178,11 @@ const BuyFlow = ({ onBack }) => {
       <style>{GLOBAL_CSS}</style>
       <div style={{ animation: "fadeUp 0.25s ease forwards" }}>
         {step === 1 && (
-          <BuyFlowStep1
+          <SellFlowStep1
             selectedAsset={selectedAsset}
             setSelectedAsset={setSelectedAsset}
+            cryptoSource={cryptoSource}
+            setCryptoSource={setCryptoSource}
             payAmount={payAmount}
             setPayAmount={setPayAmount}
             inputCurrency={inputCurrency}
@@ -201,32 +199,17 @@ const BuyFlow = ({ onBack }) => {
         )}
 
         {step === 2 && (
-          <BuyFlowStep2
+          <SellFlowStep2
             {...commonProps}
-            paymentMethod={paymentMethod}
-            setPaymentMethod={setPaymentMethod}
-            nextStep={nextStep}
-            prevStep={prevStep}
-            isExpired={isExpired}
-            resetExpiry={resetExpiry}
-          />
-        )}
-
-        {step === 3 && (
-          <BuyFlowStep3
-            {...commonProps}
-            paymentMethod={paymentMethod}
+            cryptoSource={cryptoSource}
+            paymentMethod="ngn_wallet"
             quoteData={quoteData}
             transactionData={transactionData}
             setTransactionData={setTransactionData}
-            paymentData={paymentData}
-            setPaymentData={setPaymentData}
-            bankInstructions={bankInstructions}
-            setBankInstructions={setBankInstructions}
-            hasPaid={hasPaid}
-            setHasPaid={setHasPaid}
+            depositAddressData={depositAddressData}
+            setDepositAddressData={setDepositAddressData}
             prevStep={prevStep}
-            onSuccess={() => setStep(4)}
+            onSuccess={() => setStep(3)}
             promoCode={promoCode}
             setPromoCode={setPromoCode}
             promoBenefit={promoBenefit}
@@ -236,14 +219,17 @@ const BuyFlow = ({ onBack }) => {
           />
         )}
 
-        {step === 4 && (
-          <BuyFlowStep4
-            paymentMethod={paymentMethod}
+        {step === 3 && (
+          <SellFlowStep3
+            cryptoSource={cryptoSource}
+            paymentMethod="ngn_wallet"
             receiveAmount={receiveAmount}
             selectedAsset={selectedAsset}
-            payAmount={quoteData?.naira_amount || payAmount}
+            payAmount={quoteData?.crypto_amount || payAmount}
             transactionData={transactionData}
+            depositAddressData={depositAddressData}
             onBack={onBack}
+            onNavigate={onNavigate}
             setStep={setStep}
             breadcrumbs={breadcrumbs}
           />
@@ -253,4 +239,4 @@ const BuyFlow = ({ onBack }) => {
   );
 };
 
-export default BuyFlow;
+export default SellFlow;

@@ -1,11 +1,14 @@
 import React from "react";
 import AppRoutes from "./routes/AppRoutes";
 import { ThemeProvider } from "@/shared/providers/ThemeProvider";
+import { RatesProvider } from "@/context/RatesContext";
 
 const App = () => {
   return (
     <ThemeProvider>
-      <AppRoutes />
+      <RatesProvider>
+        <AppRoutes />
+      </RatesProvider>
     </ThemeProvider>
   );
 };

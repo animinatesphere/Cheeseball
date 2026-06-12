@@ -6,18 +6,19 @@ import {
   formatNGN,
   CTA,
   RightPanel,
-} from "./BuyFlowShared";
-import { getBuyQuote } from "@/services/api";
-
+} from "./SellFlowShared";
+import { getSellQuote } from "@/services/api";
 
 const ALLOWED_SYMBOLS = [
   "BTC", "ETH", "USDT", "USDC", "BNB", "SOL", "XRP", "TRX", "LTC", "DOGE",
   "BCH", "ADA", "MATIC", "DOT", "LINK", "AVAX", "UNI", "XLM", "ATOM", "ETC", "TON"
 ];
 
-export default function BuyFlowStep1({
+export default function SellFlowStep1({
   selectedAsset,
   setSelectedAsset,
+  cryptoSource,
+  setCryptoSource,
   payAmount,
   setPayAmount,
   inputCurrency,
@@ -32,13 +33,11 @@ export default function BuyFlowStep1({
   const [error, setError] = useState(null);
   const ddRef = useRef(null);
 
-  // cachedRate: NGN per 1 unit of crypto (e.g. 108,000,000 for BTC)
-  // Derived from any successful API quote. All live-label math uses this.
+  // cachedRate: NGN per 1 unit of crypto
   const [cachedRate, setCachedRate] = useState(null);
   const [quoteFetching, setQuoteFetching] = useState(false);
   const debounceRef = useRef(null);
 
-  // Compute the "other side" value purely from the cached rate
   const numericInput = Number((payAmount || "").toString().replace(/,/g, ""));
   const liveEquivalent = cachedRate && numericInput > 0
     ? inputCurrency === "NGN"
@@ -46,7 +45,6 @@ export default function BuyFlowStep1({
       : numericInput * cachedRate           // crypto → NGN
     : null;
 
-  // Fetch a quote from backend to anchor the rate
   const fetchRateFromQuote = useCallback(async (amount, currency, symbol) => {
     if (!amount || amount <= 0) return;
     setQuoteFetching(true);
@@ -54,9 +52,9 @@ export default function BuyFlowStep1({
       let q;
       if (currency === "NGN") {
         if (amount < 100) return;
-        q = await getBuyQuote(symbol, null, amount);
+        q = await getSellQuote(symbol, null, amount);
       } else {
-        q = await getBuyQuote(symbol, amount, null);
+        q = await getSellQuote(symbol, amount);
       }
       if (q && q.naira_amount && q.crypto_amount) {
         const rate = parseFloat(q.naira_amount) / parseFloat(q.crypto_amount);
@@ -70,7 +68,6 @@ export default function BuyFlowStep1({
     }
   }, []);
 
-  // Debounced rate refresh whenever input changes
   useEffect(() => {
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
@@ -79,7 +76,6 @@ export default function BuyFlowStep1({
     return () => clearTimeout(debounceRef.current);
   }, [numericInput, inputCurrency, selectedAsset.symbol]); // eslint-disable-line
 
-  // Reset rate when asset changes
   useEffect(() => {
     setCachedRate(null);
     setError(null);
@@ -101,15 +97,12 @@ export default function BuyFlowStep1({
 
   const handleSwap = () => {
     setError(null);
-    // Pre-fill the swapped field with the currently computed equivalent
     if (liveEquivalent !== null && liveEquivalent > 0) {
       if (inputCurrency === "NGN") {
-        // switching to CRYPTO → pre-fill with crypto amount, up to 8 decimals
         const cryptoVal = parseFloat(liveEquivalent.toFixed(8));
         setPayAmount(String(cryptoVal));
         setInputCurrency("CRYPTO");
       } else {
-        // switching to NGN → pre-fill with NGN amount rounded to whole number
         const ngnVal = Math.round(liveEquivalent);
         setPayAmount(ngnVal.toLocaleString("en-US"));
         setInputCurrency("NGN");
@@ -132,22 +125,21 @@ export default function BuyFlowStep1({
       let quote;
       if (inputCurrency === "NGN") {
         if (numericAmount < 1000) {
-          setError("Minimum buy amount is ₦1,000");
+          setError("Minimum sell amount is ₦1,000");
           setLoading(false);
           return;
         }
-        quote = await getBuyQuote(selectedAsset.symbol, null, numericAmount);
+        quote = await getSellQuote(selectedAsset.symbol, null, numericAmount);
       } else {
-        // If cachedRate exists, derive equivalent NGN to validate minimum
         const ngnEquiv = cachedRate ? numericAmount * cachedRate : null;
         if (ngnEquiv !== null && ngnEquiv < 1000) {
-          setError("Minimum buy amount is ₦1,000");
+          setError("Minimum sell amount is ₦1,000");
           setLoading(false);
           return;
         }
-        quote = await getBuyQuote(selectedAsset.symbol, numericAmount, null);
+        quote = await getSellQuote(selectedAsset.symbol, numericAmount);
         if (parseFloat(quote.naira_amount) < 1000) {
-           setError("Minimum buy amount is ₦1,000");
+           setError("Minimum sell amount is ₦1,000");
            setLoading(false);
            return;
         }
@@ -176,7 +168,7 @@ export default function BuyFlowStep1({
         background: T.white,
         width: "100%",
       }}
-      className="buygrid"
+      className="sellgrid"
     >
       <div
         className="step-content"
@@ -188,20 +180,20 @@ export default function BuyFlowStep1({
         }}
       >
         {breadcrumbs}
-        <p
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            color: T.blue,
-            textTransform: "uppercase",
-            letterSpacing: "1px",
-            marginBottom: 6,
-            fontFamily: "'DM Sans',sans-serif",
-          }}
-        >
-          Transaction
-        </p>
-        <h1
+          <p
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: T.blue,
+              textTransform: "uppercase",
+              letterSpacing: "1px",
+              marginBottom: 6,
+              fontFamily: "'DM Sans',sans-serif",
+            }}
+          >
+            Step 1 of 3
+          </p>
+          <h1
           className="responsive-title"
           style={{
             fontFamily: "'Sora',sans-serif",
@@ -212,7 +204,7 @@ export default function BuyFlowStep1({
             lineHeight: 1.15,
           }}
         >
-          Buy Crypto
+          Sell Crypto
         </h1>
         <p
           style={{
@@ -223,12 +215,48 @@ export default function BuyFlowStep1({
             fontFamily: "'DM Sans',sans-serif",
           }}
         >
-          Select an asset and enter the amount you'd like to purchase. Crypto is
-          delivered instantly to your Cheeseball wallet.
+          Select an asset, choose your source, and enter an amount. Your fiat will be deposited based on your selection.
         </p>
 
+        {/* Crypto Source Cards */}
+        <div style={{ marginTop: 28 }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 10, fontFamily: "'DM Sans',sans-serif" }}>
+            Crypto Source
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {[
+              { key: "external_wallet", label: "External Wallet", sub: "Send from Binance, Trust Wallet, etc.", IconComp: Ico.external },
+              { key: "cheeseball_wallet", label: "Cheeseball Wallet", sub: "Sell directly from your balance", IconComp: Ico.wallet },
+            ].map(({ key, label, sub, IconComp }) => {
+              const active = cryptoSource === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => setCryptoSource(key)}
+                  style={{
+                    border: `1.5px solid ${active ? T.blue : T.border}`,
+                    borderRadius: 16, padding: "20px 18px", background: active ? T.blueLight : T.white,
+                    cursor: "pointer", textAlign: "left", transition: "all 0.18s", position: "relative",
+                  }}
+                >
+                  {active && (
+                    <div style={{ position: "absolute", top: 12, right: 12, width: 20, height: 20, borderRadius: "50%", background: T.blue, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      {Ico.check("#fff")}
+                    </div>
+                  )}
+                  <div style={{ width: 40, height: 40, borderRadius: 12, background: active ? T.blue : T.surface, display: "flex", alignItems: "center", justifyContent: "center", color: active ? "#fff" : T.text2, marginBottom: 12 }}>
+                    <IconComp />
+                  </div>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: active ? T.blue : T.text }}>{label}</p>
+                  <p style={{ fontSize: 12, color: T.text2, marginTop: 4, lineHeight: 1.4 }}>{sub}</p>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Asset selector */}
-        <div style={{ marginTop: 32 }}>
+        <div style={{ marginTop: 28 }}>
           <p
             style={{
               fontSize: 11,
@@ -416,7 +444,7 @@ export default function BuyFlowStep1({
                 fontFamily: "'DM Sans',sans-serif",
               }}
             >
-              You pay
+              You sell
             </p>
           </div>
           <div
@@ -460,12 +488,11 @@ export default function BuyFlowStep1({
                       parts[1] !== undefined ? intPart + "." + parts[1] : intPart;
                     setPayAmount(formatted);
                   } else {
-                    // For crypto, allow decimals as typed
                     setPayAmount(raw);
                   }
                   setError(null);
                 }}
-                className="buy-amt-input"
+                className="sell-amt-input"
                 style={{
                   flex: 1,
                   border: "none",
@@ -536,7 +563,6 @@ export default function BuyFlowStep1({
             </div>
           </div>
           
-          {/* Dynamic Green Label — computed locally from cached rate */}
           <div className="fadein" style={{ marginTop: 8, paddingLeft: 6, minHeight: 24 }}>
             {liveEquivalent !== null && !error ? (
               <p style={{ fontSize: 14, color: T.green, fontWeight: 600, fontFamily: "'DM Sans',sans-serif" }}>
@@ -548,48 +574,8 @@ export default function BuyFlowStep1({
               <p style={{ fontSize: 12, color: T.text3, fontFamily: "'DM Sans',sans-serif" }}>Fetching rate…</p>
             ) : null}
           </div>
-
-          {inputCurrency === "NGN" && (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(100px, 1fr))",
-                gap: 8,
-                marginTop: 10,
-              }}
-            >
-              {[5000, 10000, 50000, 100000].map((amt) => (
-                <button
-                  key={amt}
-                  onClick={() => {
-                    setPayAmount(amt);
-                    setError(null);
-                  }}
-                  className="qbtn"
-                  style={{
-                    flex: "1 0 80px",
-                    border: `1.5px solid ${payAmount == amt ? T.blue : T.border}`,
-                    background: payAmount == amt ? T.blueLight : T.white,
-                    borderRadius: 10,
-                    padding: "8px 10px",
-                    fontSize: 12,
-                    fontWeight: 600,
-                    color: payAmount == amt ? T.blue : T.text2,
-                    cursor: "pointer",
-                    transition: "all 0.15s",
-                    textAlign: "center",
-                    fontFamily: "'DM Sans',sans-serif",
-                    minWidth: "fit-content",
-                  }}
-                >
-                  {formatNGN(amt)}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
 
-        {/* Error message */}
         {error && (
           <div
             className="fadein"
@@ -618,32 +604,6 @@ export default function BuyFlowStep1({
           </div>
         )}
 
-        {/* Delivery info banner */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            gap: 10,
-            background: T.blueLight,
-            borderRadius: 14,
-            padding: "14px 18px",
-            marginTop: 20,
-          }}
-        >
-          <Ico.info />
-          <p
-            style={{
-              fontSize: 13,
-              color: "#1A3A8A",
-              lineHeight: 1.6,
-              fontFamily: "'DM Sans',sans-serif",
-            }}
-          >
-            Purchased crypto is automatically deposited into your Cheeseball
-            internal wallet — no external address needed.
-          </p>
-        </div>
-
         <div style={{ marginTop: 24 }}>
           <CTA
             onClick={handleContinue}
@@ -670,24 +630,11 @@ export default function BuyFlowStep1({
               </>
             )}
           </CTA>
-          <p
-            style={{
-              fontSize: 11,
-              textAlign: "center",
-              color: T.text3,
-              fontWeight: 500,
-              marginTop: 12,
-              fontFamily: "'DM Sans',sans-serif",
-            }}
-          >
-            The exact amount you'll receive will be confirmed on the next
-            screen.
-          </p>
         </div>
       </div>
       <RightPanel
-        payAmount={inputCurrency === "NGN" ? numericInput : (liveEquivalent ? Math.round(liveEquivalent) : 0)}
-        receiveAmount={inputCurrency === "CRYPTO" ? numericInput : (liveEquivalent ? parseFloat(liveEquivalent.toFixed(8)) : 0)}
+        payAmount={inputCurrency === "CRYPTO" ? numericInput : (liveEquivalent ? parseFloat(liveEquivalent.toFixed(8)) : 0)}
+        receiveAmount={inputCurrency === "NGN" ? numericInput : (liveEquivalent ? Math.round(liveEquivalent) : 0)}
         rate={cachedRate}
         selectedAsset={selectedAsset}
         expiryTime={0}

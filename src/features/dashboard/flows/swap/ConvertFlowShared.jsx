@@ -217,6 +217,10 @@ export const Ico = {
   ),
 };
 
+/**
+ * @deprecated Use useRates() from @/context/RatesContext to get the live
+ * NGN/USD exchange rate. This constant is kept only as a last-resort fallback.
+ */
 export const NGN_RATE = 1412.14;
 export const formatNGN = (v) =>
   new Intl.NumberFormat("en-NG", {

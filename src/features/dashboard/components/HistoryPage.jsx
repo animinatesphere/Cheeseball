@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowDownLeft, CircleDollarSign, Gift, ChevronRight,
   Download, Search, SlidersHorizontal, X, ChevronDown,
@@ -66,7 +67,19 @@ const TYPE_FILTERS = ["All Types", "Buy", "Sell", "Swap", "Deposit", "Withdraw",
 /* ─── Detail drawer ──────────────────────────────────────────── */
 function TxnDetail({ txn, onClose }) {
   const s   = STATUS_CFG[txn.status];
-  const inc = txn.amount > 0;
+  const isCredit = txn.isCredit;
+  const isSettled = txn.isSettled;
+  const isBuy = txn.isBuy;
+  const inc = isCredit && isSettled;
+
+  let amountDisplay = "";
+  if (isBuy || txn.type === "withdraw") {
+    amountDisplay = "−" + fmtNGN(txn.amount);
+  } else if (isCredit && isSettled) {
+    amountDisplay = "+" + fmtNGN(txn.amount);
+  } else {
+    amountDisplay = fmtNGN(txn.amount);
+  }
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "flex-start", justifyContent: "flex-end" }}>
@@ -89,7 +102,7 @@ function TxnDetail({ txn, onClose }) {
             <div style={{ width: 50, height: 50, borderRadius: "50%", background: txn.iconBg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 700, color: txn.iconColor, margin: "0 auto 14px" }}>{txn.icon}</div>
             <p style={{ fontSize: 12, color: T.text2, marginBottom: 8, fontWeight: 500 }}>{txn.label}</p>
             <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 32, fontWeight: 700, color: inc ? T.greenText : T.text, letterSpacing: "-1.2px", lineHeight: 1 }}>
-              {inc ? "+" : "−"}{fmtNGN(txn.amount)}
+              {amountDisplay}
             </p>
           </div>
 
@@ -127,6 +140,8 @@ function TxnDetail({ txn, onClose }) {
 
 /* ═══════════════════════════════════════════════════════════════ */
 export default function TransactionHistory({ onNavigate }) {
+  const { id: routeId } = useParams();
+  const navigate = useNavigate();
   const [statusTab,  setStatusTab]  = useState("All");
   const [typeFilter, setTypeFilter] = useState("All Types");
   const [search,     setSearch]     = useState("");
@@ -145,6 +160,10 @@ export default function TransactionHistory({ onNavigate }) {
           const type = t.transaction_type || t.type || 'transfer';
           const isBuy = type.toLowerCase().includes('buy');
           const isSell = type.toLowerCase().includes('sell');
+          const isCredit = !isBuy && type !== "withdraw";
+          const status = t.status === 'pending_payment' ? 'pending' : (t.status || 'pending');
+          const isSettled = status === 'completed' || status === 'successful' || status === 'success';
+
           const assetSymbol = t.asset_code || 'Crypto';
           const amount = parseFloat(t.naira_amount || 0);
           return {
@@ -155,16 +174,24 @@ export default function TransactionHistory({ onNavigate }) {
             icon: assetSymbol[0]?.toUpperCase() || 'C',
             iconColor: T.blue,
             iconBg: T.blueLight,
-            amount: isBuy ? -amount : amount,
+            amount: amount,
+            isBuy,
+            isCredit,
+            isSettled,
             date: new Date(t.created_at || Date.now()).toLocaleDateString(),
             time: new Date(t.created_at || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            status: t.status === 'pending_payment' ? 'pending' : (t.status || 'pending'),
+            status: status,
             method: t.payment_method || t.payout_method || 'Wallet',
             bank: t.bank_name ? `${t.bank_name} · ${t.bank_account_number || ''}` : null,
             ref: t.id || `TXN-${Math.floor(Math.random()*10000)}`,
           };
         });
         setTransactions(mapped);
+        
+        if (routeId) {
+          const found = mapped.find(t => String(t.id) === String(routeId));
+          if (found) setSelected(found);
+        }
       } catch (error) {
         console.error("Failed to load transactions", error);
       } finally {
@@ -184,8 +211,8 @@ export default function TransactionHistory({ onNavigate }) {
     return matchStatus && matchType && matchSearch;
   }), [transactions, statusTab, typeFilter, search]);
 
-  const totalIn  = filtered.filter(t => t.amount > 0).reduce((s, t) => s + t.amount, 0);
-  const totalOut = filtered.filter(t => t.amount < 0).reduce((s, t) => s + Math.abs(t.amount), 0);
+  const totalIn  = filtered.filter(t => t.isCredit && t.isSettled).reduce((s, t) => s + t.amount, 0);
+  const totalOut = filtered.filter(t => t.isBuy || t.type === "withdraw").reduce((s, t) => s + t.amount, 0);
   const hasFilters = statusTab !== "All" || typeFilter !== "All Types" || search;
 
   const SUMMARY = [
@@ -376,7 +403,20 @@ export default function TransactionHistory({ onNavigate }) {
             {filtered.map((txn, i) => {
               const s   = STATUS_CFG[txn.status];
               const tc  = TYPE_CFG[txn.type];
-              const inc = txn.amount > 0;
+              const isCredit = txn.isCredit;
+              const isSettled = txn.isSettled;
+              const isBuy = txn.isBuy;
+              const inc = isCredit && isSettled;
+
+              let amountDisplay = "";
+              if (isBuy || txn.type === "withdraw") {
+                amountDisplay = "−" + fmtNGN(txn.amount);
+              } else if (isCredit && isSettled) {
+                amountDisplay = "+" + fmtNGN(txn.amount);
+              } else {
+                amountDisplay = fmtNGN(txn.amount);
+              }
+
               return (
                 <div
                   key={txn.id}
@@ -406,7 +446,7 @@ export default function TransactionHistory({ onNavigate }) {
 
                   {/* Amount */}
                   <p className="txn-amount-mobile" style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: inc ? T.greenText : T.text, textAlign: "right", letterSpacing: "-0.3px" }}>
-                    {inc ? "+" : "−"}{fmtNGN(txn.amount)}
+                    {amountDisplay}
                   </p>
 
                   {/* Date */}
@@ -476,7 +516,7 @@ export default function TransactionHistory({ onNavigate }) {
       </div>
 
       {/* Detail drawer */}
-      {selected && <TxnDetail txn={selected} onClose={() => setSelected(null)} />}
+      {selected && <TxnDetail txn={selected} onClose={() => { setSelected(null); if (routeId) navigate("/currency-change/history", { replace: true }); }} />}
     </>
   );
 }

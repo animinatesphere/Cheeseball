@@ -25,6 +25,7 @@ import {
   ShieldCheck,
   Landmark,
   LogOut,
+  Send,
 } from "lucide-react";
 import {
   createTransaction,
@@ -42,7 +43,7 @@ import AddressBook from "../components/AddressBook";
 import BankAccounts from "../components/BankAccounts";
 import SupportPage from "../components/SupportPage";
 import HistoryPage from "../components/HistoryPage";
-import SellCryptocurrency from "../flows/sell/SellCryptocurrency";
+import SellFlow from "../flows/sell/SellFlow";
 import SwapGiftCard from "../flows/swap/SwapGiftCard";
 import GiftCardUpload from "../flows/gift-card/GiftCardUpload";
 import SettingsPage from "../components/SettingsPage";
@@ -50,6 +51,7 @@ import NotificationsPage from "../components/NotificationsPage";
 import DepositFlow from "../flows/deposit/DepositFlow";
 import WithdrawPage from "../flows/withdraw/WithdrawPage";
 import KYCVerification from "../components/KYCVerification";
+import SendCryptoFlow from "../flows/send/SendCryptoFlow";
 
 /* ─── Design tokens ─── */
 const T = {
@@ -81,6 +83,7 @@ const NAV_ITEMS = [
   { id: "sell", icon: CircleDollarSign, label: "Sell Crypto" },
   { id: "swap", icon: ArrowRightLeft, label: "Swap" },
   { id: "deposit", icon: ArrowDownLeft, label: "Deposit" },
+  { id: "send", icon: Send, label: "Send Crypto" },
   { id: "withdraw", icon: ArrowUpRight, label: "Withdraw" },
   { id: "giftcard-swap", icon: Gift, label: "Gift Cards" },
   { id: "history", icon: History, label: "Transactions" },
@@ -834,13 +837,22 @@ const CurrencyPage = () => {
                   }
                 />
                 <Route
+                  path="send"
+                  element={
+                    <SendCryptoFlow
+                      onBack={handleBack}
+                      onNavigate={handleNavigation}
+                    />
+                  }
+                />
+                <Route
                   path="withdraw"
                   element={<WithdrawPage onNavigate={handleNavigation} />}
                 />
                 <Route
                   path="sell"
                   element={
-                    <SellCryptocurrency
+                    <SellFlow
                       onBack={handleBack}
                       onNavigate={handleNavigation}
                     />
@@ -869,6 +881,10 @@ const CurrencyPage = () => {
                 />
                 <Route
                   path="history"
+                  element={<HistoryPage onNavigate={handleNavigation} />}
+                />
+                <Route
+                  path="transaction/:id"
                   element={<HistoryPage onNavigate={handleNavigation} />}
                 />
                 <Route

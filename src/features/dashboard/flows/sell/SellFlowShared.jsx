@@ -74,24 +74,12 @@ export const Ico = {
   upload: ()=><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>,
   refresh:()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>,
   chevDn: ()=><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A8B4CC" strokeWidth="2.5" strokeLinecap="round"><polyline points="6 9 12 15 18 9"/></svg>,
-  paystack: ()=><svg width="20" height="20" viewBox="0 0 44.6 44.3" fill="none"><path fill="#00C3F7" d="M39.9,0H2.3C1.1,0,0,1.1,0,2.4v4.2C0,7.9,1.1,9,2.3,9h37.6c1.3,0,2.3-1.1,2.4-2.4V2.4C42.3,1.1,41.2,0,39.9,0L39.9,0z M39.9,23.6H2.3c-0.6,0-1.2,0.3-1.7,0.7C0.2,24.7,0,25.3,0,26v4.2c0,1.3,1.1,2.4,2.3,2.4h37.6c1.3,0,2.3-1,2.4-2.4V26C42.3,24.6,41.2,23.6,39.9,23.6L39.9,23.6z M23.5,35.4H2.3c-0.6,0-1.2,0.2-1.6,0.7c-0.4,0.4-0.7,1-0.7,1.7V42c0,1.3,1.1,2.4,2.3,2.4h21.1c1.3,0,2.3-1.1,2.3-2.4v-4.3C25.8,36.4,24.8,35.4,23.5,35.4L23.5,35.4z M42.3,11.8h-40c-0.6,0-1.2,0.2-1.6,0.7c-0.4,0.4-0.7,1-0.7,1.7v4.2c0,1.3,1.1,2.4,2.3,2.4h39.9c1.3,0,2.3-1.1,2.3-2.4v-4.2C44.6,12.9,43.6,11.8,42.3,11.8L42.3,11.8z"/></svg>,
+  external: ()=><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
 };
 
-/**
- * @deprecated Use useRates() from @/context/RatesContext to get the live
- * NGN/USD exchange rate. This constant is kept only as a last-resort
- * fallback for components that cannot consume the context.
- */
-export const NGN_RATE = 1412.14;
 export const formatNGN = v=>new Intl.NumberFormat("en-NG",{style:"currency",currency:"NGN",minimumFractionDigits:0}).format(Number(String(v).replace(/,/g, '')));
-export const formatUSD = v => {
-  if (v >= 100) return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(v);
-  if (v >= 1)   return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:2}).format(v);
-  return         new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2,maximumFractionDigits:4}).format(v);
-};
 export const truncateAddress = a=>a?`${a.slice(0,6)}...${a.slice(-4)}`:"";
 export const formatTime = s=>`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`;
-
 
 export const SecureFooter = ()=>(
   <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4,marginTop:"auto",paddingTop:24}}>
@@ -119,26 +107,29 @@ export const GhostBtn = ({onClick,children,style={}})=>(
 
 export const RightPanel = ({payAmount,receiveAmount,selectedAsset,expiryTime,step,rate})=>{
   const isUrgent = expiryTime<=60;
+  
   const numPayAmount = Number((payAmount || "").toString().replace(/,/g, ""));
+  const numReceiveAmount = Number((receiveAmount || "").toString().replace(/,/g, ""));
+
   const rows=[
-    ["You pay", numPayAmount > 0 ? formatNGN(numPayAmount) : "—"],
-    ["You receive", receiveAmount > 0 ? `${receiveAmount} ${selectedAsset.symbol}` : "—"],
+    ["You sell", numPayAmount > 0 ? `${numPayAmount} ${selectedAsset.symbol}` : "—"],
+    ["You receive", numReceiveAmount > 0 ? formatNGN(numReceiveAmount) : "—"],
     ["Exchange Rate", rate ? `${formatNGN(rate)} / ${selectedAsset.symbol}` : "—"],
     ["Asset", `${selectedAsset.name} (${selectedAsset.symbol})`],
     ["Network", selectedAsset.network],
-    ["Delivery","Internal Wallet"]
   ];
+
   return(
     <div className="rightpanel" style={{padding:"44px 28px 60px",background:T.surface,display:"flex",flexDirection:"column",minHeight:"100vh"}}>
       <p style={{fontSize:11,fontWeight:600,color:T.text3,textTransform:"uppercase",letterSpacing:"0.8px",marginBottom:16,fontFamily:"'DM Sans',sans-serif"}}>Order Summary</p>
       
       <div style={{display:"flex",flexDirection:"column",gap:10}}>
         <div style={{background:T.white,border:`1.5px solid ${T.border}`,borderRadius:16,padding:"18px 20px"}}>
-          <p style={{fontSize:11,fontWeight:600,color:T.text3,textTransform:"uppercase",letterSpacing:"0.7px",marginBottom:12,fontFamily:"'DM Sans',sans-serif"}}>You are buying</p>
+          <p style={{fontSize:11,fontWeight:600,color:T.text3,textTransform:"uppercase",letterSpacing:"0.7px",marginBottom:12,fontFamily:"'DM Sans',sans-serif"}}>You are selling</p>
           <div style={{display:"flex",alignItems:"center",gap:12}}>
             <div style={{width:40,height:40,borderRadius:"50%",background:selectedAsset.color,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'Sora',sans-serif",fontSize:14,fontWeight:700,color:"#fff",flexShrink:0}}>{selectedAsset.icon}</div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 700, color: receiveAmount > 0 ? T.text : T.text3, letterSpacing: "-0.8px", lineHeight: 1, overflowWrap: "break-word" }}>{receiveAmount > 0 ? `${receiveAmount} ${selectedAsset.symbol}` : `0.00 ${selectedAsset.symbol}`}</p>
+              <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 18, fontWeight: 700, color: numPayAmount > 0 ? T.text : T.text3, letterSpacing: "-0.8px", lineHeight: 1, overflowWrap: "break-word" }}>{numPayAmount > 0 ? `${numPayAmount} ${selectedAsset.symbol}` : `0.00 ${selectedAsset.symbol}`}</p>
               <p style={{ fontSize: 11, color: T.text2, marginTop: 4, fontFamily: "'DM Sans', sans-serif" }}>{selectedAsset.name}</p>
             </div>
           </div>
@@ -147,11 +138,8 @@ export const RightPanel = ({payAmount,receiveAmount,selectedAsset,expiryTime,ste
         <div style={{ display: "flex", justifyContent: "center", margin: "-15px 0" }}><div style={{ width: 24, height: 24, borderRadius: "50%", background: T.blueLight, display: "flex", alignItems: "center", justifyContent: "center", border: `2px solid ${T.surface}`, zIndex: 2 }}><Ico.arrowDn /></div></div>
 
         <div style={{ background: T.blue, borderRadius: 16, padding: "18px 20px" }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>You will pay</p>
-          <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 24, fontWeight: 700, color: numPayAmount > 0 ? "#fff" : "rgba(255,255,255,0.3)", letterSpacing: "-1px", lineHeight: 1, overflowWrap: "break-word" }}>{numPayAmount > 0 ? formatNGN(numPayAmount) : "₦0.00"}</p>
-          <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:14,paddingTop:14,borderTop:"1px solid rgba(255,255,255,0.15)"}}>
-            <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:"rgba(255,255,255,0.55)"}}>Delivery</span><span style={{fontFamily:"'Sora',sans-serif",fontSize:11,fontWeight:700,color:"rgba(255,255,255,0.9)"}}>Internal Wallet</span></div>
-          </div>
+          <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 12, fontFamily: "'DM Sans', sans-serif" }}>You will receive</p>
+          <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 24, fontWeight: 700, color: numReceiveAmount > 0 ? "#fff" : "rgba(255,255,255,0.3)", letterSpacing: "-1px", lineHeight: 1, overflowWrap: "break-word" }}>{numReceiveAmount > 0 ? formatNGN(numReceiveAmount) : "₦0.00"}</p>
         </div>
       </div>
 

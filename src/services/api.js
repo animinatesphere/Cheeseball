@@ -106,7 +106,7 @@ function shouldAttemptRefresh(path, data) {
   return true;
 }
 
-async function request(path, options = {}, _isRetry = false) {
+export async function request(path, options = {}, _isRetry = false) {
   const authHeaders = {};
   const accessToken = localStorage.getItem("accessToken");
   // Attach access token via Authorization header if available
@@ -128,7 +128,6 @@ async function request(path, options = {}, _isRetry = false) {
   });
   const data = await parseResponse(response);
 
-  // If 401 on a protected endpoint, try refreshing the access token once.
   if (
     response.status === 401 &&
     !_isRetry &&
@@ -138,8 +137,21 @@ async function request(path, options = {}, _isRetry = false) {
       await refreshAccessToken();
       return request(path, options, true); // retry with fresh token
     } catch {
+      clearTokens();
+      if (window.location.pathname !== "/login") {
+        window.location.href = "/login";
+      }
       throw new Error("Session expired. Please log in again.");
     }
+  }
+
+  // If a protected route returns 401 even after retry (or without retry attempt), log the user out
+  if (response.status === 401 && shouldAttemptRefresh(path, data)) {
+    clearTokens();
+    if (window.location.pathname !== "/login") {
+      window.location.href = "/login";
+    }
+    throw new Error("Session expired. Please log in again.");
   }
 
   if (!response.ok) {
@@ -190,17 +202,10 @@ export const getAccountStats = async () =>
   });
 
 export const getCurrencies = async () =>
-  withFallback(
-    async () => normalizeListResponse(await request("/api/rates/assets"), []),
-    [
-      { symbol: "BTC", name: "Bitcoin", sell_rate: 52000000 },
-      { symbol: "ETH", name: "Ethereum", sell_rate: 2800000 },
-      { symbol: "USDT", name: "Tether", sell_rate: 1540 },
-      { symbol: "SOL", name: "Solana", sell_rate: 180000 },
-      { symbol: "BNB", name: "Binance Coin", sell_rate: 620000 },
-      { symbol: "XRP", name: "Ripple", sell_rate: 2800 },
-    ],
-  );
+  normalizeListResponse(await request("/api/rates/assets"), []);
+
+export const getUsdNgnRate = async () =>
+  request("/api/rates/usd-ngn");
 
 export const getUserPortfolio = async () =>
   withFallback(
@@ -261,30 +266,14 @@ export const getWallets = async () =>
   );
 
 export const previewConversion = async (fromAsset, toAsset, fromAmount) =>
-  withFallback(
-    async () =>
-      request("/api/wallets/convert/preview", {
-        method: "POST",
-        body: JSON.stringify({
-          from_asset: fromAsset,
-          to_asset: toAsset,
-          from_amount: fromAmount,
-        }),
-      }),
-    {
+  request("/api/wallets/convert/preview", {
+    method: "POST",
+    body: JSON.stringify({
       from_asset: fromAsset,
       to_asset: toAsset,
-      from_amount: Number(fromAmount),
-      to_amount: Number(
-        (Number(fromAmount) * (fromAsset === "NGN" ? 1 / 1600 : 1540)).toFixed(
-          6,
-        ),
-      ),
-      rate: fromAsset === "NGN" ? 1 / 1600 : 1540,
-      fee: 0,
-      expires_at: new Date(Date.now() + 120000).toISOString(),
-    },
-  );
+      from_amount: fromAmount,
+    }),
+  });
 
 export const executeConversion = async (payload) =>
   withFallback(
@@ -377,10 +366,10 @@ export const uploadFile = async (file, folder = "uploads") => {
 
 /* ─── Buy Crypto Flow ─── */
 
-export const getBuyQuote = async (asset, nairaAmount) =>
+export const getBuyQuote = async (asset, cryptoAmount, nairaAmount = null) =>
   request("/api/rates/buy-quote", {
     method: "POST",
-    body: JSON.stringify({ asset, naira_amount: nairaAmount }),
+    body: JSON.stringify({ asset, crypto_amount: cryptoAmount, naira_amount: nairaAmount }),
   });
 
 export const createBuyTransaction = async (quoteId, paymentMethod, opts = {}) =>
@@ -469,6 +458,23 @@ export const getReferralData = async () => {
   }
   return data;
 };
+
+/* ─── Send Crypto Flow ─── */
+
+export const lookupUser = async (email) =>
+  request(`/api/auth/users/lookup?email=${encodeURIComponent(email)}`);
+
+export const sendCrypto = async (payload) =>
+  request("/api/transfers/send", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
+export const getTransfers = async () =>
+  withFallback(
+    async () => normalizeListResponse(await request("/api/transfers/"), []),
+    [],
+  );
 
 /* ─── KYC Verification ─── */
 

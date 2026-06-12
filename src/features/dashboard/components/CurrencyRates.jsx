@@ -22,6 +22,7 @@ import {
   getUserTransactions,
   getReferralData,
 } from "@/services/api";
+import { useRates, MARKET_ASSETS } from "@/context/RatesContext";
 import KYCStatusBanner from "./KYCStatusBanner";
 
 /* ─── Design tokens ──────────────────────────────────────────── */
@@ -147,9 +148,11 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
   const [copied, setCopied] = useState(false);
   const [assets, setAssets] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  const [market, setMarket] = useState([]);
   const [refData, setRefData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Live rates from the global context (fetched once on app load, cached 5 min)
+  const { rates: liveRates, isLoading: ratesLoading } = useRates();
 
   useEffect(() => {
     async function loadData() {
@@ -162,6 +165,8 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
         const wallets = Array.isArray(wRes) ? wRes : wRes?.data || [];
         const currencies = Array.isArray(cRes) ? cRes : cRes?.data || [];
         const txns = Array.isArray(tRes) ? tRes : tRes?.data || [];
+        // Use the BTC buy-rate from context as a live USD/NGN base rate for portfolio valuation
+        const systemUsdRate = liveRates?.BTC?.buyRate || 0;
 
         const COLORS = [
           "#F7931A",
@@ -180,23 +185,38 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
           "#FFFBEB",
         ];
 
-        const TARGET_ASSETS = ["BTC", "ETH", "USDT", "NGN"];
+        const interactedAssets = new Set();
+        txns.forEach(t => {
+          const status = t.status === "pending_payment" ? "pending" : t.status || "pending";
+          const isSettled = status === "completed" || status === "successful" || status === "success";
+          if (t.asset_code && isSettled) interactedAssets.add(t.asset_code);
+        });
+        
+        // Ensure all wallets with >0 balance are included
+        wallets.forEach(w => {
+          if (w.balance > 0 || w.available_balance > 0) {
+            interactedAssets.add(w.asset);
+          }
+        });
 
-        const computedAssets = TARGET_ASSETS.map((symbol, i) => {
+        const computedAssets = [];
+        let colorIdx = 0;
+
+        interactedAssets.forEach(symbol => {
+          if (!symbol) return;
           const w = wallets.find((w) => w.asset === symbol) || {
             asset: symbol,
             balance: 0,
             available_balance: 0,
           };
-          const cur = currencies.find(
-            (c) => (c.symbol || c.code) === symbol,
-          ) || { name: symbol };
-          const priceNGN = cur.buy_rate || (symbol === "NGN" ? 1 : 0);
+          const cur = currencies.find((c) => (c.symbol || c.code) === symbol) || { name: symbol };
+          
           const bal = w.available_balance || w.balance || 0;
+          const priceNGN = cur.buy_rate || (symbol === "NGN" ? 1 : 0);
           const isNGN = symbol === "NGN";
-          // For crypto assets, derive a USD price from the NGN rate (approx ₦1,650/USD)
-          const usdRate = cur.usd_rate || (isNGN ? 0 : priceNGN / 1650);
-          return {
+          const usdRate = cur.usd_rate || (isNGN ? 0 : (systemUsdRate ? priceNGN / systemUsdRate : 0));
+          
+          computedAssets.push({
             symbol: symbol,
             name: cur.name || symbol,
             balance: bal,
@@ -207,41 +227,49 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
             priceUSD: usdRate,
             isNGN,
             change: 0,
-            color: COLORS[i % COLORS.length],
-            bg: BGS[i % BGS.length],
+            color: COLORS[colorIdx % COLORS.length],
+            bg: BGS[colorIdx % BGS.length],
             icon: symbol[0],
-          };
+          });
+          colorIdx++;
         });
+        
         setAssets(computedAssets);
 
-        const computedMarket = currencies.map((c, i) => ({
-          symbol: c.symbol || c.code,
-          name: c.name,
-          price: `₦${fmt(c.buy_rate || 1)}`,
-          change: 0,
-          color: COLORS[i % COLORS.length],
-          icon: (c.symbol || c.code)[0],
-        }));
-        setMarket(computedMarket);
 
-        const recentTxns = txns.slice(0, 5).map((t) => {
+        const recentTxns = txns.slice(0, 6).map((t) => {
           const type = t.transaction_type || t.type || "transfer";
           const isBuy = type.toLowerCase().includes("buy");
           const isSell = type.toLowerCase().includes("sell");
           const asset = t.asset_code || "Crypto";
           const amount = t.naira_amount || 0;
+          const status =
+            t.status === "pending_payment"
+              ? "pending"
+              : t.status || "pending";
+          // Only mark as settled/positive if the transaction is actually completed
+          const isSettled = status === "completed" || status === "successful" || status === "success";
+          const isCredit = !isBuy && type !== "withdraw";
+          // Amount prefix: only show + for completed credits, − for debits, nothing for pending
+          let amountStr;
+          if (isBuy) {
+            amountStr = `−₦${fmt(amount)}`;
+          } else if (isCredit && isSettled) {
+            amountStr = `+₦${fmt(amount)}`;
+          } else {
+            amountStr = `₦${fmt(amount)}`;
+          }
 
           return {
             id: t.id || Math.random(),
+            rawId: t.id,
             type: isBuy ? `Bought ${asset}` : isSell ? `Sold ${asset}` : type,
             method: t.payment_method || t.payout_method || "Wallet",
-            amount: isBuy ? `−₦${fmt(amount)}` : `+₦${fmt(amount)}`,
+            amount: amountStr,
             date: new Date(t.created_at || Date.now()).toLocaleString(),
-            status:
-              t.status === "pending_payment"
-                ? "pending"
-                : t.status || "pending",
-            positive: !isBuy && type !== "withdraw",
+            status,
+            // Only colour green when the credit is actually settled
+            positive: isCredit && isSettled,
           };
         });
         setTransactions(recentTxns);
@@ -267,11 +295,13 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
 
   const ngnAsset = assets.find((a) => a.symbol === "NGN");
   const ngnBalance = ngnAsset ? ngnAsset.valueNGN : 0;
-  const filteredMarket = market.filter(
-    (m) =>
-      m.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      m.name.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+
+  // Build the market list from the global rates context, filtered by search
+  const filteredMarket = MARKET_ASSETS.filter(
+    (a) =>
+      a.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      a.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  ).map((a) => ({ ...a, rate: liveRates[a.symbol] || null }));
 
   if (isLoading) {
     return (
@@ -804,9 +834,8 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
             alignItems: "start",
           }}
         >
-          {/* Portfolio table */}
+          {/* Recent Activity (swapped into Row 3 left) */}
           <div
-            className="portfolio-table"
             style={{
               background: T.white,
               borderRadius: 24,
@@ -832,9 +861,10 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
                   letterSpacing: "-0.3px",
                 }}
               >
-                Portfolio Assets
+                Recent Activity
               </h2>
               <button
+                onClick={() => onNavigate("history")}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -847,11 +877,10 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
                   cursor: "pointer",
                 }}
               >
-                Deep Dive <ChevronRight size={14} />
+                View All <ChevronRight size={14} />
               </button>
             </div>
 
-            {/* Table head */}
             <div
               className="portfolio-grid asset-hide-mobile"
               style={{
@@ -862,7 +891,7 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
                 borderBottom: `1px solid ${T.border}`,
               }}
             >
-              {["Asset", "Price", "Balance", "Value"].map((h, i) => (
+              {["Transaction", "Date", "Status", "Amount"].map((h, i) => (
                 <p
                   key={i}
                   style={{
@@ -871,7 +900,7 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
                     color: T.text3,
                     textTransform: "uppercase",
                     letterSpacing: "0.8px",
-                    textAlign: i > 0 ? "right" : "left",
+                    textAlign: i === 3 ? "right" : "left",
                   }}
                 >
                   {h}
@@ -879,407 +908,190 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
               ))}
             </div>
 
-            {assets.map((asset, i) => (
-              <div
-                key={asset.symbol}
-                className="portfolio-grid"
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "1.5fr 1fr 1fr 1fr",
-                  padding: "18px 28px",
-                  borderBottom:
-                    i === assets.length - 1 ? "none" : `1px solid ${T.border}`,
-                  alignItems: "center",
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {transactions.length === 0 && !isLoading && (
+                <p
+                  style={{
+                    fontSize: 13,
+                    color: T.text3,
+                    textAlign: "center",
+                    padding: "20px 0",
+                  }}
+                >
+                  No recent activity.
+                </p>
+              )}
+              {transactions.map((txn, i) => {
+                const cfg = STATUS[txn.status] || STATUS.pending;
+                return (
                   <div
+                    key={txn.id}
+                    onClick={() => onNavigate(`transaction/${txn.rawId}`)}
+                    className="portfolio-grid txn-row"
                     style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 12,
-                      background: asset.bg,
-                      display: "flex",
+                      display: "grid",
+                      gridTemplateColumns: "1.5fr 1fr 1fr 1fr",
+                      padding: "18px 28px",
+                      borderBottom: i === transactions.length - 1 ? "none" : `1px solid ${T.border}`,
                       alignItems: "center",
-                      justifyContent: "center",
-                      fontFamily: "'Sora', sans-serif",
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: asset.color,
-                      border: `1px solid ${asset.color}18`,
-                      flexShrink: 0,
+                      cursor: "pointer",
+                      transition: "background 0.12s",
                     }}
                   >
-                    {asset.icon}
-                  </div>
-                  <div>
-                    <p
-                      className="asset-name"
-                      style={{
-                        fontFamily: "'Sora', sans-serif",
-                        fontSize: 14,
-                        fontWeight: 700,
-                        color: T.text,
-                        transition: "color 0.12s",
-                      }}
-                    >
-                      {asset.symbol}
-                    </p>
-                    <p
-                      style={{
-                        fontSize: 11,
-                        color: T.text3,
-                        fontWeight: 500,
-                        marginTop: 1,
-                      }}
-                    >
-                      {asset.name}
-                    </p>
-                  </div>
-                </div>
-
-                <div
-                  className="asset-hide-mobile"
-                  style={{ textAlign: "right" }}
-                >
-                  <p
-                    style={{
-                      fontFamily: "'Sora', sans-serif",
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: T.text,
-                    }}
-                  >
-                    {asset.isNGN
-                      ? `₦${fmt(asset.priceNGN)}`
-                      : `$${fmtUSD(asset.priceUSD)}`}
-                  </p>
-                  <p
-                    style={{
-                      fontSize: 11,
-                      color: asset.change >= 0 ? T.greenText : T.redText,
-                      fontWeight: 600,
-                      marginTop: 2,
-                    }}
-                  >
-                    {asset.change > 0 ? "+" : ""}
-                    {asset.change}%
-                  </p>
-                </div>
-
-                <div
-                  className="asset-hide-mobile"
-                  style={{ textAlign: "right" }}
-                >
-                  <p style={{ fontSize: 13, fontWeight: 600, color: T.text2 }}>
-                    {asset.balanceLabel}
-                  </p>
-                </div>
-
-                <div style={{ textAlign: "right" }}>
-                  <p
-                    style={{
-                      fontFamily: "'Sora', sans-serif",
-                      fontSize: 14,
-                      fontWeight: 700,
-                      color: T.text,
-                    }}
-                  >
-                    {asset.isNGN
-                      ? `₦${fmtCompact(asset.valueNGN)}`
-                      : `$${fmtCompactUSD(asset.valueUSD)}`}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Right column */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {/* Recent transactions */}
-            <div
-              style={{
-                background: T.white,
-                borderRadius: 24,
-                border: `1.5px solid ${T.border}`,
-                padding: "22px 24px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: 20,
-                }}
-              >
-                <h2
-                  style={{
-                    fontFamily: "'Sora', sans-serif",
-                    fontSize: 15,
-                    fontWeight: 700,
-                    color: T.text,
-                    letterSpacing: "-0.3px",
-                  }}
-                >
-                  Recent Activity
-                </h2>
-                <button
-                  onClick={() => onNavigate("history")}
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: 9,
-                    background: T.surface,
-                    border: `1px solid ${T.border}`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    color: T.text2,
-                    transition: "all 0.15s",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = T.blueLight;
-                    e.currentTarget.style.color = T.blue;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = T.surface;
-                    e.currentTarget.style.color = T.text2;
-                  }}
-                >
-                  <History size={14} />
-                </button>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                {transactions.length === 0 && !isLoading && (
-                  <p
-                    style={{
-                      fontSize: 13,
-                      color: T.text3,
-                      textAlign: "center",
-                      padding: "10px 0",
-                    }}
-                  >
-                    No recent activity.
-                  </p>
-                )}
-                {transactions.map((txn) => {
-                  const cfg = STATUS[txn.status] || STATUS.pending;
-                  return (
-                    <div
-                      key={txn.id}
-                      className="txn-row"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        padding: "11px 10px",
-                        borderRadius: 12,
-                        cursor: "pointer",
-                        transition: "background 0.12s",
-                      }}
-                    >
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                       <div
                         style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: 12,
+                          background: T.surface,
                           display: "flex",
                           alignItems: "center",
-                          gap: 12,
+                          justifyContent: "center",
+                          flexShrink: 0,
                         }}
                       >
-                        <div
-                          style={{
-                            width: 38,
-                            height: 38,
-                            borderRadius: 11,
-                            background: T.surface,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            position: "relative",
-                            flexShrink: 0,
-                          }}
-                        >
-                          {txn.positive ? (
-                            <ArrowDownLeft size={16} color={T.green} />
-                          ) : (
-                            <ArrowUpRight size={16} color={T.text3} />
-                          )}
-                          <div
-                            style={{
-                              position: "absolute",
-                              bottom: -1,
-                              right: -1,
-                              width: 10,
-                              height: 10,
-                              borderRadius: "50%",
-                              background: cfg.bg,
-                              border: `1.5px solid ${cfg.border}`,
-                            }}
-                          />
-                        </div>
-                        <div>
-                          <p
-                            style={{
-                              fontFamily: "'Sora', sans-serif",
-                              fontSize: 13,
-                              fontWeight: 700,
-                              color: T.text,
-                              marginBottom: 2,
-                            }}
-                          >
-                            {txn.type}
-                          </p>
-                          <p
-                            style={{
-                              fontSize: 11,
-                              color: T.text3,
-                              fontWeight: 500,
-                            }}
-                          >
-                            {txn.date}
-                          </p>
-                        </div>
+                        {txn.positive ? (
+                          <ArrowDownLeft size={18} color={T.green} />
+                        ) : (
+                          <ArrowUpRight size={18} color={T.text3} />
+                        )}
                       </div>
-                      <div style={{ textAlign: "right" }}>
+                      <div>
                         <p
                           style={{
                             fontFamily: "'Sora', sans-serif",
-                            fontSize: 13,
+                            fontSize: 14,
                             fontWeight: 700,
-                            color: txn.positive ? T.greenText : T.text,
-                            marginBottom: 3,
+                            color: T.text,
                           }}
                         >
-                          {txn.amount}
+                          {txn.type}
                         </p>
-                        <span
-                          style={{
-                            fontSize: 10,
-                            fontWeight: 700,
-                            color: cfg.color,
-                            background: cfg.bg,
-                            padding: "2px 7px",
-                            borderRadius: 6,
-                            textTransform: "uppercase",
-                            letterSpacing: "0.4px",
-                          }}
-                        >
-                          {cfg.label}
-                        </span>
+                        <p style={{ fontSize: 11, color: T.text3, fontWeight: 500, marginTop: 1 }}>
+                          {txn.method}
+                        </p>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
 
-            {/* Market card */}
+                    <div>
+                      <p style={{ fontSize: 13, fontWeight: 500, color: T.text2 }}>{txn.date}</p>
+                    </div>
+
+                    <div>
+                      <span
+                        style={{
+                          fontSize: 10,
+                          fontWeight: 700,
+                          color: cfg.color,
+                          background: cfg.bg,
+                          padding: "4px 8px",
+                          borderRadius: 6,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.4px",
+                        }}
+                      >
+                        {cfg.label}
+                      </span>
+                    </div>
+
+                    <div style={{ textAlign: "right" }}>
+                      <p
+                        style={{
+                          fontFamily: "'Sora', sans-serif",
+                          fontSize: 14,
+                          fontWeight: 700,
+                          color: txn.positive ? T.greenText : T.text,
+                        }}
+                      >
+                        {txn.amount}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Market card */}
+          <div
+            style={{
+              background: T.blue,
+              borderRadius: 24,
+              padding: "28px 24px",
+              position: "relative",
+              overflow: "hidden",
+              cursor: "pointer",
+              height: "100%",
+            }}
+          >
             <div
               style={{
-                background: T.blue,
-                borderRadius: 24,
-                padding: "28px 24px",
-                position: "relative",
-                overflow: "hidden",
-                cursor: "pointer",
+                position: "absolute",
+                top: -40,
+                right: -40,
+                width: 180,
+                height: 180,
+                borderRadius: "50%",
+                background: "rgba(255,255,255,0.06)",
+                pointerEvents: "none",
               }}
-            >
-              <div
+            />
+            <div style={{ position: "relative", zIndex: 1 }}>
+              <h3
                 style={{
-                  position: "absolute",
-                  top: -40,
-                  right: -40,
-                  width: 180,
-                  height: 180,
-                  borderRadius: "50%",
-                  background: "rgba(255,255,255,0.06)",
-                  pointerEvents: "none",
+                  fontFamily: "'Sora', sans-serif",
+                  fontSize: 20,
+                  fontWeight: 700,
+                  color: "#fff",
+                  lineHeight: 1.2,
+                  marginBottom: 6,
                 }}
-              />
-              <div style={{ position: "relative", zIndex: 1 }}>
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: 20,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: 12,
-                      background: "rgba(255,255,255,0.12)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <BarChart2 size={20} color="#fff" />
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 5,
-                      background: "rgba(255,255,255,0.12)",
-                      borderRadius: 20,
-                      padding: "5px 12px",
-                    }}
-                  >
-                    <div
-                      className="blink"
-                      style={{
-                        width: 6,
-                        height: 6,
-                        borderRadius: "50%",
-                        background: T.mintGreen,
-                      }}
-                    />
-                    <span
-                      style={{
-                        fontSize: 10,
-                        fontWeight: 700,
-                        color: "#fff",
-                        textTransform: "uppercase",
-                        letterSpacing: "0.5px",
-                      }}
-                    >
-                      Market +2.4%
-                    </span>
-                  </div>
-                </div>
-                <h3
-                  style={{
-                    fontFamily: "'Sora', sans-serif",
-                    fontSize: 20,
-                    fontWeight: 700,
-                    color: "#fff",
-                    lineHeight: 1.2,
-                    marginBottom: 6,
-                  }}
-                >
-                  Global Market Rates
-                </h3>
-                <p
-                  style={{
-                    fontSize: 12,
-                    color: "rgba(255,255,255,0.5)",
-                    marginBottom: 20,
-                    fontWeight: 500,
-                  }}
-                >
-                  Real-time data for 200+ pairs
-                </p>
+              >
+                Cheeseball Rates
+              </h3>
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "rgba(255,255,255,0.5)",
+                  marginBottom: 20,
+                  fontWeight: 500,
+                }}
+              >
+                Real-time data for prominent pairs
+              </p>
 
-                {/* Market rows */}
-                <div
-                  style={{ display: "flex", flexDirection: "column", gap: 10 }}
-                >
-                  {filteredMarket.slice(0, 3).map((m) => (
+              {/* Market rows — Nigerian format: ₦X,XXX/$ rate + per-unit NGN price */}
+              <style>{`
+                @keyframes cb-rate-spin { to { transform: rotate(360deg); } }
+                .cb-rate-spinner {
+                  width: 14px;
+                  height: 14px;
+                  border: 2px solid rgba(255,255,255,0.2);
+                  border-top-color: rgba(255,255,255,0.8);
+                  border-radius: 50%;
+                  animation: cb-rate-spin 0.7s linear infinite;
+                  display: inline-block;
+                  flex-shrink: 0;
+                }
+              `}</style>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {filteredMarket.map((m) => {
+                  const r = m.rate;
+                  // While rates are still loading and we have no data yet for this asset
+                  const isRowLoading = ratesLoading && !r;
+                  // Nigerian display: ₦X,XXX/$ means buyRate (NGN per $1)
+                  const rateDisplay = r?.buyRate
+                    ? `₦${fmt(r.buyRate)}/$`
+                    : "—";
+                  // Secondary line: full NGN price of 1 unit, e.g. ₦86M for BTC
+                  const unitDisplay = r?.buyNGN
+                    ? `1 ${m.symbol} ≈ ₦${fmtCompact(r.buyNGN)}`
+                    : !ratesLoading && r?.buyNGN === null
+                    ? "Not available"
+                    : "—";
+
+                  return (
                     <div
                       key={m.symbol}
                       style={{
@@ -1310,55 +1122,208 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
                       >
                         {m.icon}
                       </div>
+
+                      {/* Symbol + name */}
                       <div style={{ flex: 1 }}>
-                        <p
-                          style={{
-                            fontFamily: "'Sora', sans-serif",
-                            fontSize: 12,
-                            fontWeight: 700,
-                            color: "#fff",
-                          }}
-                        >
+                        <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff" }}>
                           {m.symbol}
                         </p>
-                        <p
-                          style={{
-                            fontSize: 10,
-                            color: "rgba(255,255,255,0.45)",
-                            fontWeight: 500,
-                          }}
-                        >
+                        <p style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", fontWeight: 500 }}>
                           {m.name}
                         </p>
                       </div>
-                      <div style={{ textAlign: "right" }}>
-                        <p
-                          style={{
-                            fontFamily: "'Sora', sans-serif",
-                            fontSize: 12,
-                            fontWeight: 700,
-                            color: "#fff",
-                          }}
-                        >
-                          {m.price}
-                        </p>
-                        <p
-                          style={{
-                            fontSize: 10,
-                            fontWeight: 700,
-                            color: m.change >= 0 ? T.mintGreen : "#FCA5A5",
-                          }}
-                        >
-                          {m.change >= 0 ? "+" : ""}
-                          {m.change}%
-                        </p>
+
+                      {/* Rate — Nigerian format or spinner */}
+                      <div style={{ textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 3 }}>
+                        {isRowLoading ? (
+                          <span className="cb-rate-spinner" />
+                        ) : (
+                          <>
+                            <p
+                              style={{
+                                fontFamily: "'Sora', sans-serif",
+                                fontSize: 13,
+                                fontWeight: 700,
+                                color: "#fff",
+                              }}
+                            >
+                              {rateDisplay}
+                            </p>
+                            <p
+                              style={{
+                                fontSize: 10,
+                                fontWeight: 500,
+                                color: "rgba(255,255,255,0.45)",
+                              }}
+                            >
+                              {unitDisplay}
+                            </p>
+                          </>
+                        )}
                       </div>
                     </div>
-                  ))}
-                </div>
+                  );
+                })}
               </div>
             </div>
           </div>
+        </div>
+
+        {/* ── ROW 4: Portfolio Assets (swapped into Row 4) ── */}
+        <div
+          className="portfolio-table"
+          style={{
+            background: T.white,
+            borderRadius: 24,
+            border: `1.5px solid ${T.border}`,
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              padding: "22px 28px",
+              borderBottom: `1px solid ${T.border}`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <h2
+              style={{
+                fontFamily: "'Sora', sans-serif",
+                fontSize: 15,
+                fontWeight: 700,
+                color: T.text,
+                letterSpacing: "-0.3px",
+              }}
+            >
+              Portfolio Assets
+            </h2>
+          </div>
+
+          {/* Table head */}
+          <div
+            className="portfolio-grid asset-hide-mobile"
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr 1fr",
+              padding: "12px 28px",
+              background: T.surface,
+              borderBottom: `1px solid ${T.border}`,
+            }}
+          >
+            {["Asset", "Balance", "Value"].map((h, i) => (
+              <p
+                key={i}
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: T.text3,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.8px",
+                  textAlign: i === 0 ? "left" : (i === 1 ? "center" : "right"),
+                }}
+              >
+                {h}
+              </p>
+            ))}
+          </div>
+
+          {assets.length === 0 && !isLoading && (
+            <div style={{ padding: "40px 24px", textAlign: "center" }}>
+              <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: T.text, marginBottom: 6 }}>
+                No assets yet
+              </p>
+              <p style={{ fontSize: 13, color: T.text2 }}>
+                Your asset balances will appear here once you deposit or trade.
+              </p>
+            </div>
+          )}
+
+          {assets.map((asset, i) => (
+            <div
+              key={asset.symbol}
+              className="portfolio-grid"
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr 1fr",
+                padding: "18px 28px",
+                borderBottom:
+                  i === assets.length - 1 ? "none" : `1px solid ${T.border}`,
+                alignItems: "center",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 12,
+                    background: asset.bg,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontFamily: "'Sora', sans-serif",
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: asset.color,
+                    border: `1px solid ${asset.color}18`,
+                    flexShrink: 0,
+                  }}
+                >
+                  {asset.icon}
+                </div>
+                <div>
+                  <p
+                    className="asset-name"
+                    style={{
+                      fontFamily: "'Sora', sans-serif",
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: T.text,
+                      transition: "color 0.12s",
+                    }}
+                  >
+                    {asset.symbol}
+                  </p>
+                  <p
+                    style={{
+                      fontSize: 11,
+                      color: T.text3,
+                      fontWeight: 500,
+                      marginTop: 1,
+                    }}
+                  >
+                    {asset.name}
+                  </p>
+                </div>
+              </div>
+
+              <div
+                className="asset-hide-mobile"
+                style={{ textAlign: "center" }}
+              >
+                <p style={{ fontSize: 13, fontWeight: 600, color: T.text2 }}>
+                  {asset.balanceLabel}
+                </p>
+              </div>
+
+              <div style={{ textAlign: "right" }}>
+                <p
+                  style={{
+                    fontFamily: "'Sora', sans-serif",
+                    fontSize: 14,
+                    fontWeight: 700,
+                    color: T.text,
+                  }}
+                >
+                  {asset.isNGN
+                    ? `₦${fmtCompact(asset.valueNGN)}`
+                    : `$${fmtCompactUSD(asset.valueUSD)}`}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </>
