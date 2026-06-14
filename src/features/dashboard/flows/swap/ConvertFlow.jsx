@@ -101,7 +101,13 @@ export default function ConvertFlow({ onClose }) {
   };
 
   const breadcrumbs = (
-    <ConvertFlowBreadcrumbs currentStep={step} totalSteps={3} />
+    <ConvertFlowBreadcrumbs 
+      currentStep={step} 
+      onClose={handleClose}
+      onStepClick={(targetStep) => {
+        if (targetStep === 1) handleBackToStep1();
+      }}
+    />
   );
 
   return (

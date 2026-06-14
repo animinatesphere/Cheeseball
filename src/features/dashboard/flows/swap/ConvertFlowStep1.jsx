@@ -701,8 +701,9 @@ export default function ConvertFlowStep1({
               !fromAmount ||
               Number(fromAmount) <= 0
             }
+            loading={loading}
           >
-            {loading ? "Getting Quote..." : "Get Quote"}
+            Get Quote
           </CTA>
         </div>
       </div>

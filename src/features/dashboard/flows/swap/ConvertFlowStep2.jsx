@@ -443,8 +443,8 @@ export default function ConvertFlowStep2({
 
         {/* Actions */}
         <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
-          <CTA onClick={handleConfirm} disabled={loading || isExpired}>
-            {loading ? "Confirming..." : "Confirm Conversion"}
+          <CTA onClick={handleConfirm} disabled={loading || isExpired} loading={loading}>
+            Confirm Conversion
           </CTA>
           <GhostBtn onClick={onBack}>Cancel</GhostBtn>
         </div>

@@ -75,7 +75,7 @@ const authService = {
     );
     // Store tokens in localStorage for Authorization header usage
     if (data?.access) {
-      setTokens(data.access, data.refresh);
+      setTokens(data.access);
     }
     return data;
   },
@@ -95,7 +95,7 @@ const authService = {
     );
     // Store tokens in localStorage after verification (auto-login)
     if (data?.access) {
-      setTokens(data.access, data.refresh);
+      setTokens(data.access);
     }
     return data;
   },

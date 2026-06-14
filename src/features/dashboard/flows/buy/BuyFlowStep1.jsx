@@ -648,27 +648,9 @@ export default function BuyFlowStep1({
           <CTA
             onClick={handleContinue}
             disabled={!payAmount || loading}
+            loading={loading}
           >
-            {loading ? (
-              <>
-                <span
-                  style={{
-                    width: 16,
-                    height: 16,
-                    border: "2px solid rgba(255,255,255,0.4)",
-                    borderTopColor: "#fff",
-                    borderRadius: "50%",
-                    display: "inline-block",
-                    animation: "spin 0.7s linear infinite",
-                  }}
-                />{" "}
-                Continuing…
-              </>
-            ) : (
-              <>
-                Continue <Ico.arrow />
-              </>
-            )}
+            Continue <Ico.arrow />
           </CTA>
           <p
             style={{

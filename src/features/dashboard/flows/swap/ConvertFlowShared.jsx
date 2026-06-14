@@ -1,4 +1,5 @@
 import React from "react";
+import { Loader2 } from "lucide-react";
 
 export const ASSETS = [
   { id: "ngn", symbol: "NGN", name: "Nigerian Naira", icon: "₦", color: "#00C48C", bg: "#E6FAF4" },
@@ -306,11 +307,11 @@ export const SecureFooter = () => (
   </div>
 );
 
-export const CTA = ({ onClick, disabled, children, style = {} }) => (
+export const CTA = ({ onClick, disabled, loading, children, style = {} }) => (
   <button
     onClick={onClick}
-    disabled={disabled}
-    className={disabled ? "" : "ctabtn"}
+    disabled={disabled || loading}
+    className={disabled || loading ? "" : "ctabtn"}
     style={{
       width: "100%",
       padding: "17px",
@@ -319,17 +320,18 @@ export const CTA = ({ onClick, disabled, children, style = {} }) => (
       fontFamily: "'Sora',sans-serif",
       fontSize: 15,
       fontWeight: 700,
-      cursor: disabled ? "not-allowed" : "pointer",
+      cursor: disabled || loading ? "not-allowed" : "pointer",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       gap: 10,
       transition: "all 0.2s",
-      background: disabled ? "#E8EEFF" : T.blue,
-      color: disabled ? "#A8B4CC" : "#fff",
+      background: disabled || loading ? "#E8EEFF" : T.blue,
+      color: disabled || loading ? "#A8B4CC" : "#fff",
       ...style,
     }}
   >
+    {loading && <Loader2 className="animate-spin" size={18} />}
     {children}
   </button>
 );

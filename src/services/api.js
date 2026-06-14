@@ -1,3 +1,5 @@
+import imageCompression from "browser-image-compression";
+
 export const API_BASE =
   window.location.hostname === "localhost" ||
   window.location.hostname === "127.0.0.1"
@@ -22,68 +24,14 @@ async function parseResponse(response) {
 
 /* ─── LocalStorage Token Store ─── */
 
-export function setTokens(access, refresh) {
+export function setTokens(access) {
   if (access) localStorage.setItem("accessToken", access);
   else localStorage.removeItem("accessToken");
-  
-  if (refresh) localStorage.setItem("refreshToken", refresh);
-  else localStorage.removeItem("refreshToken");
 }
 
 export function clearTokens() {
   localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
   localStorage.removeItem("user_email");
-}
-
-/* ─── Token Refresh Logic ─── */
-
-let isRefreshing = false;
-let refreshPromise = null;
-
-async function refreshAccessToken() {
-  if (isRefreshing && refreshPromise) {
-    return refreshPromise;
-  }
-
-  isRefreshing = true;
-  refreshPromise = (async () => {
-    try {
-      const headers = {
-        "Content-Type": "application/json",
-        accept: "application/json",
-      };
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (refreshToken) {
-        headers["Authorization"] = `Bearer ${refreshToken}`;
-      }
-
-      const response = await fetch(`${API_BASE}/api/auth/token/refresh`, {
-        method: "POST",
-        headers,
-        credentials: "include",
-        body: JSON.stringify(
-          refreshToken ? { refresh_token: refreshToken } : {},
-        ),
-      });
-
-      if (!response.ok) {
-        clearTokens();
-        throw new Error("Token refresh failed");
-      }
-
-      const data = await parseResponse(response);
-      if (data?.access) {
-        setTokens(data.access, data.refresh || refreshToken);
-      }
-      return true;
-    } finally {
-      isRefreshing = false;
-      refreshPromise = null;
-    }
-  })();
-
-  return refreshPromise;
 }
 
 const AUTH_CREDENTIAL_PATHS = [
@@ -122,27 +70,10 @@ export async function request(path, options = {}, _isRetry = false) {
   });
   const data = await parseResponse(response);
 
-  if (
-    response.status === 401 &&
-    !_isRetry &&
-    shouldAttemptRefresh(path, data)
-  ) {
-    try {
-      await refreshAccessToken();
-      return request(path, options, true);
-    } catch {
-      clearTokens();
-      if (window.location.pathname !== "/login") {
-        window.location.href = "/login";
-      }
-      throw new Error("Session expired. Please log in again.");
-    }
-  }
-
-  if (response.status === 401 && shouldAttemptRefresh(path, data)) {
+  if (response.status === 401 && !isOnAuthPage()) {
     clearTokens();
     if (window.location.pathname !== "/login") {
-      window.location.href = "/login";
+      window.location.href = "/login?session_expired=true";
     }
     throw new Error("Session expired. Please log in again.");
   }
@@ -341,6 +272,43 @@ export const uploadFile = async (file, folder = "uploads") => {
   }, URL.createObjectURL(file));
 };
 
+export const uploadToCloudinary = async (file) => {
+  try {
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    };
+    const compressedFile = await imageCompression(file, options);
+
+    const formData = new FormData();
+    formData.append("file", compressedFile);
+    formData.append(
+      "upload_preset",
+      "cheeseball"
+    );
+
+    const cloudName = "dahz436mo";
+    const url = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || "Failed to upload image");
+    }
+
+    const data = await response.json();
+    return data.secure_url;
+  } catch (err) {
+    console.error("Cloudinary upload error:", err);
+    throw err;
+  }
+};
+
 /* ─── Buy Crypto Flow ─── */
 
 export const getBuyQuote = async (asset, cryptoAmount, nairaAmount = null) =>
@@ -438,8 +406,8 @@ export const getReferralData = async () => {
 
 /* ─── Send Crypto Flow ─── */
 
-export const lookupUser = async (email) =>
-  request(`/api/auth/users/lookup?email=${encodeURIComponent(email)}`);
+export const lookupUser = async (query) =>
+  request(`/api/auth/users/lookup?email=${encodeURIComponent(query)}`);
 
 export const sendCrypto = async (payload) =>
   request("/api/transfers/send", {
@@ -460,6 +428,9 @@ export const submitKYC = async (payload) =>
     method: "POST",
     body: JSON.stringify(payload),
   });
+
+export const getMyKYC = async () =>
+  request("/api/kyc/me", { method: "GET" });
 
 /* ─── Notifications ─── */
 

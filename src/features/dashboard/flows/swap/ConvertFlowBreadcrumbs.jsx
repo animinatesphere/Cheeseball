@@ -1,58 +1,72 @@
 import React from "react";
-import { T, Ico } from "./ConvertFlowShared";
 
-export default function ConvertFlowBreadcrumbs({ currentStep, totalSteps }) {
+/* ── Design tokens (mirrors buy/sell flow) ─────────────────── */
+const T = {
+  blue:      "#1A6FFF",
+  text2:     "#6B7A99",
+  text3:     "#A8B4CC",
+  border:    "#E8EEFF",
+  blueLight: "#EEF3FF",
+};
+
+const STEPS = [
+  { id: 1, label: "Swap Crypto" },
+  { id: 2, label: "Preview Swap" },
+  { id: 3, label: "Complete" },
+];
+
+export default function ConvertFlowBreadcrumbs({ currentStep, onStepClick, onClose }) {
+  /* Determine which steps to show in the breadcrumb trail.
+     Design spec: show Dashboard › [previous completed steps] › [current step].
+     We only surface the steps up to and including the current one.  */
+  const visibleSteps = STEPS.slice(0, currentStep);
+
   return (
-    <div
+    <nav
+      className="breadcrumb-nav"
       style={{
         display: "flex",
         alignItems: "center",
-        gap: 12,
-        marginBottom: 32,
+        gap: 6,
+        flexWrap: "wrap",
+        marginBottom: 36,
       }}
     >
-      {Array.from({ length: totalSteps }).map((_, i) => (
-        <React.Fragment key={i}>
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: "50%",
-              background:
-                i < currentStep
-                  ? T.green
-                  : i === currentStep - 1
-                    ? T.blue
-                    : T.border,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontFamily: "'Sora',sans-serif",
-              fontSize: 13,
-              fontWeight: 700,
-              color:
-                i < currentStep
-                  ? "#fff"
-                  : i === currentStep - 1
-                    ? "#fff"
-                    : T.text3,
-              transition: "all 0.3s",
-            }}
-          >
-            {i < currentStep - 1 ? Ico.check("#fff") : i + 1}
-          </div>
-          {i < totalSteps - 1 && (
-            <div
+      {/* Dashboard link */}
+      <span
+        onClick={onClose}
+        className="breadcrumb-item"
+        style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer" }}
+      >
+        Dashboard
+      </span>
+
+      {visibleSteps.map((step, idx) => {
+        const isLast = idx === visibleSteps.length - 1;
+        const isCompleted = currentStep > step.id;
+
+        return (
+          <React.Fragment key={step.id}>
+            {/* Separator */}
+            <span className="breadcrumb-item" style={{ color: T.text3, fontSize: 12, userSelect: "none" }}>›</span>
+
+            {/* Step label */}
+            <span
+              onClick={() => isCompleted && onStepClick?.(step.id)}
+              className="breadcrumb-item"
               style={{
-                width: 24,
-                height: 2,
-                background: i < currentStep - 1 ? T.green : T.border,
-                transition: "all 0.3s",
+                fontSize: 13,
+                fontWeight: isLast ? 600 : 500,
+                color: isLast ? T.blue : T.text2,
+                cursor: isCompleted ? "pointer" : "default",
+                fontFamily: "'DM Sans', sans-serif",
               }}
-            />
-          )}
-        </React.Fragment>
-      ))}
-    </div>
+            >
+              {step.label}
+            </span>
+          </React.Fragment>
+        );
+      })}
+    </nav>
   );
 }

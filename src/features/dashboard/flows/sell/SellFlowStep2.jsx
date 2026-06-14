@@ -141,8 +141,8 @@ export default function SellFlowStep2(props) {
 
           <div className="actions-wrap" style={{ display: "flex", gap: 12, marginTop: 32 }}>
             <GhostBtn onClick={prevStep} style={{ flex: 1 }}>← Back</GhostBtn>
-            <CTA onClick={handleSell} disabled={loading} style={{ flex: 2 }}>
-              {loading ? "Processing..." : buttonText}
+            <CTA onClick={handleSell} disabled={loading} loading={loading} style={{ flex: 2 }}>
+              {buttonText}
             </CTA>
           </div>
         </div>

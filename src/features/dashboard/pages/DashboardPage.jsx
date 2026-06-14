@@ -431,7 +431,7 @@ const CurrencyPage = () => {
 
   useEffect(() => {
     getCurrentUser().then(setUser);
-  }, []);
+  }, [location.pathname]);
 
   const handleContinue = async (extraData = {}) => {
     setLoading(true);
@@ -697,27 +697,29 @@ const CurrencyPage = () => {
                   </span>
                   <Bell className="block md:hidden" size={17} color={T.text} />
                   
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: -6,
-                      right: -6,
-                      minWidth: 20,
-                      height: 20,
-                      borderRadius: 10,
-                      background: T.red,
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      border: "2px solid #fff",
-                      fontSize: 10,
-                      fontWeight: 700,
-                      color: "#fff",
-                      padding: "0 5px"
-                    }}
-                  >
-                    {unreadCount || 0}
-                  </span>
+                  {unreadCount > 0 && (
+                    <span
+                      style={{
+                        position: "absolute",
+                        top: -6,
+                        right: -6,
+                        minWidth: 20,
+                        height: 20,
+                        borderRadius: 10,
+                        background: T.red,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        border: "2px solid #fff",
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: "#fff",
+                        padding: "0 5px"
+                      }}
+                    >
+                      {unreadCount}
+                    </span>
+                  )}
                 </button>
               </div>
             </header>
@@ -845,7 +847,14 @@ const CurrencyPage = () => {
                 />
                 <Route
                   path="kyc"
-                  element={<KYCVerification onNavigate={handleNavigation} />}
+                  element={
+                    <KYCVerification
+                      onNavigate={handleNavigation}
+                      kycStatus={kycStatus}
+                      kycRejectionReason={kycRejectionReason}
+                      onKycUpdate={() => getCurrentUser().then(setUser)}
+                    />
+                  }
                 />
                 <Route
                   path="account"

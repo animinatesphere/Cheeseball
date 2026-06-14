@@ -180,8 +180,8 @@ function WalletVariant({
 
         <div className="actions-wrap" style={{display:"flex",gap:12,marginTop:24}}>
           <GhostBtn onClick={prevStep} style={{flex:1}}>← Back</GhostBtn>
-          <CTA onClick={handlePay} disabled={loading||!hasSufficientBalance} style={{flex:2}}>
-            {loading ? "Processing…" : `Pay ${formatNGN(finalPayAmount)}`}
+          <CTA onClick={handlePay} disabled={loading||!hasSufficientBalance} loading={loading} style={{flex:2}}>
+            {`Pay ${formatNGN(finalPayAmount)}`}
           </CTA>
         </div>
         <SecureFooter/>
@@ -352,7 +352,7 @@ function PaystackVariant({
           <div className="actions-wrap" style={{ display: "flex", gap: 12 }}>
             <GhostBtn onClick={prevStep} style={{ flex: 1 }}>Back</GhostBtn>
             {!setupDone ? (
-              <CTA onClick={handleSetupPayment} disabled={loading} style={{ flex: 2 }}>{loading ? "Setting up…" : "Generate Account"}</CTA>
+              <CTA onClick={handleSetupPayment} disabled={loading} loading={loading} style={{ flex: 2 }}>Generate Account</CTA>
             ) : (
               <CTA disabled style={{ flex: 2, background: T.greenLight, color: T.greenText, border: `1px solid #A7F3D0` }}>{Ico.check(T.greenText)} Waiting for payment…</CTA>
             )}

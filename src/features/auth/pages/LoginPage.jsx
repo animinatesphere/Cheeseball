@@ -92,6 +92,7 @@ export default function Auth() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("session_expired") === "true") {
+      setError("Session has expired, Login again.");
       // Clean up the URL without triggering a navigation
       window.history.replaceState({}, "", window.location.pathname);
     }

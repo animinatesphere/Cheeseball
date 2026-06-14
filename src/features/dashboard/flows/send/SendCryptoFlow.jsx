@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { T, Ico, ASSETS, CTA } from "../swap/ConvertFlowShared";
-import { lookupUser, sendCrypto } from "../../../../services/api";
+import { lookupUser, sendCrypto, getUserPortfolio } from "../../../../services/api";
 
 const SEND_CSS = `
   @import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=DM+Sans:wght@400;500;600&display=swap');
@@ -20,6 +20,60 @@ const SEND_CSS = `
   input::placeholder { color: #CED6E8; }
 `;
 
+function SendBreadcrumbs({ step, onNavigate, onClose }) {
+  const steps = [{ id: 1, label: "Send Crypto" }];
+  
+  if (step >= 2) steps.push({ id: 2, label: "Select Asset" });
+  if (step >= 3) steps.push({ id: 3, label: "Details" });
+  if (step >= 4) steps.push({ id: 4, label: "Summary" });
+  if (step >= 5) steps.push({ id: 5, label: "Status" });
+
+  return (
+    <nav
+      className="breadcrumb-nav"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        flexWrap: "wrap",
+        marginBottom: 36,
+      }}
+    >
+      <span
+        onClick={onClose}
+        className="breadcrumb-item"
+        style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+      >
+        Dashboard
+      </span>
+
+      {steps.map((s, idx) => {
+        const isLast = idx === steps.length - 1;
+        const clickable = !isLast && step < 5;
+
+        return (
+          <React.Fragment key={s.id}>
+            <span className="breadcrumb-item" style={{ color: T.text3, fontSize: 12, userSelect: "none" }}>›</span>
+            <span
+              onClick={() => clickable && onNavigate(s.id)}
+              className="breadcrumb-item"
+              style={{
+                fontSize: 13,
+                fontWeight: isLast ? 600 : 500,
+                color: isLast ? T.blue : T.text2,
+                cursor: clickable ? "pointer" : "default",
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {s.label}
+            </span>
+          </React.Fragment>
+        );
+      })}
+    </nav>
+  );
+}
+
 export default function SendCryptoFlow({ onNavigate, onBack }) {
   // Navigation & Data
   const [step, setStep] = useState(1);
@@ -31,6 +85,8 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
   const [recipientEmail, setRecipientEmail] = useState("");
   const [recipientAddress, setRecipientAddress] = useState("");
   const [network, setNetwork] = useState("");
+  const [lookupMethod, setLookupMethod] = useState("email");
+  const [recipientUuid, setRecipientUuid] = useState("");
   
   // User Lookup
   const [lookedUpUser, setLookedUpUser] = useState(null);
@@ -43,6 +99,28 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
   const [submitResult, setSubmitResult] = useState(null); // success details
 
   const cryptoAssets = ASSETS.filter((a) => a.symbol !== "NGN");
+  const [balances, setBalances] = useState([]);
+
+  useEffect(() => {
+    getUserPortfolio().then(setBalances).catch(console.error);
+  }, []);
+
+  const availableBalance = balances?.find((b) => b.asset === selectedAsset?.symbol)?.available_balance || 0;
+
+  const [ddOpen, setDdOpen] = useState(false);
+  const [assetQuery, setAssetQuery] = useState("");
+  const ddRef = useRef(null);
+
+  const filteredAssets = cryptoAssets.filter(a =>
+    a.name.toLowerCase().includes(assetQuery.toLowerCase()) ||
+    a.symbol.toLowerCase().includes(assetQuery.toLowerCase())
+  );
+
+  useEffect(() => {
+    const h = e => { if (ddRef.current && !ddRef.current.contains(e.target)) setDdOpen(false); };
+    document.addEventListener("mousedown", h);
+    return () => document.removeEventListener("mousedown", h);
+  }, []);
 
   const handleSelectMethod = (method) => {
     setSendMethod(method);
@@ -62,23 +140,24 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
   };
 
   const performLookup = async () => {
-    if (!recipientEmail || recipientEmail.trim().length === 0) return;
+    const query = lookupMethod === "email" ? recipientEmail : recipientUuid;
+    if (!query || query.trim().length === 0) return;
     setIsLookingUp(true);
     setLookupError("");
     setLookedUpUser(null);
     try {
-      const user = await lookupUser(recipientEmail.trim());
+      const user = await lookupUser(query.trim());
       setLookedUpUser(user);
     } catch (err) {
-      setLookupError("User not found with this email");
+      setLookupError(`User not found with this ${lookupMethod === "email" ? "email" : "ID"}`);
     } finally {
       setIsLookingUp(false);
     }
   };
 
-  // Trigger lookup when email input blurs
-  const handleEmailBlur = () => {
-    if (recipientEmail && !lookedUpUser && !lookupError) {
+  const handleBlur = () => {
+    const query = lookupMethod === "email" ? recipientEmail : recipientUuid;
+    if (query && !lookedUpUser && !lookupError) {
       performLookup();
     }
   };
@@ -97,7 +176,7 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
     try {
       const payload = {
         transfer_type: sendMethod,
-        asset_id: selectedAsset.symbol,
+        asset: selectedAsset.symbol,
         amount: parseFloat(amount),
       };
 
@@ -105,7 +184,7 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
         payload.recipient_email = lookedUpUser.email;
       } else {
         payload.recipient_address = recipientAddress;
-        payload.network = network;
+        payload.recipient_network = network;
       }
 
       const res = await sendCrypto(payload);
@@ -132,56 +211,20 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
       <style>{SEND_CSS}</style>
 
       <div
+        className="step-content"
         style={{
           minHeight: "100vh",
-          background: T.surface,
-          padding: "40px 20px",
+          background: T.white,
+          padding: "44px 52px 60px",
           fontFamily: "'DM Sans', sans-serif",
         }}
       >
-        {step < 5 && (
-          <button
-            onClick={handleBackStep}
-            style={{
-              padding: "10px 16px",
-              background: "transparent",
-              border: `1.5px solid ${T.border}`,
-              borderRadius: 10,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 32,
-              transition: "all 0.2s",
-            }}
-            onMouseOver={(e) => (e.currentTarget.style.background = T.blueLight)}
-            onMouseOut={(e) => (e.currentTarget.style.background = "transparent")}
-          >
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke={T.text}
-              strokeWidth="2.5"
-              strokeLinecap="round"
-            >
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            <span
-              style={{
-                fontFamily: "'Sora', sans-serif",
-                fontSize: 14,
-                fontWeight: 600,
-                color: T.text,
-              }}
-            >
-              Back
-            </span>
-          </button>
-        )}
-
-        <div style={{ maxWidth: 800, margin: "0 auto" }}>
+        <div style={{ maxWidth: 640 }}>
+          <SendBreadcrumbs 
+            step={step} 
+            onNavigate={(s) => setStep(s)} 
+            onClose={() => { if (onBack) onBack(); else window.history.back(); }} 
+          />
           {step === 1 && (
             <div className="fadein">
               <p
@@ -191,7 +234,7 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                   color: T.blue,
                   textTransform: "uppercase",
                   letterSpacing: "1px",
-                  marginBottom: 8,
+                  marginBottom: 4,
                   fontFamily: "'DM Sans',sans-serif",
                 }}
               >
@@ -204,7 +247,7 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                   fontWeight: 700,
                   color: T.text,
                   letterSpacing: "-0.6px",
-                  marginBottom: 12,
+                  marginBottom: 8,
                 }}
               >
                 How would you like to send?
@@ -213,7 +256,7 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                 style={{
                   fontSize: 15,
                   color: T.text2,
-                  marginBottom: 40,
+                  marginBottom: 20,
                   lineHeight: 1.6,
                 }}
               >
@@ -225,8 +268,8 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                 style={{
                   display: "grid",
                   gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-                  gap: 20,
-                  marginBottom: 32,
+                  gap: 16,
+                  marginBottom: 16,
                 }}
               >
                 {/* Internal Option */}
@@ -415,7 +458,7 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                   color: T.blue,
                   textTransform: "uppercase",
                   letterSpacing: "1px",
-                  marginBottom: 8,
+                  marginBottom: 4,
                   fontFamily: "'DM Sans',sans-serif",
                 }}
               >
@@ -428,7 +471,7 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                   fontWeight: 700,
                   color: T.text,
                   letterSpacing: "-0.6px",
-                  marginBottom: 12,
+                  marginBottom: 8,
                 }}
               >
                 Select Cryptocurrency
@@ -437,82 +480,110 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                 style={{
                   fontSize: 15,
                   color: T.text2,
-                  marginBottom: 32,
+                  marginBottom: 20,
                   lineHeight: 1.6,
                 }}
               >
                 Choose which cryptocurrency you'd like to send.
               </p>
 
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-                  gap: 16,
-                  marginBottom: 32,
-                }}
-              >
-                {cryptoAssets.map((asset) => (
+              <div style={{ maxWidth: 500, marginBottom: 16 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, color: T.text2, textTransform: "uppercase", letterSpacing: "0.7px", display: "block", marginBottom: 8, fontFamily: "'DM Sans',sans-serif" }}>
+                  Asset to Send
+                </label>
+
+                {/* Dropdown trigger */}
+                <div ref={ddRef} style={{ position: "relative" }}>
                   <button
-                    key={asset.id}
-                    onClick={() => handleSelectAsset(asset)}
-                    className="method-card popIn"
+                    onClick={() => setDdOpen(!ddOpen)}
+                    className="netsel"
                     style={{
-                      padding: 20,
-                      background: selectedAsset?.id === asset.id ? T.blueLight : T.white,
-                      border: `2px solid ${selectedAsset?.id === asset.id ? T.blue : T.border}`,
-                      borderRadius: 14,
-                      cursor: "pointer",
-                      transition: "all 0.3s",
-                      textAlign: "left",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 14,
+                      width: "100%", padding: "16px", borderRadius: 14,
+                      border: `1.5px solid ${selectedAsset ? T.blue : T.border}`,
+                      background: selectedAsset ? T.blueLight : T.white,
+                      display: "flex", alignItems: "center", justifyContent: "space-between",
+                      cursor: "pointer", transition: "all 0.2s",
+                      fontFamily: "'DM Sans',sans-serif", fontSize: 15, fontWeight: 600, color: T.text,
                     }}
                   >
-                    <div
-                      style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: "50%",
-                        background: asset.color,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontFamily: "'Sora',sans-serif",
-                        fontSize: 18,
-                        fontWeight: 700,
-                        color: "#fff",
-                        flexShrink: 0,
-                      }}
-                    >
-                      {asset.icon}
-                    </div>
-                    <div style={{ flex: 1 }}>
-                      <p
-                        style={{
-                          fontFamily: "'Sora',sans-serif",
-                          fontSize: 15,
-                          fontWeight: 700,
-                          color: T.text,
-                        }}
-                      >
-                        {asset.name}
-                      </p>
-                      <p
-                        style={{
-                          fontSize: 12,
-                          color: T.text2,
-                          marginTop: 2,
-                          fontFamily: "'DM Sans',sans-serif",
-                        }}
-                      >
-                        {asset.symbol}
-                      </p>
-                    </div>
-                    {selectedAsset?.id === asset.id && Ico.check(T.blue)}
+                    <span style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      {selectedAsset && (
+                        <div style={{
+                          width: 32, height: 32, borderRadius: "50%", background: selectedAsset.color,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: "#fff",
+                        }}>{selectedAsset.icon}</div>
+                      )}
+                      <span style={{ color: selectedAsset ? T.text : T.text3 }}>
+                        {selectedAsset ? `${selectedAsset.name} (${selectedAsset.symbol})` : "Select an asset to send"}
+                      </span>
+                    </span>
+                    {ddOpen ? (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={T.text2} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={T.text2} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    )}
                   </button>
-                ))}
+
+                  {ddOpen && (
+                    <div className="fadein" style={{
+                      position: "absolute", top: "100%", left: 0, right: 0, marginTop: 8,
+                      background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 14,
+                      zIndex: 1000, maxHeight: 320, overflow: "auto",
+                      boxShadow: "0 12px 32px rgba(0,0,0,0.08)",
+                    }}>
+                      <div style={{ position: "sticky", top: 0, background: T.white, zIndex: 1, padding: "12px 16px", borderBottom: `1px solid ${T.border}` }}>
+                        <div style={{ display: "flex", alignItems: "center", background: T.surface, borderRadius: 10, padding: "8px 12px", gap: 6 }}>
+                          <Ico.search />
+                          <input
+                            type="text" placeholder="Search asset..." value={assetQuery}
+                            onChange={e => setAssetQuery(e.target.value)}
+                            autoFocus
+                            style={{ flex: 1, border: "none", outline: "none", fontSize: 14, fontFamily: "'DM Sans',sans-serif", background: "transparent", color: T.text }}
+                          />
+                        </div>
+                      </div>
+
+                      {filteredAssets.map((asset, i) => (
+                        <button key={asset.id} className="ddopt"
+                          onClick={() => {
+                            setSelectedAsset(asset);
+                            setDdOpen(false);
+                            setAssetQuery("");
+                          }}
+                          style={{
+                            width: "100%", padding: "14px 16px", border: "none",
+                            borderBottom: i < filteredAssets.length - 1 ? `1px solid ${T.border}` : "none",
+                            background: T.white, display: "flex", alignItems: "center", gap: 12,
+                            cursor: "pointer", transition: "all 0.15s", textAlign: "left",
+                          }}
+                        >
+                          <div style={{
+                            width: 36, height: 36, borderRadius: "50%", background: asset.color,
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: "#fff", flexShrink: 0,
+                          }}>{asset.icon}</div>
+                          <div style={{ flex: 1 }}>
+                            <p style={{ fontWeight: 600, color: T.text, fontSize: 14, fontFamily: "'Sora',sans-serif" }}>{asset.name}</p>
+                            <p style={{ fontSize: 12, color: T.text2, marginTop: 2 }}>{asset.symbol} · {asset.network}</p>
+                          </div>
+                        </button>
+                      ))}
+                      {filteredAssets.length === 0 && (
+                        <div style={{ padding: 20, textAlign: "center", color: T.text3, fontSize: 13 }}>No assets found.</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ marginTop: 24 }}>
+                  <CTA onClick={() => {
+                    setStep(3);
+                    setNetwork(selectedAsset.networks ? selectedAsset.networks[0].name : "Mainnet");
+                  }} disabled={!selectedAsset}>
+                    Continue
+                  </CTA>
+                </div>
               </div>
             </div>
           )}
@@ -526,7 +597,7 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                   color: T.blue,
                   textTransform: "uppercase",
                   letterSpacing: "1px",
-                  marginBottom: 8,
+                  marginBottom: 4,
                   fontFamily: "'DM Sans',sans-serif",
                 }}
               >
@@ -539,12 +610,12 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                   fontWeight: 700,
                   color: T.text,
                   letterSpacing: "-0.6px",
-                  marginBottom: 12,
+                  marginBottom: 8,
                 }}
               >
                 Transfer Details
               </h1>
-              <p style={{ fontSize: 15, color: T.text2, marginBottom: 32 }}>
+              <p style={{ fontSize: 15, color: T.text2, marginBottom: 20 }}>
                 Enter the amount and recipient details below.
               </p>
 
@@ -553,11 +624,11 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                   background: T.white,
                   border: `1px solid ${T.border}`,
                   borderRadius: 20,
-                  padding: "32px",
+                  padding: "24px",
                 }}
               >
                 {/* Amount Input */}
-                <div style={{ marginBottom: 24 }}>
+                <div style={{ marginBottom: 16 }}>
                   <label
                     style={{
                       display: "block",
@@ -610,48 +681,81 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                       {selectedAsset?.symbol}
                     </span>
                   </div>
+                  {parseFloat(amount) > availableBalance && (
+                    <p style={{ fontSize: 12, color: T.red, marginTop: 8, fontFamily: "'DM Sans',sans-serif" }}>
+                      Insufficient {selectedAsset?.symbol} balance. Available: {availableBalance}
+                    </p>
+                  )}
                 </div>
 
                 {sendMethod === "internal" ? (
                   <>
-                    <div style={{ marginBottom: 24 }}>
-                      <label
-                        style={{
-                          display: "block",
-                          fontSize: 13,
-                          fontWeight: 600,
-                          color: T.text,
-                          marginBottom: 8,
-                        }}
-                      >
-                        Recipient Email
-                      </label>
-                      <input
-                        type="email"
-                        placeholder="user@example.com"
-                        value={recipientEmail}
-                        onChange={(e) => {
-                          setRecipientEmail(e.target.value);
-                          setLookedUpUser(null);
-                          setLookupError("");
-                        }}
-                        onBlur={handleEmailBlur}
-                        style={{
-                          width: "100%",
-                          border: `1.5px solid ${T.border}`,
-                          borderRadius: 12,
-                          padding: "16px",
-                          fontSize: 15,
-                          color: T.text,
-                          fontFamily: "'DM Sans', sans-serif",
-                          outline: "none",
-                          transition: "border-color 0.2s",
-                        }}
-                      />
+                    <div style={{ marginBottom: 20 }}>
+                      <div style={{ display: "flex", gap: 16, marginBottom: 8 }}>
+                        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: T.text, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>
+                          <input type="radio" checked={lookupMethod === "email"} onChange={() => { setLookupMethod("email"); setLookedUpUser(null); setLookupError(""); }} />
+                          Lookup by Email
+                        </label>
+                        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: T.text, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}>
+                          <input type="radio" checked={lookupMethod === "uuid"} onChange={() => { setLookupMethod("uuid"); setLookedUpUser(null); setLookupError(""); }} />
+                          Lookup by User ID
+                        </label>
+                      </div>
+                      
+                      {lookupMethod === "email" ? (
+                        <input
+                          type="email"
+                          placeholder="user@example.com"
+                          value={recipientEmail}
+                          onChange={(e) => {
+                            setRecipientEmail(e.target.value);
+                            setLookedUpUser(null);
+                            setLookupError("");
+                          }}
+                          onBlur={handleBlur}
+                          style={{
+                            width: "100%",
+                            border: `1.5px solid ${T.border}`,
+                            borderRadius: 12,
+                            padding: "16px",
+                            fontSize: 15,
+                            color: T.text,
+                            fontFamily: "'DM Sans', sans-serif",
+                            outline: "none",
+                            transition: "border-color 0.2s",
+                          }}
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          placeholder="e.g. 4a79b1c7-2e2c-4dbb-84db-..."
+                          value={recipientUuid}
+                          onChange={(e) => {
+                            setRecipientUuid(e.target.value);
+                            setLookedUpUser(null);
+                            setLookupError("");
+                          }}
+                          onBlur={handleBlur}
+                          style={{
+                            width: "100%",
+                            border: `1.5px solid ${T.border}`,
+                            borderRadius: 12,
+                            padding: "16px",
+                            fontSize: 15,
+                            color: T.text,
+                            fontFamily: "'DM Sans', sans-serif",
+                            outline: "none",
+                            transition: "border-color 0.2s",
+                          }}
+                        />
+                      )}
                       {isLookingUp && (
-                        <p style={{ fontSize: 12, color: T.blue, marginTop: 8 }}>
-                          Looking up user...
-                        </p>
+                        <div style={{ marginTop: 12, fontSize: 13, color: T.blue, display: "flex", alignItems: "center", gap: 8 }}>
+                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ animation: "spin 0.6s linear infinite" }}>
+                             <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                           </svg>
+                           Looking up user...
+                        </div>
                       )}
                       {lookupError && (
                         <p style={{ fontSize: 12, color: T.red, marginTop: 8 }}>
@@ -778,7 +882,9 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                   disabled={
                     !amount ||
                     parseFloat(amount) <= 0 ||
-                    (sendMethod === "internal" && !recipientEmail) ||
+                    parseFloat(amount) > availableBalance ||
+                    (sendMethod === "internal" && lookupMethod === "email" && !recipientEmail) ||
+                    (sendMethod === "internal" && lookupMethod === "uuid" && !recipientUuid) ||
                     (sendMethod === "external" && !recipientAddress)
                   }
                   style={{ width: "100%" }}
@@ -798,7 +904,7 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                   color: T.blue,
                   textTransform: "uppercase",
                   letterSpacing: "1px",
-                  marginBottom: 8,
+                  marginBottom: 4,
                   fontFamily: "'DM Sans',sans-serif",
                 }}
               >
@@ -811,12 +917,12 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                   fontWeight: 700,
                   color: T.text,
                   letterSpacing: "-0.6px",
-                  marginBottom: 12,
+                  marginBottom: 8,
                 }}
               >
                 Confirm Transfer
               </h1>
-              <p style={{ fontSize: 15, color: T.text2, marginBottom: 32 }}>
+              <p style={{ fontSize: 15, color: T.text2, marginBottom: 20 }}>
                 Please review the details of your transaction before confirming.
               </p>
 
@@ -825,24 +931,39 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                   background: T.white,
                   border: `1px solid ${T.border}`,
                   borderRadius: 20,
-                  padding: "32px",
+                  padding: "24px",
                 }}
               >
-                <div style={{ textAlign: "center", marginBottom: 32 }}>
-                  <p style={{ fontSize: 13, color: T.text2, marginBottom: 8 }}>
-                    You are sending
+                {/* Send Details */}
+                <div style={{ background: T.surface, borderRadius: 12, padding: "16px", marginBottom: 16 }}>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 12, fontFamily: "'DM Sans',sans-serif" }}>You are sending</p>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: selectedAsset?.color, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora',sans-serif", fontSize: 14, fontWeight: 700, color: "#fff" }}>
+                      {selectedAsset?.icon}
+                    </div>
+                    <div>
+                      <p style={{ fontFamily: "'Sora',sans-serif", fontSize: 20, fontWeight: 700, color: T.text, letterSpacing: "-0.5px" }}>{amount} {selectedAsset?.symbol}</p>
+                      <p style={{ fontSize: 12, color: T.text2, marginTop: 2, fontFamily: "'DM Sans',sans-serif" }}>{selectedAsset?.name}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Arrow Divider */}
+                <div style={{ display: "flex", justifyContent: "center", marginTop: -8, marginBottom: -8 }}>
+                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: T.blueLight, display: "flex", alignItems: "center", justifyContent: "center", border: `2px solid ${T.white}`, zIndex: 2 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={T.blue} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+                  </div>
+                </div>
+
+                {/* To Details */}
+                <div style={{ background: T.blue, borderRadius: 12, padding: "16px", marginTop: 16, marginBottom: 32 }}>
+                  <p style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.7px", marginBottom: 12, fontFamily: "'DM Sans',sans-serif" }}>Recipient</p>
+                  <p style={{ fontFamily: "'Sora',sans-serif", fontSize: 20, fontWeight: 700, color: "#fff", letterSpacing: "-0.8px", wordBreak: "break-all" }}>
+                    {sendMethod === "internal" ? lookedUpUser?.email : `${recipientAddress.slice(0, 8)}...${recipientAddress.slice(-8)}`}
                   </p>
-                  <p
-                    style={{
-                      fontFamily: "'Sora', sans-serif",
-                      fontSize: 36,
-                      fontWeight: 700,
-                      color: T.text,
-                      lineHeight: 1,
-                    }}
-                  >
-                    {amount} {selectedAsset?.symbol}
-                  </p>
+                  {sendMethod === "internal" && lookedUpUser?.fullname && (
+                    <p style={{ fontSize: 12, color: "rgba(255,255,255,0.8)", marginTop: 4, fontFamily: "'DM Sans',sans-serif" }}>{lookedUpUser.fullname}</p>
+                  )}
                 </div>
 
                 <div
@@ -944,57 +1065,86 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
           )}
 
           {step === 5 && (
-            <div className="fadein" style={{ maxWidth: 500, margin: "0 auto", textAlign: "center", padding: "40px 20px" }}>
-              <div
-                style={{
-                  width: 80,
-                  height: 80,
-                  borderRadius: "50%",
-                  background: submitResult?.status === "pending_review" ? T.orange : T.green,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  margin: "0 auto 24px",
-                  animation: "popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards",
-                }}
-              >
-                {submitResult?.status === "pending_review" ? (
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
-                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-                  </svg>
-                ) : (
-                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                )}
-              </div>
-              <h1
-                style={{
-                  fontFamily: "'Sora', sans-serif",
-                  fontSize: 28,
-                  fontWeight: 700,
-                  color: T.text,
-                  marginBottom: 16,
-                }}
-              >
-                {submitResult?.status === "pending_review" ? "Transfer Queued" : "Transfer Successful"}
-              </h1>
-              <p style={{ fontSize: 15, color: T.text2, lineHeight: 1.6, marginBottom: 32 }}>
-                {submitResult?.status === "pending_review"
-                  ? "Your external transfer requires manual admin review due to platform liquidity checks. Your funds have been locked, and you will be notified once it is approved."
-                  : `Successfully sent ${amount} ${selectedAsset?.symbol} to ${sendMethod === "internal" ? lookedUpUser?.email : recipientAddress}.`
-                }
-              </p>
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+              <div className="fadein" style={{ maxWidth: 500, width: "100%", background: T.white, borderRadius: 20, padding: "40px 32px", boxShadow: "0 10px 40px rgba(0,0,0,0.1)" }}>
+                {/* Success Icon */}
+                <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
+                  <div style={{ width: 80, height: 80, borderRadius: "50%", background: submitResult?.status === "pending_review" ? T.orangeLight : T.greenLight, display: "flex", alignItems: "center", justifyContent: "center", animation: "popIn 0.6s cubic-bezier(0.175,0.885,0.32,1.275)" }}>
+                    {submitResult?.status === "pending_review" ? (
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={T.orange} strokeWidth="2.5" strokeLinecap="round">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                    ) : (
+                      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke={T.green} strokeWidth="2.5" strokeLinecap="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </div>
+                </div>
 
-              <CTA
-                onClick={() => {
-                  if (onNavigate) onNavigate("dashboard");
-                  else window.location.href = "/currency-change/dashboard";
-                }}
-                style={{ width: "100%" }}
-              >
-                Back to Dashboard
-              </CTA>
+                <h1 style={{ fontFamily: "'Sora',sans-serif", fontSize: 24, fontWeight: 700, color: T.text, textAlign: "center", marginBottom: 8, letterSpacing: "-0.5px" }}>
+                  {submitResult?.status === "pending_review" ? "Transfer Queued" : "Transfer Successful!"}
+                </h1>
+                <p style={{ fontSize: 14, color: T.text2, textAlign: "center", marginBottom: 32, fontFamily: "'DM Sans',sans-serif" }}>
+                  {submitResult?.status === "pending_review"
+                    ? "Your external transfer requires manual admin review due to platform liquidity checks. Your funds have been locked, and you will be notified once it is approved."
+                    : `Your assets have been successfully transferred to ${sendMethod === "internal" ? lookedUpUser?.email : `${recipientAddress.slice(0, 8)}...`}.`
+                  }
+                </p>
+
+                {/* Transfer Details Card */}
+                <div style={{ background: T.surface, borderRadius: 16, padding: "16px", marginBottom: 24, display: "flex", flexDirection: "column", gap: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 12, borderBottom: `1px solid ${T.border}` }}>
+                    <span style={{ fontSize: 12, color: T.text2, fontFamily: "'DM Sans',sans-serif" }}>Amount Sent</span>
+                    <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 14, fontWeight: 700, color: T.text }}>{amount} {selectedAsset?.symbol}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 12, borderBottom: `1px solid ${T.border}` }}>
+                    <span style={{ fontSize: 12, color: T.text2, fontFamily: "'DM Sans',sans-serif" }}>Recipient</span>
+                    <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 14, fontWeight: 700, color: T.text }}>{sendMethod === "internal" ? lookedUpUser?.email : `${recipientAddress.slice(0, 8)}...`}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <span style={{ fontSize: 12, color: T.text2, fontFamily: "'DM Sans',sans-serif" }}>Status</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <div style={{ width: 8, height: 8, borderRadius: "50%", background: submitResult?.status === "pending_review" ? T.orange : T.green }} />
+                      <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: submitResult?.status === "pending_review" ? T.orange : T.greenText, textTransform: "capitalize" }}>
+                        {submitResult?.status || "Completed"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Transaction ID */}
+                {submitResult?.id && (
+                  <div style={{ background: T.blueLight, borderRadius: 12, padding: "12px 14px", marginBottom: 24, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <p style={{ fontSize: 10, color: T.text3, textTransform: "uppercase", letterSpacing: "0.6px", fontFamily: "'DM Sans',sans-serif", marginBottom: 4 }}>Transaction ID</p>
+                      <p style={{ fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: T.blue, wordBreak: "break-all" }}>{submitResult?.id}</p>
+                    </div>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(submitResult?.id)}
+                      style={{ padding: "8px 12px", marginLeft: 8, background: T.blue, border: "none", borderRadius: 8, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}
+                      onMouseOver={(e) => (e.currentTarget.style.background = T.blueDark)}
+                      onMouseOut={(e) => (e.currentTarget.style.background = T.blue)}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
+                  </div>
+                )}
+
+                {/* Timestamps */}
+                {submitResult?.created_at && (
+                  <div style={{ background: T.surface, borderRadius: 12, padding: "12px 14px", marginBottom: 32, fontSize: 12, fontFamily: "'DM Sans',sans-serif", color: T.text2, display: "flex", flexDirection: "column", gap: 8 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <span>Date</span>
+                      <span>{new Date(submitResult?.created_at).toLocaleString()}</span>
+                    </div>
+                  </div>
+                )}
+
+                <CTA onClick={() => { if (onNavigate) onNavigate("dashboard"); else window.location.href = "/currency-change/dashboard"; }} style={{ width: "100%" }}>
+                  Close & Return to Dashboard
+                </CTA>
+              </div>
             </div>
           )}
         </div>

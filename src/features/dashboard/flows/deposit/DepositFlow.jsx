@@ -43,25 +43,71 @@ const CSS = `
   .copy-btn:hover { background: ${T.blueLight}; color: ${T.blue}; border-color: ${T.blue}; }
 `;
 
-/* ─── shared back button ────────────────────────────────── */
-function BackBtn({ onClick }) {
+function DepositBreadcrumbs({ screen, onNavigate, onClose }) {
+  let steps = [{ id: "choose", label: "Deposit" }];
+  
+  if (screen.startsWith("crypto")) {
+    if (screen === "crypto-select" || screen === "crypto-address" || screen === "crypto-status") {
+      steps.push({ id: "crypto-select", label: "Receive Crypto" });
+    }
+    if (screen === "crypto-address" || screen === "crypto-status") {
+      steps.push({ id: "crypto-address", label: "Address" });
+    }
+    if (screen === "crypto-status") {
+      steps.push({ id: "crypto-status", label: "Status" });
+    }
+  } else if (screen.startsWith("ngn")) {
+    if (screen === "ngn-amount" || screen === "ngn-details") {
+      steps.push({ id: "ngn-amount", label: "Deposit Naira" });
+    }
+    if (screen === "ngn-details") {
+      steps.push({ id: "ngn-details", label: "Details" });
+    }
+  }
+
   return (
-    <button
-      onClick={onClick}
+    <nav
+      className="breadcrumb-nav"
       style={{
-        padding: "10px 16px", background: "transparent",
-        border: `1.5px solid ${T.border}`, borderRadius: 10,
-        cursor: "pointer", display: "flex", alignItems: "center",
-        gap: 8, marginBottom: 24, transition: "all 0.2s",
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        flexWrap: "wrap",
+        marginBottom: 36,
       }}
-      onMouseOver={e => e.currentTarget.style.background = T.blueLight}
-      onMouseOut={e => e.currentTarget.style.background = "transparent"}
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.text} strokeWidth="2.5" strokeLinecap="round">
-        <path d="M19 12H5M12 19l-7-7 7-7" />
-      </svg>
-      <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 14, fontWeight: 600, color: T.text }}>Back</span>
-    </button>
+      <span
+        onClick={onClose}
+        className="breadcrumb-item"
+        style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+      >
+        Dashboard
+      </span>
+
+      {steps.map((step, idx) => {
+        const isLast = idx === steps.length - 1;
+        const clickable = !isLast && screen !== "crypto-status" && screen !== "ngn-details";
+
+        return (
+          <React.Fragment key={step.id}>
+            <span className="breadcrumb-item" style={{ color: T.text3, fontSize: 12, userSelect: "none" }}>›</span>
+            <span
+              onClick={() => clickable && onNavigate(step.id)}
+              className="breadcrumb-item"
+              style={{
+                fontSize: 13,
+                fontWeight: isLast ? 600 : 500,
+                color: isLast ? T.blue : T.text2,
+                cursor: clickable ? "pointer" : "default",
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              {step.label}
+            </span>
+          </React.Fragment>
+        );
+      })}
+    </nav>
   );
 }
 
@@ -111,7 +157,7 @@ function StepChoose({ onChoose }) {
               <p style={{ fontFamily: "'Sora',sans-serif", fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 4 }}>Receive Crypto</p>
               <p style={{ fontSize: 13, color: T.text2 }}>Generate a wallet deposit address</p>
             </div>
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: "#9945FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: "#fff" }}>◎</div>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: "#9945FF", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, color: "#fff", flexShrink: 0 }}>◎</div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", background: T.blueLight, borderRadius: 10 }}>
             {Ico.check(T.blue)}
@@ -126,9 +172,9 @@ function StepChoose({ onChoose }) {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div>
               <p style={{ fontFamily: "'Sora',sans-serif", fontSize: 18, fontWeight: 700, color: T.text, marginBottom: 4 }}>Deposit Naira</p>
-              <p style={{ fontSize: 13, color: T.text2 }}>Fund wallet via bank transfer</p>
+              <p style={{ fontSize: 13, color: T.text2 }}>Fund wallet via bank transfer with paystack</p>
             </div>
-            <div style={{ width: 48, height: 48, borderRadius: 12, background: T.green, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#fff", fontWeight: 700 }}>₦</div>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: T.green, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, color: "#fff", fontWeight: 700, flexShrink: 0 }}>₦</div>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", background: T.greenLight, borderRadius: 10 }}>
             {Ico.check(T.green)}
@@ -253,8 +299,8 @@ function StepSelectAsset({ onContinue, loading }) {
 
         {/* Continue button – same width as dropdown */}
         <div style={{ marginTop: 24 }}>
-          <CTA onClick={() => onContinue(selected)} disabled={!selected || loading}>
-            {loading ? "Generating address..." : "Generate Deposit Address"}
+          <CTA onClick={() => onContinue(selected)} disabled={!selected || loading} loading={loading}>
+            Generate Deposit Address
           </CTA>
         </div>
       </div>
@@ -413,15 +459,12 @@ function StepCryptoStatus({ depositData, asset, onBack, onNavigate }) {
   ];
 
   return (
-    <div className="sellgrid fadein" style={{ display: "grid", gridTemplateColumns: "1fr 360px", height: "100vh", fontFamily: "'DM Sans',sans-serif", background: T.white, color: T.text, overflowX: "hidden", maxWidth: "100vw", margin: "-16px -20px" }}>
+    <div className="sellgrid fadein" style={{ display: "grid", gridTemplateColumns: "1fr 360px", minHeight: "100vh", fontFamily: "'DM Sans',sans-serif", background: T.white, color: T.text, overflowX: "hidden", maxWidth: "100vw" }}>
 
       {/* ── LEFT PANEL ── */}
       <div style={{ padding: "28px 36px 28px", borderRight: `1px solid ${T.border}`, display: "flex", flexDirection: "column", overflow: "hidden" }} className="step-content">
 
-        <button onClick={onBack} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "none", cursor: "pointer", marginBottom: 24, alignSelf: "flex-start", padding: "6px 0" }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={T.text2} strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-          <span style={{ fontSize: 13, fontWeight: 600, color: T.text2, fontFamily: "'Sora',sans-serif" }}>Back</span>
-        </button>
+        <DepositBreadcrumbs screen="crypto-status" onNavigate={(s) => {}} onClose={onNavigate} />
 
         {/* Status icon + headline */}
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16 }}>
@@ -482,7 +525,7 @@ function StepCryptoStatus({ depositData, asset, onBack, onNavigate }) {
           <p style={{ fontSize: 10, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 10, fontFamily: "'DM Sans',sans-serif" }}>Progress</p>
           <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
             {steps.map((s, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+              <div key={i} style={{ display: "flex", alignItems: "stretch", gap: 10 }}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
                   <div style={{
                     width: 22, height: 22, borderRadius: "50%",
@@ -491,6 +534,7 @@ function StepCryptoStatus({ depositData, asset, onBack, onNavigate }) {
                     display: "flex", alignItems: "center", justifyContent: "center",
                     boxShadow: s.active ? "0 3px 8px rgba(245,158,11,0.3)" : "none",
                     transition: "all 0.3s",
+                    flexShrink: 0,
                   }}>
                     {s.done
                       ? <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -500,12 +544,14 @@ function StepCryptoStatus({ depositData, asset, onBack, onNavigate }) {
                     }
                   </div>
                   {i < steps.length - 1 && (
-                    <div style={{ width: 2, height: 14, background: s.done ? T.green : T.border, borderRadius: 2, margin: "2px 0" }} />
+                    <div style={{ width: 2, flex: 1, minHeight: 14, background: s.done ? T.green : T.border, borderRadius: 2 }} />
                   )}
                 </div>
-                <p style={{ fontSize: 12, fontWeight: s.active ? 700 : s.done ? 600 : 500, color: s.active ? "#92400E" : s.done ? T.greenText : T.text3, paddingTop: 3, fontFamily: s.active || s.done ? "'Sora',sans-serif" : "'DM Sans',sans-serif", marginBottom: i < steps.length - 1 ? 10 : 0 }}>
-                  {s.label}
-                </p>
+                <div style={{ paddingBottom: i < steps.length - 1 ? 16 : 0, paddingTop: 3, flex: 1 }}>
+                  <p style={{ fontSize: 12, fontWeight: s.active ? 700 : s.done ? 600 : 500, color: s.active ? "#92400E" : s.done ? T.greenText : T.text3, fontFamily: s.active || s.done ? "'Sora',sans-serif" : "'DM Sans',sans-serif", margin: 0 }}>
+                    {s.label}
+                  </p>
+                </div>
               </div>
             ))}
           </div>
@@ -513,7 +559,8 @@ function StepCryptoStatus({ depositData, asset, onBack, onNavigate }) {
 
         {/* Actions */}
         <div className="actions-wrap" style={{ display: "flex", gap: 10, marginTop: "auto" }}>
-          <CTA onClick={onNavigate} style={{ flex: 1, padding: "13px 16px", fontSize: 13, boxShadow: "0 6px 16px rgba(26,111,255,0.25)" }}>Return to Dashboard</CTA>
+          <button onClick={() => onNavigate && onNavigate("history")} className="ghostbtn" style={{ flex: 1, padding: "13px 16px", fontSize: 13, borderRadius: 14, border: `1.5px solid ${T.border}`, background: T.white, color: T.text2, fontWeight: 600, fontFamily: "'DM Sans',sans-serif", cursor: "pointer", transition: "all 0.2s" }}>View Transactions</button>
+          <CTA onClick={() => onNavigate && onNavigate("dashboard")} style={{ flex: 1, padding: "13px 16px", fontSize: 13, boxShadow: "0 6px 16px rgba(26,111,255,0.25)" }}>Return to Dashboard</CTA>
         </div>
       </div>
 
@@ -565,7 +612,7 @@ function StepCryptoStatus({ depositData, asset, onBack, onNavigate }) {
 function StepNGNAmount({ onContinue, loading }) {
   const [amount, setAmount] = useState("");
   const numericAmount = parseFloat(String(amount).replace(/,/g, "")) || 0;
-  const isValid = numericAmount >= 100;
+  const isValid = numericAmount >= 1000;
 
   const fmt = val => {
     const n = String(val).replace(/[^0-9]/g, "");
@@ -610,15 +657,15 @@ function StepNGNAmount({ onContinue, loading }) {
             }}
           />
         </div>
-        {numericAmount > 0 && numericAmount < 100 && (
+        {numericAmount > 0 && numericAmount < 1000 && (
           <p style={{ fontSize: 12, color: T.red, marginTop: 8, fontFamily: "'DM Sans',sans-serif" }}>
-            Minimum deposit amount is ₦100.
+            Minimum deposit amount is ₦1000.
           </p>
         )}
 
         <div style={{ marginTop: 24 }}>
-          <CTA onClick={() => onContinue(numericAmount)} disabled={!isValid || loading}>
-            {loading ? "Connecting to Paystack..." : "Continue to Paystack"}
+          <CTA onClick={() => onContinue(numericAmount)} disabled={!isValid || loading} loading={loading}>
+            Continue to Paystack
           </CTA>
         </div>
       </div>
@@ -747,7 +794,7 @@ function StepNGNDetails({ fundingData, amount, onClose }) {
 }
 
 /* ─── Main component ─────────────────────────────────────── */
-export default function DepositFlow({ onClose }) {
+export default function DepositFlow({ onBack, onNavigate, onClose }) {
   // "choose" | "crypto-select" | "crypto-address" | "ngn-amount" | "ngn-details"
   const [screen, setScreen] = useState("choose");
   const [depositData, setDepositData] = useState(null);
@@ -757,13 +804,16 @@ export default function DepositFlow({ onClose }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleBack = () => {
+  const handleClose = onBack || onClose;
+  const navigateFn = onNavigate || handleClose;
+
+  const handleGoBack = () => {
     setError(null);
     if (screen === "crypto-select" || screen === "ngn-amount") setScreen("choose");
     else if (screen === "crypto-address") setScreen("crypto-select");
     else if (screen === "crypto-status") setScreen("crypto-address");
     else if (screen === "ngn-details") setScreen("ngn-amount");
-    else onClose?.();
+    else handleClose?.();
   };
 
   const handleCryptoAssetContinue = async (asset) => {
@@ -808,12 +858,12 @@ export default function DepositFlow({ onClose }) {
     <>
       <style>{CSS}</style>
       {screen === "crypto-status" && depositData ? (
-        <StepCryptoStatus depositData={depositData} asset={selectedAsset} onBack={() => setScreen("crypto-address")} onNavigate={onClose} />
+        <StepCryptoStatus depositData={depositData} asset={selectedAsset} onBack={() => setScreen("crypto-address")} onNavigate={navigateFn} />
       ) : (
-        <div style={{ minHeight: "100vh", background: T.surface, padding: "16px 20px", fontFamily: "'DM Sans',sans-serif" }}>
-          {screen !== "choose" && <BackBtn onClick={handleBack} />}
+        <div className="step-content" style={{ minHeight: "100vh", background: T.white, padding: "44px 52px 60px", fontFamily: "'DM Sans',sans-serif" }}>
+          <div style={{ maxWidth: 640 }}>
+            <DepositBreadcrumbs screen={screen} onNavigate={(s) => setScreen(s)} onClose={handleClose} />
 
-          <div style={{ maxWidth: 800, margin: "0 auto" }}>
             {error && (
               <div className="fadein" style={{
                 display: "flex", alignItems: "center", gap: 10,
@@ -832,7 +882,7 @@ export default function DepositFlow({ onClose }) {
             {screen === "crypto-select" && <StepSelectAsset onContinue={handleCryptoAssetContinue} loading={loading} />}
             {screen === "crypto-address" && depositData && <StepCryptoAddress depositData={depositData} asset={selectedAsset} onClose={() => setScreen("crypto-status")} />}
             {screen === "ngn-amount" && <StepNGNAmount onContinue={handleNGNContinue} loading={loading} />}
-            {screen === "ngn-details" && fundingData && <StepNGNDetails fundingData={fundingData} amount={ngnAmount} onClose={onClose} />}
+            {screen === "ngn-details" && fundingData && <StepNGNDetails fundingData={fundingData} amount={ngnAmount} onClose={handleClose} />}
           </div>
         </div>
       )}

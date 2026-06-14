@@ -101,9 +101,47 @@ function ImageUpload({ file, onFile, onRemove }) {
             </div>
           </div>
         )}
+        )}
         <input ref={inputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={e => { if (e.target.files[0]) onFile(e.target.files[0]); }} />
       </div>
     </div>
+  );
+}
+
+function GiftCardBreadcrumbs({ onNavigate }) {
+  return (
+    <nav
+      className="breadcrumb-nav"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        flexWrap: "wrap",
+        marginBottom: 36,
+      }}
+    >
+      <span
+        onClick={() => onNavigate?.("dashboard")}
+        className="breadcrumb-item"
+        style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+      >
+        Dashboard
+      </span>
+
+      <span className="breadcrumb-item" style={{ color: T.text3, fontSize: 12, userSelect: "none" }}>›</span>
+      <span
+        className="breadcrumb-item"
+        style={{
+          fontSize: 13,
+          fontWeight: 600,
+          color: T.blue,
+          cursor: "default",
+          fontFamily: "'DM Sans', sans-serif",
+        }}
+      >
+        Gift Cards
+      </span>
+    </nav>
   );
 }
 
@@ -149,40 +187,33 @@ export default function SwapGiftCard({ onNavigate }) {
         .submit-btn:hover{background:${T.blueDark}!important;}
         .submit-btn:active{transform:scale(0.985)!important;}
 
+        @media (max-width: 1024px) {
+          .buygrid { grid-template-columns: 1fr 340px !important; }
+        }
+
         @media (max-width: 900px) {
-          .gc-main-grid { grid-template-columns: 1fr !important; gap: 24px !important; }
-          .gc-container { padding: 24px 20px 60px !important; }
-          .gc-side-panel { order: -1 !important; }
+          .buygrid { grid-template-columns: 1fr !important; }
+          .step-content { padding: 32px 24px 60px !important; border-right: none !important; }
+          .gc-side-panel { padding: 32px 24px 60px !important; order: -1; }
         }
 
         @media (max-width: 640px) {
           .gc-brand-grid { grid-template-columns: repeat(3, 1fr) !important; }
           .gc-denom-grid { flex-direction: column !important; }
           .gc-denom-grid button { width: 100% !important; }
-          .gc-top-bar { padding: 0 20px !important; }
         }
 
         @media (max-width: 480px) {
           .gc-brand-grid { grid-template-columns: repeat(2, 1fr) !important; }
-          .gc-header h1 { font-size: 22px !important; }
           .gc-success-card { padding: 32px 24px !important; }
         }
       `}</style>
 
-      <div style={{ minHeight: "100vh", background: T.surface, fontFamily: "'DM Sans', sans-serif", color: T.text, display: "flex", flexDirection: "column" }}>
-
-        {/* Top bar */}
-        <div className="gc-top-bar" style={{ background: T.white, borderBottom: `1px solid ${T.border}`, height: 60, padding: "0 40px", display: "flex", alignItems: "center", flexShrink: 0 }}>
-          <nav style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            <span style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer" }} onClick={() => onNavigate?.("dashboard")}>Dashboard</span>
-            <span style={{ color: T.text3, fontSize: 12 }}>›</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: T.blue }}>Gift Cards</span>
-          </nav>
-        </div>
+      <div className="buygrid" style={{ minHeight: "100vh", background: T.white, fontFamily: "'DM Sans', sans-serif", color: T.text, display: "grid", gridTemplateColumns: "1fr 400px", width: "100%" }}>
 
         {/* ── Success state ── */}
         {submitted && (
-          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+          <div style={{ gridColumn: "1 / -1", flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
             <div className="fadein gc-success-card" style={{ background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 24, padding: "52px 48px", textAlign: "center", maxWidth: 440, width: "100%" }}>
               <div style={{ position: "relative", width: 80, height: 80, margin: "0 auto 24px" }}>
                 <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: `3px solid ${T.green}`, opacity: 0.25, animation: "ripple 1.8s ease-out infinite" }} />
@@ -219,17 +250,17 @@ export default function SwapGiftCard({ onNavigate }) {
 
         {/* ── Main flow ── */}
         {!submitted && (
-          <div className="gc-container" style={{ flex: 1, maxWidth: 1060, width: "100%", margin: "0 auto", padding: "32px 40px 60px" }}>
+          <>
+            {/* ── LEFT ── */}
+            <div className="step-content" style={{ padding: "44px 52px 60px", borderRight: `1px solid ${T.border}`, width: "100%", minWidth: 0 }}>
+              <GiftCardBreadcrumbs onNavigate={onNavigate} />
 
-            <div className="gc-header" style={{ marginBottom: 28 }}>
-              <p style={{ fontSize: 11, fontWeight: 600, color: T.blue, textTransform: "uppercase", letterSpacing: "1px", marginBottom: 6 }}>Redeem</p>
-              <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 26, fontWeight: 700, color: T.text, letterSpacing: "-0.5px", marginBottom: 5 }}>Gift Cards</h1>
-              <p style={{ fontSize: 14, color: T.text2 }}>Select a brand, enter the card value, and upload a photo to get paid.</p>
-            </div>
+              <div className="gc-header" style={{ marginBottom: 28 }}>
+                <p style={{ fontSize: 11, fontWeight: 600, color: T.blue, textTransform: "uppercase", letterSpacing: "1px", marginBottom: 6 }}>Redeem</p>
+                <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 26, fontWeight: 700, color: T.text, letterSpacing: "-0.5px", marginBottom: 5 }}>Gift Cards</h1>
+                <p style={{ fontSize: 14, color: T.text2 }}>Select a brand, enter the card value, and upload a photo to get paid.</p>
+              </div>
 
-            <div className="gc-main-grid" style={{ display: "grid", gridTemplateColumns: "1fr 340px", gap: 20, alignItems: "start" }}>
-
-              {/* ── LEFT ── */}
               <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
 
                 {/* Brand selector */}
@@ -310,102 +341,79 @@ export default function SwapGiftCard({ onNavigate }) {
 
                 )}
 
-                {/* All rates — always visible in left column */}
-                <div style={{ background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 16, overflow: "hidden", marginTop: 16 }}>
-                  <div style={{ padding: "14px 18px", borderBottom: `1px solid ${T.border}` }}>
-                    <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 700, color: T.text }}>All rates</p>
-                  </div>
-                  {CARDS.map((c, i) => (
-                    <div key={c.id} onClick={() => { setSelected(c.id); setDenomination(""); setCustomAmt(""); setCardImage(null); }}
-                      style={{ display: "flex", alignItems: "center", gap: 10, padding: "11px 18px", borderBottom: i === CARDS.length - 1 ? "none" : `1px solid ${T.border}`, cursor: "pointer", background: selected === c.id ? T.blueLight : T.white, transition: "background 0.12s" }}
-                      onMouseEnter={e => { if (selected !== c.id) e.currentTarget.style.background = T.surface; }}
-                      onMouseLeave={e => { if (selected !== c.id) e.currentTarget.style.background = T.white; }}
-                    >
-                      <div style={{ width: 28, height: 28, borderRadius: 8, background: selected === c.id ? T.blue : c.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 11, fontWeight: 700, color: selected === c.id ? "#fff" : c.color, flexShrink: 0, transition: "all 0.15s" }}>{c.icon}</div>
-                      <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: selected === c.id ? T.blue : T.text }}>{c.name}</span>
-                      <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: selected === c.id ? T.blue : T.text2 }}>₦{c.rate.toLocaleString("en-NG")}/$</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* ── RIGHT — Summary ── */}
-              <div className="gc-side-panel" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-
-                {/* Rate card */}
-                {card ? (
-                  <>
-                    <div style={{ background: T.blue, borderRadius: 20, padding: "24px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-                        <div style={{ width: 42, height: 42, borderRadius: 12, background: card.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 16, fontWeight: 700, color: card.color, flexShrink: 0 }}>{card.icon}</div>
-                        <div>
-                          <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: "#fff" }}>{card.name}</p>
-                          <p style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", marginTop: 1 }}>Selected brand</p>
-                        </div>
-                      </div>
-
-                      <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)", paddingTop: 16, display: "flex", flexDirection: "column", gap: 10 }}>
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>Our rate</span>
-                          <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff" }}>₦{card.rate.toLocaleString("en-NG")} / $1</span>
-                        </div>
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>Card value</span>
-                          <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: amount > 0 ? "#fff" : "rgba(255,255,255,0.3)" }}>{amount > 0 ? fmtUSD(amount) : "—"}</span>
-                        </div>
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                          <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>Service fee (1%)</span>
-                          <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: amount > 0 ? "#fff" : "rgba(255,255,255,0.3)" }}>{amount > 0 ? fmtNGN(fee) : "—"}</span>
-                        </div>
-                      </div>
-
-                      <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.12)" }}>
-                        <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>You will receive</p>
-                        <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 32, fontWeight: 700, color: amount > 0 ? "#fff" : "rgba(255,255,255,0.2)", letterSpacing: "-1.2px", lineHeight: 1 }}>
-                          {amount > 0 ? fmtNGN(net) : "₦0.00"}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Checklist */}
-                    <div style={{ background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 16, padding: "16px 20px" }}>
-                      <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 12 }}>Submission checklist</p>
-                      {[
-                        { label: "Brand selected",    done: !!card         },
-                        { label: "Card value entered", done: amount > 0    },
-                        { label: "Image uploaded",     done: !!cardImage   },
-                      ].map(({ label, done }, i) => (
-                        <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderTop: i > 0 ? `1px solid ${T.border}` : "none" }}>
-                          <div style={{ width: 22, height: 22, borderRadius: "50%", background: done ? T.green : T.surface, border: `1.5px solid ${done ? T.green : T.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s" }}>
-                            {done && <CheckCircle2 size={12} color="#fff" />}
-                          </div>
-                          <span style={{ fontSize: 13, fontWeight: 500, color: done ? T.text : T.text3 }}>{label}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  /* Placeholder before selection */
-                  <div style={{ background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 20, padding: "36px 24px", textAlign: "center" }}>
-                    <div style={{ width: 52, height: 52, borderRadius: 16, background: T.surface, border: `1.5px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-                      <span style={{ fontSize: 22 }}>🎁</span>
-                    </div>
-                    <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: T.text, marginBottom: 6 }}>Select a brand</p>
-                    <p style={{ fontSize: 13, color: T.text3, lineHeight: 1.6 }}>Choose a gift card brand on the left to see the rate and payout.</p>
-                  </div>
-                )}
 
               </div>
             </div>
-          </div>
-        )}
 
-        {/* Footer */}
-        <div style={{ borderTop: `1px solid ${T.border}`, padding: "18px 40px", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: T.white, flexShrink: 0 }}>
-          <Ico.shield />
-          <span style={{ fontSize: 12, color: T.text2, fontWeight: 500 }}>Your transaction is secure · </span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: T.mintGreen }}>Protected by Cheeseball</span>
-        </div>
+            {/* ── RIGHT — Summary ── */}
+            <div className="gc-side-panel rightpanel" style={{ background: T.surface, minHeight: "100vh", padding: "44px 32px 60px", display: "flex", flexDirection: "column", gap: 14 }}>
+
+              {/* Rate card */}
+              {card ? (
+                <>
+                  <div style={{ background: T.blue, borderRadius: 20, padding: "24px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
+                      <div style={{ width: 42, height: 42, borderRadius: 12, background: card.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 16, fontWeight: 700, color: card.color, flexShrink: 0 }}>{card.icon}</div>
+                      <div>
+                        <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: "#fff" }}>{card.name}</p>
+                        <p style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", marginTop: 1 }}>Selected brand</p>
+                      </div>
+                    </div>
+
+                    <div style={{ borderTop: "1px solid rgba(255,255,255,0.12)", paddingTop: 16, display: "flex", flexDirection: "column", gap: 10 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>Our rate</span>
+                        <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff" }}>₦{card.rate.toLocaleString("en-NG")} / $1</span>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>Card value</span>
+                        <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: amount > 0 ? "#fff" : "rgba(255,255,255,0.3)" }}>{amount > 0 ? fmtUSD(amount) : "—"}</span>
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.55)" }}>Service fee (1%)</span>
+                        <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: amount > 0 ? "#fff" : "rgba(255,255,255,0.3)" }}>{amount > 0 ? fmtNGN(fee) : "—"}</span>
+                      </div>
+                    </div>
+
+                    <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid rgba(255,255,255,0.12)" }}>
+                      <p style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", marginBottom: 6 }}>You will receive</p>
+                      <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 32, fontWeight: 700, color: amount > 0 ? "#fff" : "rgba(255,255,255,0.2)", letterSpacing: "-1.2px", lineHeight: 1 }}>
+                        {amount > 0 ? fmtNGN(net) : "₦0.00"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Checklist */}
+                  <div style={{ background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 16, padding: "16px 20px" }}>
+                    <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 12 }}>Submission checklist</p>
+                    {[
+                      { label: "Brand selected",    done: !!card         },
+                      { label: "Card value entered", done: amount > 0    },
+                      { label: "Image uploaded",     done: !!cardImage   },
+                    ].map(({ label, done }, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 0", borderTop: i > 0 ? `1px solid ${T.border}` : "none" }}>
+                        <div style={{ width: 22, height: 22, borderRadius: "50%", background: done ? T.green : T.surface, border: `1.5px solid ${done ? T.green : T.border}`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.2s" }}>
+                          {done && <CheckCircle2 size={12} color="#fff" />}
+                        </div>
+                        <span style={{ fontSize: 13, fontWeight: 500, color: done ? T.text : T.text3 }}>{label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                /* Placeholder before selection */
+                <div style={{ background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 20, padding: "36px 24px", textAlign: "center" }}>
+                  <div style={{ width: 52, height: 52, borderRadius: 16, background: T.surface, border: `1.5px solid ${T.border}`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                    <span style={{ fontSize: 22 }}>🎁</span>
+                  </div>
+                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 14, fontWeight: 700, color: T.text, marginBottom: 6 }}>Select a brand</p>
+                  <p style={{ fontSize: 13, color: T.text3, lineHeight: 1.6 }}>Choose a gift card brand on the left to see the rate and payout.</p>
+                </div>
+              )}
+
+            </div>
+          </>
+        )}
       </div>
     </>
   );

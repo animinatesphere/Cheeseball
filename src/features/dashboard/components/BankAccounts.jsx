@@ -418,6 +418,52 @@ function AddAccountDrawer({ onClose, onSave }) {
   );
 }
 
+function BankAccountBreadcrumbs({ onNavigate }) {
+  return (
+    <nav
+      className="breadcrumb-nav"
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        flexWrap: "wrap",
+        marginBottom: 36,
+      }}
+    >
+      <span
+        onClick={() => onNavigate?.("dashboard")}
+        className="breadcrumb-item"
+        style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+      >
+        Dashboard
+      </span>
+
+      <span className="breadcrumb-item" style={{ color: T.text3, fontSize: 12, userSelect: "none" }}>›</span>
+      <span
+        onClick={() => onNavigate?.("account")}
+        className="breadcrumb-item"
+        style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}
+      >
+        Settings
+      </span>
+
+      <span className="breadcrumb-item" style={{ color: T.text3, fontSize: 12, userSelect: "none" }}>›</span>
+      <span
+        className="breadcrumb-item"
+        style={{
+          fontSize: 13,
+          fontWeight: 600,
+          color: T.blue,
+          cursor: "default",
+          fontFamily: "'DM Sans', sans-serif",
+        }}
+      >
+        Bank Accounts
+      </span>
+    </nav>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════════ */
 export default function BankAccountPage({ onNavigate }) {
   const [accounts,    setAccounts]    = useState([]);
@@ -485,27 +531,18 @@ export default function BankAccountPage({ onNavigate }) {
         .add-btn:hover:not(:disabled){border-color:${T.blue}!important;background:${T.blueLight}!important;color:${T.blue}!important;}
         
         @media (max-width: 768px) {
-          .bank-top-bar { padding: 0 20px !important; }
-          .bank-container { padding: 24px 20px 48px !important; }
+          .step-content { padding: 32px 24px 48px !important; }
           .acc-card { flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
           .acc-actions { opacity: 1 !important; width: 100%; justify-content: flex-end; }
         }
       `}</style>
 
-      <div style={{ minHeight: "100vh", background: T.surface, fontFamily: "'DM Sans', sans-serif", color: T.text, display: "flex", flexDirection: "column", overflowX: "hidden" }}>
+      <div style={{ minHeight: "100vh", background: T.white, fontFamily: "'DM Sans', sans-serif", color: T.text, display: "flex", flexDirection: "column", overflowX: "hidden" }}>
 
-        {/* Top bar */}
-        <div className="bank-top-bar" style={{ background: T.white, borderBottom: `1px solid ${T.border}`, height: 60, padding: "0 40px", display: "flex", alignItems: "center", flexShrink: 0 }}>
-          <nav style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer" }} onClick={() => onNavigate?.("dashboard")}>Dashboard</span>
-            <span style={{ color: T.text3, fontSize: 12 }}>›</span>
-            <span style={{ fontSize: 13, color: T.text2, fontWeight: 500, cursor: "pointer" }} onClick={() => onNavigate?.("account")}>Settings</span>
-            <span style={{ color: T.text3, fontSize: 12 }}>›</span>
-            <span style={{ fontSize: 13, fontWeight: 600, color: T.blue }}>Bank Accounts</span>
-          </nav>
-        </div>
+        <div className="step-content" style={{ padding: "44px 52px 60px", flex: 1 }}>
+          <BankAccountBreadcrumbs onNavigate={onNavigate} />
 
-        <div className="bank-container" style={{ flex: 1, maxWidth: 680, width: "100%", margin: "0 auto", padding: "32px 20px 60px" }}>
+          <div className="bank-container" style={{ maxWidth: 680, width: "100%" }}>
 
           {/* Page heading */}
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, flexWrap: "wrap", gap: "10px" }}>
@@ -626,13 +663,7 @@ export default function BankAccountPage({ onNavigate }) {
               </p>
             </div>
           )}
-        </div>
-
-        {/* Footer */}
-        <div style={{ borderTop: `1px solid ${T.border}`, padding: "18px 40px", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, background: T.white, flexShrink: 0 }}>
-          <Ico.shield />
-          <span style={{ fontSize: 12, color: T.text2, fontWeight: 500 }}>Your transaction is secure · </span>
-          <span style={{ fontSize: 12, fontWeight: 600, color: T.mintGreen }}>Protected by Cheeseball</span>
+          </div>
         </div>
       </div>
 

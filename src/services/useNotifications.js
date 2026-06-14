@@ -5,7 +5,7 @@ import {
   markAllNotificationsAsRead,
 } from "./api";
 
-const POLL_INTERVAL = 20000; // 20 seconds
+const POLL_INTERVAL = 60000; // 60 seconds
 
 export const useNotifications = () => {
   const [notifications, setNotifications] = useState([]);

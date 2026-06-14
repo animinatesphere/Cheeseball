@@ -1,4 +1,5 @@
 import React from "react";
+import { Loader2 } from "lucide-react";
 
 export const ASSETS = [
   { id:"bitcoin", symbol:"BTC", name:"Bitcoin", network:"Bitcoin", price:108280523, change:2.14, icon:"₿", color:"#F7931A", bg:"#FEF3E2" },
@@ -88,11 +89,12 @@ export const SecureFooter = ()=>(
   </div>
 );
 
-export const CTA = ({onClick,disabled,children,style={}})=>(
-  <button onClick={onClick} disabled={disabled} className={disabled?"":"ctabtn"}
+export const CTA = ({onClick,disabled,loading,children,style={}})=>(
+  <button onClick={onClick} disabled={disabled || loading} className={disabled || loading ?"":"ctabtn"}
     style={{width:"100%",padding:"17px",borderRadius:14,border:"none",fontFamily:"'Sora',sans-serif",fontSize:15,fontWeight:700,
-      cursor:disabled?"not-allowed":"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,
-      transition:"all 0.2s",background:disabled?"#E8EEFF":T.blue,color:disabled?"#A8B4CC":"#fff",...style}}>
+      cursor:disabled || loading ?"not-allowed":"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,
+      transition:"all 0.2s",background:disabled || loading ?"#E8EEFF":T.blue,color:disabled || loading ?"#A8B4CC":"#fff",...style}}>
+    {loading && <Loader2 className="animate-spin" size={18} />}
     {children}
   </button>
 );
