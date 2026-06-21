@@ -165,7 +165,7 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
         ]);
         const wallets = Array.isArray(wRes) ? wRes : wRes?.data || [];
         const currencies = Array.isArray(cRes) ? cRes : cRes?.data || [];
-        const txns = Array.isArray(tRes) ? tRes : tRes?.data || [];
+        const txns = Array.isArray(tRes) ? tRes : tRes?.items || tRes?.data || [];
         // Use the BTC buy-rate from context as a live USD/NGN base rate for portfolio valuation
         const systemUsdRate = liveRates?.BTC?.buyRate || 0;
 
@@ -366,6 +366,14 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
           .asset-hide-mobile { display: none !important; }
           .ref-card-main { padding: 16px !important; gap: 14px !important; }
           .ref-card-main h2 { font-size: 13px !important; }
+          .txn-row { grid-template-columns: auto 1fr auto !important; padding: 12px 14px !important; gap: 8px 12px !important; }
+          .txn-icon { width: 32px !important; height: 32px !important; border-radius: 9px !important; }
+          .txn-icon svg { width: 14px !important; height: 14px !important; }
+          .txn-label { font-size: 13px !important; margin-bottom: 2px !important; }
+          .txn-ref { font-size: 10px !important; }
+          .txn-amount-mobile { font-size: 15px !important; text-align: right !important; margin: 0 !important; grid-column: 3 !important; grid-row: 1 !important; }
+          .txn-mobile-footer { display: flex !important; justify-content: space-between !important; align-items: center !important; grid-column: 2 / span 2 !important; grid-row: 2 !important; margin-top: -2px !important; }
+          .txn-date-col, .txn-status-col { display: none !important; }
         }
         @media (max-width: 430px) {
           .dash-grid-top, .dash-grid-bottom { grid-template-columns: 1fr !important; }
@@ -773,7 +781,7 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
                   <div
                     key={txn.id}
                     onClick={() => onNavigate(`transaction/${txn.rawId}`)}
-                    className="portfolio-grid txn-row"
+                    className="txn-row"
                     style={{
                       display: "grid",
                       gridTemplateColumns: "1.5fr 1fr 1fr 1fr",
@@ -786,6 +794,7 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                       <div
+                        className="txn-icon"
                         style={{
                           width: 40,
                           height: 40,
@@ -803,28 +812,32 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
                           <ArrowUpRight size={18} color={T.text3} />
                         )}
                       </div>
-                      <div>
+                      <div style={{ minWidth: 0 }}>
                         <p
+                          className="txn-label"
                           style={{
                             fontFamily: "'Sora', sans-serif",
                             fontSize: 14,
                             fontWeight: 700,
                             color: T.text,
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
                           }}
                         >
                           {txn.type}
                         </p>
-                        <p style={{ fontSize: 11, color: T.text3, fontWeight: 500, marginTop: 1 }}>
+                        <p className="txn-ref" style={{ fontSize: 11, color: T.text3, fontWeight: 500, marginTop: 1 }}>
                           {txn.method}
                         </p>
                       </div>
                     </div>
 
-                    <div>
+                    <div className="txn-date-col">
                       <p style={{ fontSize: 13, fontWeight: 500, color: T.text2 }}>{txn.date}</p>
                     </div>
 
-                    <div>
+                    <div className="txn-status-col">
                       <span
                         style={{
                           fontSize: 10,
@@ -841,7 +854,7 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
                       </span>
                     </div>
 
-                    <div style={{ textAlign: "right" }}>
+                    <div className="txn-amount-mobile" style={{ textAlign: "right" }}>
                       <p
                         style={{
                           fontFamily: "'Sora', sans-serif",
@@ -852,6 +865,16 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
                       >
                         {txn.amount}
                       </p>
+                    </div>
+
+                    {/* Mobile Footer */}
+                    <div className="txn-mobile-footer" style={{ display: "none" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                         <span style={{ fontSize: 11, color: T.text3, fontWeight: 500 }}>{txn.date}</span>
+                      </div>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 10, fontWeight: 700, color: cfg.color, background: cfg.bg, padding: "4px 8px", border: `1px solid ${cfg.border}`, borderRadius: 6, textTransform: "uppercase" }}>
+                        {cfg.label}
+                      </span>
                     </div>
                   </div>
                 );

@@ -149,13 +149,24 @@ export default function TransactionHistory({ onNavigate }) {
   const [typeOpen,   setTypeOpen]   = useState(false);
   const [transactions, setTransactions] = useState([]);
   const [isLoading, setIsLoading]   = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   useEffect(() => {
     async function loadData() {
+      setIsLoading(true);
       try {
-        const txns = await getUserTransactions();
-        const txnsList = Array.isArray(txns) ? txns : (txns?.data || []);
+        const txnsResponse = await getUserTransactions(currentPage);
+        const txnsList = txnsResponse?.items || txnsResponse?.data || (Array.isArray(txnsResponse) ? txnsResponse : []);
         
+        setTotalItems(txnsResponse?.count || txnsList.length);
+        setTotalPages(Math.ceil((txnsResponse?.count || txnsList.length) / 10) || 1);
+
         const mapped = txnsList.map(t => {
           const type = t.transaction_type || t.type || 'transfer';
           const isBuy = type.toLowerCase().includes('buy');
@@ -199,7 +210,7 @@ export default function TransactionHistory({ onNavigate }) {
       }
     }
     loadData();
-  }, []);
+  }, [currentPage, routeId]);
 
   const filtered = useMemo(() => transactions.filter((t) => {
     const matchStatus = statusTab === "All" || t.status === statusTab.toLowerCase();
@@ -211,12 +222,10 @@ export default function TransactionHistory({ onNavigate }) {
     return matchStatus && matchType && matchSearch;
   }), [transactions, statusTab, typeFilter, search]);
 
-  const totalIn  = filtered.filter(t => t.isCredit && t.isSettled).reduce((s, t) => s + t.amount, 0);
-  const totalOut = filtered.filter(t => t.isBuy || t.type === "withdraw").reduce((s, t) => s + t.amount, 0);
   const hasFilters = statusTab !== "All" || typeFilter !== "All Types" || search;
 
   const SUMMARY = [
-    { label: "Total Transactions", value: String(transactions.length),                                                          color: T.blue       },
+    { label: "Total Transactions", value: String(totalItems),                                                                   color: T.blue       },
     { label: "Completed",          value: String(transactions.filter(t => t.status === "completed").length),                    color: T.greenText  },
     { label: "Pending / Failed",   value: String(transactions.filter(t => t.status !== "completed").length),                   color: T.orangeText },
   ];
@@ -278,12 +287,6 @@ export default function TransactionHistory({ onNavigate }) {
             <span style={{ color: T.text3, fontSize: 12 }}>›</span>
             <span style={{ fontSize: 13, fontWeight: 600, color: T.blue }}>Transaction History</span>
           </nav>
-          <button
-            className="icon-hover"
-            style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 16px", border: `1.5px solid ${T.border}`, borderRadius: 10, background: T.white, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 600, color: T.text2, transition: "all 0.15s" }}
-          >
-            <Download size={14} /> Export CSV
-          </button>
         </div>
 
         <div className="history-container" style={{ flex: 1, maxWidth: 1200, width: "100%", margin: "0 auto", padding: "32px 40px 60px" }}>
@@ -482,24 +485,27 @@ export default function TransactionHistory({ onNavigate }) {
             })}
           </div>
 
-          {/* Footer summary bar */}
-          {filtered.length > 0 && (
-            <div className="txn-summary-footer" style={{ marginTop: 14, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 14, flexWrap: "wrap", gap: 16 }}>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div style={{ marginTop: 14, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 20px", background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 14, flexWrap: "wrap", gap: 16 }}>
               <p style={{ fontSize: 13, color: T.text2, fontWeight: 500 }}>
-                Showing <span style={{ fontWeight: 700, color: T.text }}>{filtered.length}</span> of {transactions.length} transactions
+                Showing page <span style={{ fontWeight: 700, color: T.text }}>{currentPage}</span> of {totalPages}
               </p>
-              <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: T.green }} />
-                  <span style={{ fontSize: 12, color: T.text2, fontWeight: 500 }}>In:</span>
-                  <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 700, color: T.greenText }}>+{fmtNGN(totalIn)}</span>
-                </div>
-                <div style={{ width: 1, height: 16, background: T.border }} />
-                <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                  <div style={{ width: 7, height: 7, borderRadius: "50%", background: T.red }} />
-                  <span style={{ fontSize: 12, color: T.text2, fontWeight: 500 }}>Out:</span>
-                  <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 700, color: T.text }}>−{fmtNGN(totalOut)}</span>
-                </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => { setCurrentPage(p => p - 1); window.scrollTo(0, 0); }}
+                  style={{ padding: "6px 12px", borderRadius: 8, border: `1px solid ${T.border}`, background: currentPage === 1 ? T.surface : T.white, color: currentPage === 1 ? T.text3 : T.text, cursor: currentPage === 1 ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  Previous
+                </button>
+                <button
+                  disabled={currentPage === totalPages}
+                  onClick={() => { setCurrentPage(p => p + 1); window.scrollTo(0, 0); }}
+                  style={{ padding: "6px 12px", borderRadius: 8, border: `1px solid ${T.border}`, background: currentPage === totalPages ? T.surface : T.white, color: currentPage === totalPages ? T.text3 : T.text, cursor: currentPage === totalPages ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  Next
+                </button>
               </div>
             </div>
           )}

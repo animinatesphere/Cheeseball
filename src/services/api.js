@@ -169,11 +169,13 @@ export const createGiftCardTrade = async (payload) =>
     { id: crypto.randomUUID?.() || `gift-${Date.now()}`, ...payload },
   );
 
-export const getUserTransactions = async () =>
+export const getUserTransactions = async (page = 1) =>
   withFallback(
-    async () =>
-      normalizeListResponse(await request("/api/broker/transactions"), []),
-    [],
+    async () => {
+      const response = await request(`/api/broker/transactions?page=${page}`);
+      return response;
+    },
+    { items: [], count: 0 },
   );
 
 export const getUserGiftCardTrades = async () =>
