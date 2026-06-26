@@ -1,7 +1,10 @@
 import { useState, useRef } from "react";
 import {
-  Upload, X, CheckCircle2, ChevronRight, ArrowLeft,
+  Upload, X, CheckCircle2, ChevronRight, ArrowLeft, ShoppingBag, Gamepad2, Sparkles,
 } from "lucide-react";
+import {
+  SiApple, SiGoogleplay, SiSteam, SiPlaystation, SiNetflix, SiWalmart, SiEbay,
+} from "react-icons/si";
 
 /* ─── Tokens ─────────────────────────────────────────────────── */
 const T = {
@@ -27,16 +30,16 @@ const T = {
 
 /* ─── Gift card catalogue ────────────────────────────────────── */
 const CARDS = [
-  { id: "amazon",      name: "Amazon",         color: "#FF9900", bg: "#FFF8EC", rate: 1_400, icon: "A",  popular: true  },
-  { id: "itunes",      name: "iTunes / Apple", color: "#555555", bg: "#F5F5F7", rate: 1_350, icon: "🍎", popular: true  },
-  { id: "google-play", name: "Google Play",    color: "#00C853", bg: "#E8FAF0", rate: 1_300, icon: "▶",  popular: true  },
-  { id: "steam",       name: "Steam",          color: "#1B2838", bg: "#EDF0F5", rate: 1_250, icon: "S",  popular: false },
-  { id: "xbox",        name: "Xbox",           color: "#107C10", bg: "#E8F5E8", rate: 1_200, icon: "X",  popular: false },
-  { id: "playstation", name: "PlayStation",    color: "#003791", bg: "#E8EEF8", rate: 1_300, icon: "P",  popular: false },
-  { id: "netflix",     name: "Netflix",        color: "#E50914", bg: "#FDEAEA", rate: 1_100, icon: "N",  popular: false },
-  { id: "sephora",     name: "Sephora",        color: "#C5007C", bg: "#FAEAF5", rate: 1_150, icon: "S",  popular: false },
-  { id: "walmart",     name: "Walmart",        color: "#0071CE", bg: "#E8F3FD", rate: 1_350, icon: "W",  popular: false },
-  { id: "ebay",        name: "eBay",           color: "#E53238", bg: "#FDEAEA", rate: 1_280, icon: "e",  popular: false },
+  { id: "amazon",      name: "Amazon",         color: "#FF9900", bg: "#FFF8EC", rate: 1_400, icon: ShoppingBag,   popular: true  },
+  { id: "itunes",      name: "iTunes / Apple", color: "#555555", bg: "#F5F5F7", rate: 1_350, icon: SiApple,       popular: true  },
+  { id: "google-play", name: "Google Play",    color: "#00C853", bg: "#E8FAF0", rate: 1_300, icon: SiGoogleplay,  popular: true  },
+  { id: "steam",       name: "Steam",          color: "#1B2838", bg: "#EDF0F5", rate: 1_250, icon: SiSteam,       popular: false },
+  { id: "xbox",        name: "Xbox",           color: "#107C10", bg: "#E8F5E8", rate: 1_200, icon: Gamepad2,      popular: false },
+  { id: "playstation", name: "PlayStation",    color: "#003791", bg: "#E8EEF8", rate: 1_300, icon: SiPlaystation, popular: false },
+  { id: "netflix",     name: "Netflix",        color: "#E50914", bg: "#FDEAEA", rate: 1_100, icon: SiNetflix,     popular: false },
+  { id: "sephora",     name: "Sephora",        color: "#C5007C", bg: "#FAEAF5", rate: 1_150, icon: Sparkles,      popular: false },
+  { id: "walmart",     name: "Walmart",        color: "#0071CE", bg: "#E8F3FD", rate: 1_350, icon: SiWalmart,     popular: false },
+  { id: "ebay",        name: "eBay",           color: "#E53238", bg: "#FDEAEA", rate: 1_280, icon: SiEbay,        popular: false },
 ];
 
 const DENOMINATIONS = [25, 50, 100, 200, 500];
@@ -248,8 +251,8 @@ export default function SwapGiftCard({ onNavigate }) {
                           {c.popular && !active && (
                             <div style={{ position: "absolute", top: -6, right: -4, background: T.orange, borderRadius: 6, padding: "1px 5px", fontSize: 8, fontWeight: 700, color: "#fff", textTransform: "uppercase", letterSpacing: "0.3px" }}>Hot</div>
                           )}
-                          <div style={{ width: 38, height: 38, borderRadius: 10, background: active ? T.blue : c.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: active ? "#fff" : c.color, transition: "all 0.15s" }}>
-                            {c.icon}
+                          <div style={{ width: 38, height: 38, borderRadius: 10, background: active ? T.blue : c.bg, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s" }}>
+                            <c.icon size={18} color={active ? "#fff" : c.color} />
                           </div>
                           <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 10, fontWeight: 700, color: active ? T.blue : T.text, textAlign: "center", lineHeight: 1.3 }}>{c.name}</p>
                         </button>
@@ -321,7 +324,7 @@ export default function SwapGiftCard({ onNavigate }) {
                       onMouseEnter={e => { if (selected !== c.id) e.currentTarget.style.background = T.surface; }}
                       onMouseLeave={e => { if (selected !== c.id) e.currentTarget.style.background = T.white; }}
                     >
-                      <div style={{ width: 28, height: 28, borderRadius: 8, background: selected === c.id ? T.blue : c.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 11, fontWeight: 700, color: selected === c.id ? "#fff" : c.color, flexShrink: 0, transition: "all 0.15s" }}>{c.icon}</div>
+                      <div style={{ width: 28, height: 28, borderRadius: 8, background: selected === c.id ? T.blue : c.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.15s" }}><c.icon size={13} color={selected === c.id ? "#fff" : c.color} /></div>
                       <span style={{ flex: 1, fontSize: 12, fontWeight: 600, color: selected === c.id ? T.blue : T.text }}>{c.name}</span>
                       <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: selected === c.id ? T.blue : T.text2 }}>₦{c.rate.toLocaleString("en-NG")}/$</span>
                     </div>
@@ -337,7 +340,7 @@ export default function SwapGiftCard({ onNavigate }) {
                   <>
                     <div style={{ background: T.blue, borderRadius: 20, padding: "24px" }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-                        <div style={{ width: 42, height: 42, borderRadius: 12, background: card.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 16, fontWeight: 700, color: card.color, flexShrink: 0 }}>{card.icon}</div>
+                        <div style={{ width: 42, height: 42, borderRadius: 12, background: card.bg, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><card.icon size={20} color={card.color} /></div>
                         <div>
                           <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 15, fontWeight: 700, color: "#fff" }}>{card.name}</p>
                           <p style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", marginTop: 1 }}>Selected brand</p>

@@ -95,7 +95,7 @@ export default function SettingsPage({ onNavigate }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const name = user ? `${user.first_name || ""} ${user.last_name || ""}`.trim() || "User" : "Loading...";
+  const name = user?.fullname || "User";
   const initials = user?.email ? user.email.substring(0, 2).toUpperCase() : "CB";
   const verified = !!user?.verified_at;
   const joinedDate = user?.verified_at ? new Date(user.verified_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "Recently";

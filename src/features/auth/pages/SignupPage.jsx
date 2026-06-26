@@ -80,7 +80,7 @@ const GiftIcon = () => (
 );
 
 /* ─── Input component ────────────────────────────────────────── */
-function Field({ label, type = "text", placeholder, value, onChange, onFocus, onBlur, focused, error, right, hint }) {
+function Field({ label, type = "text", placeholder, value, onChange, onFocus, onBlur, focused, error, right, hint, required }) {
   return (
     <div>
       <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: T.text2, marginBottom: 7 }}>{label}</label>
@@ -92,6 +92,7 @@ function Field({ label, type = "text", placeholder, value, onChange, onFocus, on
           onChange={e => onChange(e.target.value)}
           onFocus={onFocus}
           onBlur={onBlur}
+          required={required}
           style={{
             width: "100%", border: `1.5px solid ${focused ? T.blue : error ? T.red : T.border}`,
             borderRadius: 13, padding: right ? "13px 44px 13px 16px" : "13px 16px",
@@ -372,6 +373,7 @@ export default function AuthSignup({ onSignUp, onLogin, initialReferralCode = ""
                 onBlur={() => setFocused("")}
                 focused={focused === "fullName"}
                 error={errors.fullName}
+                required
               />
 
               {/* Email */}
@@ -385,6 +387,7 @@ export default function AuthSignup({ onSignUp, onLogin, initialReferralCode = ""
                 onBlur={() => setFocused("")}
                 focused={focused === "email"}
                 error={errors.email}
+                required
               />
 
               {/* Phone */}
@@ -398,6 +401,7 @@ export default function AuthSignup({ onSignUp, onLogin, initialReferralCode = ""
                 onBlur={() => setFocused("")}
                 focused={focused === "phone"}
                 error={errors.phone}
+                required
               />
 
               {/* Password */}
@@ -412,6 +416,7 @@ export default function AuthSignup({ onSignUp, onLogin, initialReferralCode = ""
                   onBlur={() => setFocused("")}
                   focused={focused === "password"}
                   error={errors.password}
+                  required
                   right={
                     <button type="button" onClick={() => setShowPass(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", padding: 0 }}>
                       <EyeIcon visible={!showPass} />
@@ -432,6 +437,7 @@ export default function AuthSignup({ onSignUp, onLogin, initialReferralCode = ""
                 onBlur={() => setFocused("")}
                 focused={focused === "confirmPass"}
                 error={errors.confirmPass}
+                required
                 right={
                   <button type="button" onClick={() => setShowConfirm(v => !v)} style={{ background: "none", border: "none", cursor: "pointer", display: "flex", padding: 0 }}>
                     <EyeIcon visible={!showConfirm} />
