@@ -6,7 +6,7 @@ export default function SellFlowStep2(props) {
   const {
     payAmount, receiveAmount, selectedAsset, selectedNetwork, quoteData, finalRate, expiryTime,
     promoCode, setPromoCode, promoBenefit, setPromoBenefit,
-    onSuccess, prevStep, setTransactionData, setDepositAddressData, cryptoSource,
+    onSuccess, prevStep, setTransactionData, setDepositAddressData, cryptoSource, breadcrumbs,
     isExpired, resetExpiry
   } = props;
 
@@ -81,7 +81,7 @@ export default function SellFlowStep2(props) {
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr 400px", minHeight: "100vh", background: T.white, overflowX: "hidden", maxWidth: "100vw" }} className="sellgrid">
       <div style={{ padding: "44px 52px 60px", borderRight: `1px solid ${T.border}` }} className="step-content">
-
+        {breadcrumbs}
         <p style={{ fontSize: 11, fontWeight: 600, color: T.blue, textTransform: "uppercase", letterSpacing: "1px", marginBottom: 6, fontFamily: "'DM Sans',sans-serif" }}>Step 2 of 3</p>
         <h1 className="responsive-title" style={{ fontFamily: "'Sora',sans-serif", fontSize: 28, fontWeight: 700, color: T.text, letterSpacing: "-0.6px", lineHeight: 1.15 }}>Confirm Details</h1>
         <p style={{ fontSize: 14, color: T.text2, marginTop: 6, lineHeight: 1.6, fontFamily: "'DM Sans',sans-serif" }}>Review your order details and apply any promo codes before confirming.</p>

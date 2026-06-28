@@ -5,7 +5,7 @@ import { request } from "@/services/api";
 const fmtTime = (d) => d.toLocaleTimeString("en-NG",{hour:"2-digit",minute:"2-digit"});
 const fmtDate = (d) => d.toLocaleDateString("en-NG",{day:"numeric",month:"short",year:"numeric"});
 
-function ExternalWalletVariant({ payAmount, receiveAmount, selectedAsset, selectedNetwork, transactionData, depositAddressData, onBack, onNavigate, paymentMethod }) {
+function ExternalWalletVariant({ payAmount, receiveAmount, selectedAsset, selectedNetwork, transactionData, depositAddressData, onBack, onNavigate, paymentMethod, breadcrumbs }) {
   const [copied, setCopied] = useState(false);
   const [hasPaid, setHasPaid] = useState(false);
   const [brokerAddress, setBrokerAddress] = useState(depositAddressData?.address || "");
@@ -216,6 +216,7 @@ function ExternalWalletVariant({ payAmount, receiveAmount, selectedAsset, select
   return (
     <div className="sellgrid" style={{ display: "grid", gridTemplateColumns: "1fr 400px", minHeight: "100vh", fontFamily: "'DM Sans',sans-serif", background: T.white, color: T.text, overflowX: "hidden", maxWidth: "100vw" }}>
       <div style={{ padding: "44px 52px 60px", borderRight: `1px solid ${T.border}` }} className="step-content">
+        {breadcrumbs}
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 6 }}>
           <div style={{ width: 44, height: 44, borderRadius: "50%", background: selectedAsset.color, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora',sans-serif", fontSize: 16, fontWeight: 700, color: "#fff", flexShrink: 0 }}>{selectedAsset.icon}</div>
           <div>
@@ -327,13 +328,14 @@ function ExternalWalletVariant({ payAmount, receiveAmount, selectedAsset, select
   );
 }
 
-function InternalWalletVariant({ payAmount, receiveAmount, selectedAsset, transactionData, onBack, paymentMethod }) {
+function InternalWalletVariant({ payAmount, receiveAmount, selectedAsset, transactionData, onBack, paymentMethod, breadcrumbs }) {
   const txRef = transactionData?.id || "CHB-2024-" + String(Date.now()).slice(-5);
   const submittedAt = new Date();
 
   return (
     <div style={{ minHeight: "100vh", background: T.surface, fontFamily: "'DM Sans',sans-serif", color: T.text, overflowX: "hidden", maxWidth: "100vw", display: "flex", flexDirection: "column" }}>
       <div style={{ maxWidth: 800, margin: "0 auto", padding: "80px 24px", width: "100%" }}>
+        {breadcrumbs}
         <div className="fadein" style={{ background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 24, padding: "48px", textAlign: "center", boxShadow: "0 10px 40px rgba(0,0,0,0.03)" }}>
           <div style={{ position: "relative", width: 80, height: 80, margin: "0 auto 24px" }}>
             <div className="pulsing" style={{ position: "absolute", inset: 0, borderRadius: "50%", background: T.greenLight }} />
