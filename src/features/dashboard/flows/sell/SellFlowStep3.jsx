@@ -5,11 +5,14 @@ import { request } from "@/services/api";
 const fmtTime = (d) => d.toLocaleTimeString("en-NG",{hour:"2-digit",minute:"2-digit"});
 const fmtDate = (d) => d.toLocaleDateString("en-NG",{day:"numeric",month:"short",year:"numeric"});
 
-function ExternalWalletVariant({ payAmount, receiveAmount, selectedAsset, transactionData, depositAddressData, onBack, onNavigate, paymentMethod }) {
+function ExternalWalletVariant({ payAmount, receiveAmount, selectedAsset, selectedNetwork, transactionData, depositAddressData, onBack, onNavigate, paymentMethod }) {
   const [copied, setCopied] = useState(false);
   const [hasPaid, setHasPaid] = useState(false);
   const [brokerAddress, setBrokerAddress] = useState(depositAddressData?.address || "");
-  const network = depositAddressData?.network || selectedAsset.network;
+  // Resolve network: prefer what backend returned, then what user selected, then asset default
+  const rawNetwork = depositAddressData?.network || selectedNetwork || selectedAsset.network;
+  // Resolve human-readable label from the asset's networks list if available
+  const networkLabel = selectedAsset.networks?.find(n => n.id === rawNetwork || n.id === rawNetwork?.toLowerCase())?.label || rawNetwork;
 
   useEffect(() => {
     if (brokerAddress || !transactionData?.id) return;
@@ -185,7 +188,7 @@ function ExternalWalletVariant({ payAmount, receiveAmount, selectedAsset, transa
             <div style={{ padding: "4px 14px 6px" }}>
               {[
                 ["Asset", `${selectedAsset.name} (${selectedAsset.symbol})`],
-                ["Network", selectedAsset.network],
+                ["Network", networkLabel],
                 ["Payout to", "NGN Wallet"],
               ].map(([label, val], i, arr) => (
                 <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: i < arr.length - 1 ? `1px solid ${T.border}` : "none" }}>
@@ -240,14 +243,14 @@ function ExternalWalletVariant({ payAmount, receiveAmount, selectedAsset, transa
 
         <div style={{ marginTop: 12, border: `1.5px solid ${T.border}`, borderRadius: 14, padding: "14px 18px", background: T.white, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <span style={{ fontSize: 13, color: T.text2 }}>Network</span>
-          <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: T.text, display: "flex", alignItems: "center", gap: 7 }}><div style={{ width: 8, height: 8, borderRadius: "50%", background: selectedAsset.color }} />{network}</span>
+          <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: T.text, display: "flex", alignItems: "center", gap: 7 }}><div style={{ width: 8, height: 8, borderRadius: "50%", background: selectedAsset.color }} />{networkLabel}</span>
         </div>
 
         <div style={{ marginTop: 16, display: "flex", alignItems: "flex-start", gap: 12, background: T.orangeLight, border: "1.5px solid #FDE68A", borderRadius: 14, padding: "14px 18px" }}>
           <Ico.info />
           <div>
             <p style={{ fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: "#92400E", marginBottom: 4 }}>Important</p>
-            <p style={{ fontSize: 13, color: "#92400E", lineHeight: 1.55 }}>Only send <strong>{selectedAsset.symbol}</strong> on the <strong>{network}</strong> network. Sending the wrong asset or using the wrong network may result in permanent loss of funds.</p>
+            <p style={{ fontSize: 13, color: "#92400E", lineHeight: 1.55 }}>Only send <strong>{selectedAsset.symbol}</strong> on the <strong>{networkLabel}</strong> network. Sending the wrong asset or using the wrong network may result in permanent loss of funds.</p>
           </div>
         </div>
 

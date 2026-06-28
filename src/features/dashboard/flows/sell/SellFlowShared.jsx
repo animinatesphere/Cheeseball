@@ -127,12 +127,15 @@ export const RightPanel = ({payAmount,receiveAmount,selectedAsset,selectedNetwor
   const numPayAmount = Number((payAmount || "").toString().replace(/,/g, ""));
   const numReceiveAmount = Number((receiveAmount || "").toString().replace(/,/g, ""));
 
+  const rawNetwork = selectedNetwork || selectedAsset.network;
+  const networkLabel = selectedAsset.networks?.find(n => n.id === rawNetwork)?.label || rawNetwork;
+
   const rows=[
     ["You sell", numPayAmount > 0 ? `${numPayAmount} ${selectedAsset.symbol}` : "—"],
     ["You receive", numReceiveAmount > 0 ? formatNGN(numReceiveAmount) : "—"],
     ["Exchange Rate", rate ? `${formatNGN(rate)} / ${selectedAsset.symbol}` : "—"],
     ["Asset", `${selectedAsset.name} (${selectedAsset.symbol})`],
-    ["Network", selectedNetwork || selectedAsset.network],
+    ["Network", networkLabel],
   ];
 
   return(

@@ -149,7 +149,7 @@ export default function SellFlowStep2(props) {
         </div>
       </div>
 
-      <RightPanel payAmount={payAmount} receiveAmount={receiveAmount} rate={finalRate} selectedAsset={selectedAsset} expiryTime={expiryTime} step={2} />
+      <RightPanel payAmount={payAmount} receiveAmount={receiveAmount} rate={finalRate} selectedAsset={selectedAsset} selectedNetwork={selectedNetwork} expiryTime={expiryTime} step={2} />
 
       {/* Expired overlay */}
       {isExpired && (

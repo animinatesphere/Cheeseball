@@ -194,6 +194,7 @@ const SellFlow = ({ onBack, onNavigate }) => {
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
             breadcrumbs={breadcrumbs}
+            onBack={onBack}
             onQuoteFetched={(quote) => {
               setQuoteData(quote);
               setIsExpired(false);
@@ -229,6 +230,7 @@ const SellFlow = ({ onBack, onNavigate }) => {
             paymentMethod="ngn_wallet"
             receiveAmount={receiveAmount}
             selectedAsset={selectedAsset}
+            selectedNetwork={selectedNetwork}
             payAmount={quoteData?.crypto_amount || payAmount}
             transactionData={transactionData}
             depositAddressData={depositAddressData}
