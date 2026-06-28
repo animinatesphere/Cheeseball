@@ -4,7 +4,7 @@ import { validatePromoCode, createSellTransaction } from "@/services/api";
 
 export default function SellFlowStep2(props) {
   const {
-    payAmount, receiveAmount, selectedAsset, quoteData, finalRate, expiryTime,
+    payAmount, receiveAmount, selectedAsset, selectedNetwork, quoteData, finalRate, expiryTime,
     promoCode, setPromoCode, promoBenefit, setPromoBenefit,
     onSuccess, prevStep, setTransactionData, setDepositAddressData, cryptoSource, breadcrumbs,
     isExpired, resetExpiry
@@ -47,6 +47,7 @@ export default function SellFlowStep2(props) {
         quote_id: quoteData.id,
         payout_method: "ngn_wallet",
         crypto_source: cryptoSource,
+        network: selectedNetwork || selectedAsset.network || undefined,
       };
       if (promoCode) payload.promo_code = promoCode;
 
@@ -56,7 +57,7 @@ export default function SellFlowStep2(props) {
         setDepositAddressData({
           address: res.broker_wallet_address,
           memo: res.deposit_memo,
-          network: res.network || selectedAsset.network,
+          network: res.network || selectedNetwork || selectedAsset.network,
         });
       }
       onSuccess();

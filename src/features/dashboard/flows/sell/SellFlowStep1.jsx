@@ -17,6 +17,8 @@ const ALLOWED_SYMBOLS = [
 export default function SellFlowStep1({
   selectedAsset,
   setSelectedAsset,
+  selectedNetwork,
+  setSelectedNetwork,
   cryptoSource,
   setCryptoSource,
   payAmount,
@@ -91,6 +93,8 @@ export default function SellFlowStep1({
 
   const selectCoin = (asset) => {
     setSelectedAsset(asset);
+    // Reset to the asset's default network when switching assets
+    setSelectedNetwork(asset.networks ? asset.networks[0].id : (asset.network || ""));
     setPayAmount("");
     setDdOpen(false);
   };
@@ -329,7 +333,7 @@ export default function SellFlowStep1({
                       {selectedAsset.symbol}
                     </p>
                     <div style={{ padding: "2px 6px", borderRadius: 4, background: T.surface, border: `1px solid ${T.border}`, fontSize: 10, color: T.text2, fontWeight: 600 }}>
-                      {selectedAsset.network}
+                      {selectedNetwork || selectedAsset.network}
                     </div>
                   </div>
                 </div>
@@ -430,6 +434,46 @@ export default function SellFlowStep1({
             )}
           </div>
         </div>
+
+        {/* Network selector — only shown for multi-network assets */}
+        {selectedAsset.networks && selectedAsset.networks.length > 1 && (
+          <div style={{ marginTop: 20 }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 10, fontFamily: "'DM Sans',sans-serif" }}>
+              Select Network
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {selectedAsset.networks.map((net) => {
+                const active = (selectedNetwork || selectedAsset.networks[0].id) === net.id;
+                const badgeColor = net.badge === "Cheapest" ? T.green
+                  : net.badge === "Cheap" ? T.blue
+                  : "#F59E0B";
+                const badgeBg = net.badge === "Cheapest" ? T.greenLight
+                  : net.badge === "Cheap" ? T.blueLight
+                  : "#FFFBEB";
+                return (
+                  <button
+                    key={net.id}
+                    onClick={() => setSelectedNetwork(net.id)}
+                    style={{
+                      display: "flex", flexDirection: "column", gap: 4,
+                      padding: "10px 14px", borderRadius: 12,
+                      border: `1.5px solid ${active ? T.blue : T.border}`,
+                      background: active ? T.blueLight : T.white,
+                      cursor: "pointer", transition: "all 0.18s", textAlign: "left",
+                    }}
+                  >
+                    <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 12, fontWeight: 700, color: active ? T.blue : T.text }}>
+                      {net.label}
+                    </span>
+                    <span style={{ fontSize: 10, fontWeight: 600, color: badgeColor, background: badgeBg, borderRadius: 4, padding: "1px 6px", alignSelf: "flex-start" }}>
+                      {net.badge}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Amount input */}
         <div style={{ marginTop: 28 }}>
@@ -619,6 +663,7 @@ export default function SellFlowStep1({
         receiveAmount={inputCurrency === "NGN" ? numericInput : (liveEquivalent ? Math.round(liveEquivalent) : 0)}
         rate={cachedRate}
         selectedAsset={selectedAsset}
+        selectedNetwork={selectedNetwork}
         expiryTime={0}
         step={1}
       />

@@ -77,17 +77,6 @@ const FAQS = {
 
 const CONTACT_METHODS = [
   {
-    icon: MessageCircle,
-    label: "Live Chat",
-    sub: "Chat with us right now",
-    badge: "Online",
-    badgeColor: T.greenText,
-    badgeBg: T.greenLight,
-    color: T.blue,
-    bg: T.blueLight,
-    action: "Start Chat",
-  },
-  {
     icon: Mail,
     label: "Email Support",
     sub: "support@cheeseball.io",
@@ -291,17 +280,17 @@ export default function SupportPage({ onNavigate }) {
         <div className="support-container" style={{ flex: 1, maxWidth: 1100, width: "100%", margin: "0 auto", padding: "36px 40px 60px" }}>
 
           {/* ── Hero ── */}
-          <div className="fadein support-hero" style={{ background: T.blue, borderRadius: 24, padding: "44px 48px", marginBottom: 28, position: "relative", overflow: "hidden", textAlign: "center" }}>
+          <div className="fadein support-hero" style={{ background: T.blue, borderRadius: 24, padding: "20px 48px", marginBottom: 28, position: "relative", overflow: "hidden", textAlign: "center" }}>
             <div style={{ position: "absolute", top: -60, right: -60, width: 260, height: 260, borderRadius: "50%", background: "rgba(255,255,255,0.05)", pointerEvents: "none" }} />
             <div style={{ position: "absolute", bottom: -80, left: -40, width: 200, height: 200, borderRadius: "50%", background: "rgba(255,255,255,0.04)", pointerEvents: "none" }} />
             <div style={{ position: "relative", zIndex: 1 }}>
-              <div style={{ width: 52, height: 52, borderRadius: 16, background: "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px", border: "1px solid rgba(255,255,255,0.15)" }}>
-                <HelpCircle size={24} color="#fff" />
+              <div style={{ width: 44, height: 44, borderRadius: 16, background: "rgba(255,255,255,0.12)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 12px", border: "1px solid rgba(255,255,255,0.15)" }}>
+                <HelpCircle size={20} color="#fff" />
               </div>
-              <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 32, fontWeight: 700, color: "#fff", letterSpacing: "-0.8px", marginBottom: 10 }}>
+              <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: 26, fontWeight: 700, color: "#fff", letterSpacing: "-0.8px", marginBottom: 6 }}>
                 How can we help you?
               </h1>
-              <p style={{ fontSize: 15, color: "rgba(255,255,255,0.65)", marginBottom: 28, lineHeight: 1.6 }}>
+              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.65)", marginBottom: 20, lineHeight: 1.6 }}>
                 Search our help centre or browse by category below.
               </p>
 
@@ -325,7 +314,7 @@ export default function SupportPage({ onNavigate }) {
           </div>
 
           {/* ── Contact methods ── */}
-          <div className="contact-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14, marginBottom: 28 }}>
+          <div className="contact-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14, marginBottom: 28 }}>
             {CONTACT_METHODS.map((c) => (
               <div
                 key={c.label}
@@ -448,24 +437,6 @@ export default function SupportPage({ onNavigate }) {
             </div>
           </div>
 
-          {/* ── Response time strip ── */}
-          <div className="strip-grid" style={{ marginTop: 20, display: "flex", alignItems: "center", gap: 24, padding: "16px 24px", background: T.white, border: `1.5px solid ${T.border}`, borderRadius: 16 }}>
-            {[
-              { icon: Clock,        label: "Avg. response time",  value: "< 2 hours"   },
-              { icon: CheckCircle2, label: "Resolution rate",     value: "98.4%"        },
-              { icon: MessageCircle,label: "Support hours",       value: "Mon–Sat 8–8"  },
-            ].map(({ icon: Icon, label, value }, i) => (
-              <div key={label} className="strip-item" style={{ display: "flex", alignItems: "center", gap: 10, ...(i > 0 ? { paddingLeft: 24, borderLeft: `1px solid ${T.border}` } : {}) }}>
-                <div style={{ width: 32, height: 32, borderRadius: 9, background: T.blueLight, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Icon size={14} color={T.blue} />
-                </div>
-                <div>
-                  <p style={{ fontSize: 11, color: T.text3, fontWeight: 600, marginBottom: 1 }}>{label}</p>
-                  <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 700, color: T.text }}>{value}</p>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
 
         {/* Footer */}

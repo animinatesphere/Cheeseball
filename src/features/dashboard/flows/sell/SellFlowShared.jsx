@@ -4,8 +4,22 @@ import { Loader2 } from "lucide-react";
 export const ASSETS = [
   { id:"bitcoin", symbol:"BTC", name:"Bitcoin", network:"Bitcoin", price:108280523, change:2.14, icon:"₿", color:"#F7931A", bg:"#FEF3E2" },
   { id:"ethereum", symbol:"ETH", name:"Ethereum", network:"ERC20", price:4236420, change:-0.87, icon:"Ξ", color:"#627EEA", bg:"#EEEFFE" },
-  { id:"tether", symbol:"USDT", name:"Tether", network:"TRC20", price:1412, change:0.01, icon:"₮", color:"#26A17B", bg:"#E6F7F2" },
-  { id:"usd-coin", symbol:"USDC", name:"USD Coin", network:"ERC20", price:1412, change:0.00, icon:"$", color:"#2775CA", bg:"#E6F0FA" },
+  { id:"tether", symbol:"USDT", name:"Tether", network:"TRC20", price:1412, change:0.01, icon:"₮", color:"#26A17B", bg:"#E6F7F2",
+    networks: [
+      { id: "trc20", label: "TRON (TRC-20)",           badge: "Cheapest"  },
+      { id: "bep20", label: "BNB Smart Chain (BEP-20)", badge: "Cheap"     },
+      { id: "sol",   label: "Solana",                   badge: "Cheap"     },
+      { id: "erc20", label: "Ethereum (ERC-20)",         badge: "Expensive" },
+    ]
+  },
+  { id:"usd-coin", symbol:"USDC", name:"USD Coin", network:"SOL", price:1412, change:0.00, icon:"$", color:"#2775CA", bg:"#E6F0FA",
+    networks: [
+      { id: "sol",   label: "Solana",                   badge: "Cheapest"  },
+      { id: "bep20", label: "BNB Smart Chain (BEP-20)", badge: "Cheap"     },
+      { id: "trc20", label: "TRON (TRC-20)",            badge: "Cheap"     },
+      { id: "erc20", label: "Ethereum (ERC-20)",         badge: "Expensive" },
+    ]
+  },
   { id:"bnb", symbol:"BNB", name:"BNB", network:"BEP20", price:847284, change:1.33, icon:"⬡", color:"#F0B90B", bg:"#FEF8E6" },
   { id:"solana", symbol:"SOL", name:"Solana", network:"Solana", price:211821, change:4.56, icon:"◎", color:"#9945FF", bg:"#F1E9FF" },
   { id:"ripple", symbol:"XRP", name:"XRP", network:"Ripple", price:847, change:0.5, icon:"✕", color:"#23292F", bg:"#E9EBEF" },
@@ -28,8 +42,8 @@ export const ASSETS = [
 export const NETWORKS = {
   BTC:["Bitcoin"],
   ETH:["ERC20"],
-  USDT:["TRC20"],
-  USDC:["ERC20"],
+  USDT:["TRC20","BEP20","SOL","ERC20"],
+  USDC:["SOL","BEP20","TRC20","ERC20"],
   BNB:["BEP20"],
   SOL:["Solana"],
   XRP:["Ripple"],
@@ -107,7 +121,7 @@ export const GhostBtn = ({onClick,children,style={}})=>(
   </button>
 );
 
-export const RightPanel = ({payAmount,receiveAmount,selectedAsset,expiryTime,step,rate})=>{
+export const RightPanel = ({payAmount,receiveAmount,selectedAsset,selectedNetwork,expiryTime,step,rate})=>{
   const isUrgent = expiryTime<=60;
   
   const numPayAmount = Number((payAmount || "").toString().replace(/,/g, ""));
@@ -118,7 +132,7 @@ export const RightPanel = ({payAmount,receiveAmount,selectedAsset,expiryTime,ste
     ["You receive", numReceiveAmount > 0 ? formatNGN(numReceiveAmount) : "—"],
     ["Exchange Rate", rate ? `${formatNGN(rate)} / ${selectedAsset.symbol}` : "—"],
     ["Asset", `${selectedAsset.name} (${selectedAsset.symbol})`],
-    ["Network", selectedAsset.network],
+    ["Network", selectedNetwork || selectedAsset.network],
   ];
 
   return(

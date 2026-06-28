@@ -225,10 +225,10 @@ export const getBeneficiaries = async () =>
     [],
   );
 
-export const createDeposit = async (asset, amount) =>
+export const createDeposit = async (asset, amount, network) =>
   request("/api/wallets/deposits/create", {
     method: "POST",
-    body: JSON.stringify({ asset, expected_amount: amount }),
+    body: JSON.stringify({ asset, expected_amount: amount, ...(network ? { network } : {}) }),
   });
 
 export const getDepositStatus = async (depositId) =>

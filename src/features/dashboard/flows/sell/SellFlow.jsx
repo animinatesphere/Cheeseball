@@ -92,6 +92,7 @@ const SellFlow = ({ onBack, onNavigate }) => {
 
   // Step 1 state
   const [selectedAsset, setSelectedAsset] = useState(ASSETS[0]);
+  const [selectedNetwork, setSelectedNetwork] = useState(ASSETS[0].networks ? ASSETS[0].networks[0].id : (ASSETS[0].network || ""));
   const [cryptoSource, setCryptoSource] = useState("external_wallet"); // external_wallet, cheeseball_wallet
   const [payAmount, setPayAmount] = useState(0); // This will hold the numeric value, either crypto or NGN
   const [inputCurrency, setInputCurrency] = useState("CRYPTO"); // "NGN" or "CRYPTO"
@@ -161,6 +162,7 @@ const SellFlow = ({ onBack, onNavigate }) => {
     payAmount: quoteData?.crypto_amount || payAmount,
     receiveAmount,
     selectedAsset,
+    selectedNetwork,
     expiryTime,
     finalRate,
     breadcrumbs,
@@ -181,6 +183,8 @@ const SellFlow = ({ onBack, onNavigate }) => {
           <SellFlowStep1
             selectedAsset={selectedAsset}
             setSelectedAsset={setSelectedAsset}
+            selectedNetwork={selectedNetwork}
+            setSelectedNetwork={setSelectedNetwork}
             cryptoSource={cryptoSource}
             setCryptoSource={setCryptoSource}
             payAmount={payAmount}

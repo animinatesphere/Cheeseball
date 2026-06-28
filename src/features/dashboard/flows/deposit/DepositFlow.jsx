@@ -189,6 +189,7 @@ function StepChoose({ onChoose }) {
 /* ─── Step 1 – Select crypto asset ──────────────────────── */
 function StepSelectAsset({ onContinue, loading }) {
   const [selected, setSelected] = useState(null);
+  const [selectedNetwork, setSelectedNetwork] = useState(null);
   const [ddOpen, setDdOpen] = useState(false);
   const [query, setQuery] = useState("");
   const ddRef = useRef(null);
@@ -242,8 +243,13 @@ function StepSelectAsset({ onContinue, loading }) {
                   fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: "#fff",
                 }}>{selected.icon}</div>
               )}
-              <span style={{ color: selected ? T.text : T.text3 }}>
+              <span style={{ color: selected ? T.text : T.text3, display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
                 {selected ? `${selected.name} (${selected.symbol})` : "Select an asset to deposit"}
+                {selected && (
+                  <span style={{ fontSize: 11, color: T.text2, marginTop: 2, background: T.white, padding: "2px 6px", borderRadius: 4, border: `1px solid ${T.border}` }}>
+                    Network: {selectedNetwork || selected.network}
+                  </span>
+                )}
               </span>
             </span>
             <Ico.chevDn />
@@ -271,7 +277,7 @@ function StepSelectAsset({ onContinue, loading }) {
 
               {filtered.map((asset, i) => (
                 <button key={asset.id} className="ddopt"
-                  onClick={() => { setSelected(asset); setDdOpen(false); setQuery(""); }}
+                  onClick={() => { setSelected(asset); setSelectedNetwork(asset.networks ? asset.networks[0].id : null); setDdOpen(false); setQuery(""); }}
                   style={{
                     width: "100%", padding: "14px 16px", border: "none",
                     borderBottom: i < filtered.length - 1 ? `1px solid ${T.border}` : "none",
@@ -297,9 +303,49 @@ function StepSelectAsset({ onContinue, loading }) {
           )}
         </div>
 
+        {/* Network selector — only shown for multi-network assets */}
+        {selected?.networks && selected.networks.length > 1 && (
+          <div className="fadein" style={{ marginTop: 24 }}>
+            <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 10, fontFamily: "'DM Sans',sans-serif" }}>
+              Select Network
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              {selected.networks.map((net) => {
+                const active = (selectedNetwork || selected.networks[0].id) === net.id;
+                const badgeColor = net.badge === "Cheapest" ? T.green
+                  : net.badge === "Cheap" ? T.blue
+                  : "#F59E0B";
+                const badgeBg = net.badge === "Cheapest" ? T.greenLight
+                  : net.badge === "Cheap" ? T.blueLight
+                  : "#FFFBEB";
+                return (
+                  <button
+                    key={net.id}
+                    onClick={() => setSelectedNetwork(net.id)}
+                    style={{
+                      display: "flex", flexDirection: "column", gap: 4,
+                      padding: "12px 16px", borderRadius: 12,
+                      border: `1.5px solid ${active ? T.blue : T.border}`,
+                      background: active ? T.blueLight : T.white,
+                      cursor: "pointer", transition: "all 0.18s", textAlign: "left",
+                    }}
+                  >
+                    <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 13, fontWeight: 700, color: active ? T.blue : T.text }}>
+                      {net.label}
+                    </span>
+                    <span style={{ fontSize: 10, fontWeight: 600, color: badgeColor, background: badgeBg, borderRadius: 4, padding: "2px 8px", alignSelf: "flex-start" }}>
+                      {net.badge}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Continue button – same width as dropdown */}
         <div style={{ marginTop: 24 }}>
-          <CTA onClick={() => onContinue(selected)} disabled={!selected || loading} loading={loading}>
+          <CTA onClick={() => onContinue(selected, selectedNetwork)} disabled={!selected || loading} loading={loading}>
             Generate Deposit Address
           </CTA>
         </div>
@@ -816,12 +862,12 @@ export default function DepositFlow({ onBack, onNavigate, onClose }) {
     else handleClose?.();
   };
 
-  const handleCryptoAssetContinue = async (asset) => {
+  const handleCryptoAssetContinue = async (asset, network) => {
     setLoading(true);
     setError(null);
     setSelectedAsset(asset);
     try {
-      const data = await createDeposit(asset.symbol, 0);
+      const data = await createDeposit(asset.symbol, 0, network || asset.network);
       if (data?.id) {
         setDepositData(data);
         setScreen("crypto-address");

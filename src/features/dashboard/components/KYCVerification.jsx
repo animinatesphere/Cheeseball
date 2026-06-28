@@ -166,68 +166,17 @@ function UnderReview() {
           Our compliance team is reviewing your documents. You'll receive an email notification the moment it's complete.
         </p>
 
-        {/* Estimated time callout */}
-        <div className="fadein4" style={{ display: "flex", alignItems: "center", gap: 14, background: T.orangeLight, border: "1.5px solid #FDE68A", borderRadius: 16, padding: "16px 22px", maxWidth: 380 }}>
-          <div style={{ width: 10, height: 10, borderRadius: "50%", background: T.orange, animation: "blink 1.5s ease-in-out infinite", flexShrink: 0 }} />
-          <p style={{ fontSize: 14, color: T.orangeText, lineHeight: 1.5 }}>
-            Estimated review time: <strong style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700 }}>2–6 hours</strong>
-          </p>
-        </div>
+
 
         <p className="fadein5" style={{ fontSize: 13, color: T.text3, marginTop: 28 }}>
           Questions? Email <strong style={{ color: T.text2 }}>support@cheeseballapp.com</strong>
         </p>
       </div>
 
-      {/* RIGHT — progress tracker */}
+      {/* RIGHT — What happens next */}
       <div className="kyc-right" style={{ width: 380, flexShrink: 0, borderLeft: `1px solid ${T.border}`, background: T.surface, padding: "52px 40px", display: "flex", flexDirection: "column" }}>
-        <p style={{ fontSize: 11, fontWeight: 700, color: T.text3, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: 32 }}>Verification progress</p>
-
-        <div style={{ position: "relative" }}>
-          {/* Vertical connector line */}
-          <div style={{ position: "absolute", left: 17, top: 36, bottom: 36, width: 2, background: T.border, zIndex: 0 }} />
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-            {steps.map((step, i) => (
-              <div key={i} style={{ display: "flex", gap: 20, position: "relative", paddingBottom: i < steps.length - 1 ? 40 : 0 }}>
-                {/* Node */}
-                <div style={{
-                  width: 36, height: 36, borderRadius: "50%", flexShrink: 0, zIndex: 1,
-                  background: step.done ? T.green : step.active ? T.orange : T.white,
-                  border: `2px solid ${step.done ? T.green : step.active ? T.orange : T.border}`,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: step.active ? `0 0 0 5px ${T.orangeLight}` : step.done ? `0 0 0 4px ${T.greenLight}` : "none",
-                  transition: "all .3s",
-                }}>
-                  {step.done
-                    ? <CheckCircle2 size={18} color="#fff" strokeWidth={2.5} />
-                    : step.active
-                      ? <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#fff", animation: "blink 1.3s ease-in-out infinite" }} />
-                      : <div style={{ width: 8, height: 8, borderRadius: "50%", background: T.border }} />
-                  }
-                </div>
-
-                {/* Content */}
-                <div style={{ paddingTop: 4, flex: 1 }}>
-                  <p style={{
-                    fontFamily: step.done || step.active ? "'Sora',sans-serif" : "inherit",
-                    fontSize: 14, fontWeight: step.done || step.active ? 700 : 500,
-                    color: step.done ? T.text : step.active ? T.orangeText : T.text3,
-                    marginBottom: 4,
-                  }}>
-                    {step.label}
-                  </p>
-                  <p style={{ fontSize: 13, color: step.active ? T.orange : T.text3, lineHeight: 1.5 }}>
-                    {step.sub}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
         {/* What happens next */}
-        <div style={{ marginTop: "auto", paddingTop: 36, borderTop: `1px solid ${T.border}` }}>
+        <div style={{ }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: T.text3, textTransform: "uppercase", letterSpacing: ".8px", marginBottom: 16 }}>What happens next</p>
           {[
             "We'll email you once review is complete",
