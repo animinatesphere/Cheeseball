@@ -196,6 +196,22 @@ export const getWallets = async () =>
     [],
   );
 
+export const getBalanceSummary = async () =>
+  withFallback(
+    async () => {
+      const data = await request("/api/wallets/balances/summary");
+      return data;
+    },
+    {
+      total_balance: "0",
+      total_locked: "0",
+      total_available: "0",
+      ngn_wallet_balance: "0",
+      ngn_wallet_locked_balance: "0",
+      ngn_wallet_available_balance: "0",
+    }
+  );
+
 export const previewConversion = async (fromAsset, toAsset, fromAmount) =>
   request("/api/wallets/convert/preview", {
     method: "POST",

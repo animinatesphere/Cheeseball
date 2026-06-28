@@ -23,6 +23,7 @@ import {
   getCurrencies,
   getUserTransactions,
   getReferralData,
+  getBalanceSummary,
 } from "@/services/api";
 import { useRates } from "@/context/RatesContext";
 import KYCStatusBanner from "./KYCStatusBanner";
@@ -152,17 +153,23 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
   const [transactions, setTransactions] = useState([]);
   const [refData, setRefData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [ngnWalletBalance, setNgnWalletBalance] = useState(0);
 
   const { rates: liveRates } = useRates();
 
   useEffect(() => {
     async function loadData() {
       try {
-        const [wRes, cRes, tRes] = await Promise.all([
+        const [wRes, cRes, tRes, summaryRes] = await Promise.all([
           getWallets(),
           getCurrencies(),
           getUserTransactions(),
+          getBalanceSummary(),
         ]);
+
+        // Set the NGN balance directly from the wallet balance summary
+        const rawNgn = parseFloat(summaryRes?.ngn_wallet_balance || summaryRes?.ngn_wallet_available_balance || 0);
+        setNgnWalletBalance(rawNgn);
         const wallets = Array.isArray(wRes) ? wRes : wRes?.data || [];
         const currencies = Array.isArray(cRes) ? cRes : cRes?.data || [];
         const txns = Array.isArray(tRes) ? tRes : tRes?.items || tRes?.data || [];
@@ -299,8 +306,7 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
     }
   };
 
-  const ngnAsset = assets.find((a) => a.symbol === "NGN");
-  const ngnBalance = ngnAsset ? ngnAsset.valueNGN : 0;
+  const ngnBalance = ngnWalletBalance;
 
   const totalReferrals = refData?.total_referrals || 0;
   const nextMilestone = 5;
