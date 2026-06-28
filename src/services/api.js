@@ -187,7 +187,12 @@ export const getUserGiftCardTrades = async () =>
 
 export const getWallets = async () =>
   withFallback(
-    async () => normalizeListResponse(await request("/api/wallets"), []),
+    async () => {
+      const data = await request("/api/wallets");
+      // Backend returns { balances: [...] }
+      if (Array.isArray(data?.balances)) return data.balances;
+      return normalizeListResponse(data, []);
+    },
     [],
   );
 
@@ -438,11 +443,12 @@ export const getMyKYC = async () =>
 
 export const getNotifications = async () =>
   withFallback(
-    async () =>
-      normalizeListResponse(
-        await request("/api/notifications", { method: "GET" }),
-        [],
-      ),
+    async () => {
+      const data = await request("/api/notifications", { method: "GET" });
+      // Backend returns { unread_count, notifications: [...], meta }
+      if (Array.isArray(data?.notifications)) return data.notifications;
+      return normalizeListResponse(data, []);
+    },
     [],
   );
 

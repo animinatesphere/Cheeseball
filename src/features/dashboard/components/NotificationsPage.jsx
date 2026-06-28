@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { X, Bell, RefreshCcw } from "lucide-react";
+import { X, Bell, RefreshCcw, CheckCircle2, ChevronRight, HelpCircle, MessageSquare } from "lucide-react";
 import { useNotifications } from "@/services/useNotifications";
 import {
   getNotificationConfig,
@@ -10,6 +10,7 @@ import {
 const T = {
   blue: "#1A6FFF",
   blueLight: "#EEF3FF",
+  blueGradient: "linear-gradient(135deg, #1A6FFF 0%, #0052D9 100%)",
   text: "#0A0F1E",
   text2: "#6B7A99",
   text3: "#A8B4CC",
@@ -17,64 +18,10 @@ const T = {
   surface: "#F7F9FF",
   white: "#FFFFFF",
   green: "#00C48C",
+  greenLight: "#E6FAF4",
+  red: "#EF4444",
+  redLight: "#FEF2F2",
 };
-
-function NavBar({ onBack }) {
-  return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: 8,
-        marginBottom: 12,
-      }}
-    >
-      <button
-        onClick={onBack}
-        style={{
-          border: "none",
-          background: "none",
-          cursor: "pointer",
-          color: T.blue,
-          fontSize: 18,
-        }}
-      >
-        ‹
-      </button>
-      <div>
-        <h2
-          style={{ margin: 0, fontFamily: "'Sora',sans-serif", color: T.text }}
-        >
-          Notifications
-        </h2>
-        <p style={{ margin: 0, fontSize: 12, color: T.text3, marginTop: 4 }}>
-          Activity from your account and updates
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function ActionButton({ children, onClick, primary, disabled }) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      style={{
-        padding: "10px 14px",
-        borderRadius: 12,
-        border: primary ? "none" : `1px solid ${T.border}`,
-        background: primary ? T.blue : T.white,
-        color: primary ? "#fff" : T.text,
-        cursor: disabled ? "not-allowed" : "pointer",
-        fontWeight: 700,
-        opacity: disabled ? 0.5 : 1,
-      }}
-    >
-      {children}
-    </button>
-  );
-}
 
 export default function NotificationsPage({ onNavigate }) {
   const navigate = useNavigate();
@@ -88,12 +35,14 @@ export default function NotificationsPage({ onNavigate }) {
   } = useNotifications();
 
   const handleNotificationClick = async (notification) => {
-    // Mark as read
     if (!notification.is_read) {
-      await markAsRead(notification.id);
+      try {
+        await markAsRead(notification.id);
+      } catch (err) {
+        console.error("Failed to mark as read:", err);
+      }
     }
 
-    // Deep-link to reference if available
     if (notification.reference_type && notification.reference_id) {
       const route = getReferenceRoute(
         notification.reference_type,
@@ -104,9 +53,6 @@ export default function NotificationsPage({ onNavigate }) {
         return;
       }
     }
-
-    // Navigate back if no deep-link available
-    navigate(-1);
   };
 
   const handleMarkAllAsRead = async () => {
@@ -130,43 +76,178 @@ export default function NotificationsPage({ onNavigate }) {
     if (diffMins < 60) return `${diffMins}m ago`;
     if (diffHours < 24) return `${diffHours}h ago`;
     if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString();
+    return date.toLocaleDateString(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
   };
 
   return (
     <div
-      className="notifications-container"
       style={{
         minHeight: "100%",
-        background: T.surface,
-        fontFamily: "'DM Sans',sans-serif",
-        padding: "24px 32px",
+        background: "#FAF9FC",
+        fontFamily: "'DM Sans', sans-serif",
+        padding: "32px",
       }}
     >
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=DM+Sans:wght@400;600&display=swap');`}</style>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap');
+        
+        .notification-card {
+          position: relative;
+          background: #ffffff;
+          border: 1px solid #EAE6F0;
+          border-radius: 16px;
+          padding: 20px;
+          display: flex;
+          gap: 16px;
+          align-items: flex-start;
+          cursor: pointer;
+          transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          box-shadow: 0 4px 12px rgba(10, 15, 30, 0.015);
+        }
+        
+        .notification-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(26, 111, 255, 0.06);
+          border-color: #D3CDE0;
+        }
 
-      <NavBar onBack={() => navigate(-1)} />
+        .notification-card.unread {
+          border-left: 4px solid #1A6FFF;
+          box-shadow: 0 4px 16px rgba(26, 111, 255, 0.03);
+          background: #FCFDFF;
+        }
+        
+        .notification-card.unread:hover {
+          border-left: 4px solid #0052D9;
+        }
 
+        .action-btn-primary {
+          background: #1A6FFF;
+          color: #ffffff;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 13px;
+          cursor: pointer;
+          transition: all 0.2s;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        
+        .action-btn-primary:hover:not(:disabled) {
+          background: #0052D9;
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(26, 111, 255, 0.2);
+        }
+        
+        .action-btn-primary:disabled {
+          opacity: 0.55;
+          cursor: not-allowed;
+        }
+
+        .action-btn-secondary {
+          background: #ffffff;
+          color: #4A5568;
+          border: 1px solid #E2E8F0;
+          padding: 10px 20px;
+          border-radius: 12px;
+          font-weight: 600;
+          font-size: 13px;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .action-btn-secondary:hover {
+          background: #F7FAFC;
+          color: #1A202C;
+          border-color: #CBD5E0;
+        }
+
+        .spin-anim {
+          animation: spin 1.2s linear infinite;
+        }
+
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 640px) {
+          .notification-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+          .notification-actions { width: 100%; justify-content: space-between; }
+          .action-btn-primary, .action-btn-secondary { flex: 1; text-align: center; justify-content: center; }
+        }
+      `}</style>
+
+      {/* Header Bar */}
       <div
-        className="action-buttons"
+        className="notification-header"
         style={{
           display: "flex",
-          gap: 12,
-          marginBottom: 18,
+          justifyContent: "space-between",
           alignItems: "center",
+          marginBottom: "28px",
         }}
       >
-        <ActionButton
-          onClick={handleMarkAllAsRead}
-          primary
-          disabled={unreadCount === 0 || loading}
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <button
+              onClick={() => navigate(-1)}
+              style={{
+                border: "none",
+                background: "#ffffff",
+                width: 36,
+                height: 36,
+                borderRadius: "50%",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                color: T.text2,
+                transition: "all 0.2s",
+                fontWeight: "bold",
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.transform = "translateX(-2px)"}
+              onMouseLeave={(e) => e.currentTarget.style.transform = "none"}
+            >
+              ‹
+            </button>
+            <h2 style={{ margin: 0, fontFamily: "'Sora', sans-serif", fontSize: "22px", fontWeight: 700, color: T.text, letterSpacing: "-0.5px" }}>
+              Notifications
+            </h2>
+            {unreadCount > 0 && (
+              <span
+                style={{
+                  background: "#1A6FFF",
+                  color: "#fff",
+                  fontSize: "11px",
+                  fontWeight: 700,
+                  padding: "4px 8px",
+                  borderRadius: "20px",
+                  lineHeight: 1,
+                }}
+              >
+                {unreadCount} Unread
+              </span>
+            )}
+          </div>
+          <p style={{ margin: "4px 0 0 46px", fontSize: "13px", color: T.text2, fontWeight: 500 }}>
+            Stay updated with deposits, conversions, and account activity
+          </p>
+        </div>
+
+        {/* Action Controls */}
+        <div
+          className="notification-actions"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+          }}
         >
-          Mark all as read
-        </ActionButton>
-        <ActionButton onClick={() => onNavigate?.("support")}>
-          Contact support
-        </ActionButton>
-        <div style={{ marginLeft: 8 }}>
           <button
             onClick={refetch}
             disabled={loading}
@@ -175,105 +256,111 @@ export default function NotificationsPage({ onNavigate }) {
               background: "transparent",
               cursor: loading ? "not-allowed" : "pointer",
               color: T.text2,
-              opacity: loading ? 0.5 : 1,
               display: "flex",
               alignItems: "center",
-              gap: 8,
+              justifyContent: "center",
+              width: 38,
+              height: 38,
+              borderRadius: "10px",
+              border: "1px solid #E2E8F0",
+              background: "#fff",
+              transition: "all 0.2s",
             }}
+            onMouseEnter={(e) => e.currentTarget.style.background = "#F7FAFC"}
+            onMouseLeave={(e) => e.currentTarget.style.background = "#fff"}
           >
-            <RefreshCcw
-              size={16}
-              style={{
-                animation: loading ? "spin 1s linear infinite" : "none",
-              }}
-            />{" "}
-            Refresh
+            <RefreshCcw size={16} className={loading ? "spin-anim" : ""} />
+          </button>
+
+          <button
+            onClick={handleMarkAllAsRead}
+            className="action-btn-primary"
+            disabled={unreadCount === 0 || loading}
+          >
+            <CheckCircle2 size={15} />
+            Mark all read
+          </button>
+
+          <button onClick={() => onNavigate?.("support")} className="action-btn-secondary">
+            Support
           </button>
         </div>
       </div>
 
-      <div style={{ maxWidth: 760 }}>
+      {/* Notifications list layout */}
+      <div style={{ maxWidth: "800px", margin: "0 auto" }}>
         {loading && notifications.length === 0 ? (
           <div
             style={{
-              padding: 18,
-              background: T.white,
-              border: `1px solid ${T.border}`,
-              borderRadius: 12,
+              padding: "40px",
+              textAlign: "center",
+              background: "#ffffff",
+              borderRadius: "20px",
+              border: "1px solid #EAE6F0",
             }}
           >
-            <p style={{ margin: 0, color: T.text2 }}>Loading notifications…</p>
+            <RefreshCcw size={28} className="spin-anim" color={T.blue} style={{ margin: "0 auto 12px" }} />
+            <p style={{ margin: 0, color: T.text2, fontWeight: 500 }}>Loading notifications...</p>
           </div>
         ) : notifications.length === 0 ? (
           <div
             style={{
-              background: T.white,
-              border: `1px solid ${T.border}`,
-              borderRadius: 16,
-              padding: 28,
+              background: "#ffffff",
+              border: "1px solid #EAE6F0",
+              borderRadius: "24px",
+              padding: "50px 30px",
               textAlign: "center",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.01)",
             }}
           >
-            <Bell size={36} color={T.text3} />
-            <p
+            <div
               style={{
-                marginTop: 12,
-                fontSize: 16,
-                fontWeight: 700,
-                color: T.text,
+                width: "64px",
+                height: "64px",
+                borderRadius: "50%",
+                background: "#F2F0F7",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                margin: "0 auto 16px",
               }}
             >
-              No notifications yet
-            </p>
-            <p style={{ marginTop: 6, color: T.text2 }}>
-              We'll show important updates here.
+              <Bell size={28} color={T.text3} />
+            </div>
+            <h3 style={{ margin: 0, fontFamily: "'Sora', sans-serif", fontSize: "18px", fontWeight: 700, color: T.text }}>
+              All caught up!
+            </h3>
+            <p style={{ margin: "8px 0 0", color: T.text2, fontSize: "14px", fontWeight: 500 }}>
+              No new updates or alerts at the moment.
             </p>
           </div>
         ) : (
-          <div style={{ display: "grid", gap: 12 }}>
+          <div style={{ display: "grid", gap: "12px" }}>
             {notifications.map((n) => {
               const config = getNotificationConfig(n.type);
               const Icon = config.icon;
+              const isUnread = !n.is_read;
 
               return (
                 <div
                   key={n.id}
-                  className="notification-card"
+                  className={`notification-card ${isUnread ? "unread" : ""}`}
                   onClick={() => handleNotificationClick(n)}
-                  style={{
-                    background: T.white,
-                    border: `1px solid ${T.border}`,
-                    borderRadius: 14,
-                    padding: 16,
-                    display: "flex",
-                    gap: 12,
-                    alignItems: "flex-start",
-                    cursor: "pointer",
-                    transition: "all 0.2s",
-                    opacity: n.is_read ? 0.7 : 1,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = "#F0F4FF";
-                    e.currentTarget.style.borderColor = config.color;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = T.white;
-                    e.currentTarget.style.borderColor = T.border;
-                  }}
                 >
                   <div
                     style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 10,
-                      background: `${config.color}15`,
+                      width: "44px",
+                      height: "44px",
+                      borderRadius: "12px",
+                      background: `${config.color}10`,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      color: config.color,
                       flexShrink: 0,
                     }}
                   >
-                    <Icon size={20} color={config.color} />
+                    <Icon size={20} />
                   </div>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
@@ -281,54 +368,58 @@ export default function NotificationsPage({ onNavigate }) {
                       style={{
                         display: "flex",
                         justifyContent: "space-between",
+                        alignItems: "flex-start",
                         gap: 12,
                       }}
                     >
-                      <div style={{ minWidth: 0 }}>
-                        <p
+                      <div>
+                        <h4
                           style={{
                             margin: 0,
-                            fontSize: 14,
-                            fontWeight: 700,
+                            fontFamily: "'Sora', sans-serif",
+                            fontSize: "14px",
+                            fontWeight: isUnread ? 700 : 600,
                             color: T.text,
-                            textOverflow: "ellipsis",
-                            overflow: "hidden",
-                            whiteSpace: "nowrap",
+                            lineHeight: 1.3,
                           }}
                         >
                           {n.title || config.label}
-                        </p>
+                        </h4>
                         <p
                           style={{
-                            margin: 0,
-                            marginTop: 8,
+                            margin: "6px 0 0",
                             color: T.text2,
-                            fontSize: 13,
-                            lineHeight: 1.4,
+                            fontSize: "13px",
+                            lineHeight: 1.45,
+                            fontWeight: 450,
                           }}
                         >
                           {n.message}
                         </p>
                       </div>
+                      
                       <div
-                        className="meta"
                         style={{
-                          color: T.text3,
-                          fontSize: 12,
                           textAlign: "right",
-                          whiteSpace: "nowrap",
+                          flexShrink: 0,
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "flex-end",
+                          gap: 6,
                         }}
                       >
-                        <div>{formatTime(n.created_at)}</div>
-                        {!n.is_read && (
-                          <div
+                        <span style={{ fontSize: "11px", color: T.text3, fontWeight: 500 }}>
+                          {formatTime(n.created_at)}
+                        </span>
+                        
+                        {isUnread && (
+                          <span
                             style={{
-                              marginTop: 8,
-                              width: 8,
-                              height: 8,
+                              width: "7px",
+                              height: "7px",
                               borderRadius: "50%",
                               background: T.blue,
-                              margin: "8px auto 0",
+                              display: "inline-block",
                             }}
                           />
                         )}
@@ -336,43 +427,23 @@ export default function NotificationsPage({ onNavigate }) {
                     </div>
                   </div>
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
+                  <div
                     style={{
-                      border: "none",
-                      background: "transparent",
+                      alignSelf: "center",
                       color: T.text3,
-                      cursor: "pointer",
-                      flexShrink: 0,
+                      display: "flex",
+                      alignItems: "center",
                     }}
                   >
-                    <X size={16} />
-                  </button>
+                    <ChevronRight size={16} />
+                  </div>
                 </div>
               );
             })}
           </div>
         )}
       </div>
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @media (max-width: 430px) {
-          .notifications-container { padding: 14px 12px !important; }
-          .notifications-container h2 { font-size: 18px !important; }
-          .notifications-container p { font-size: 13px !important; }
-          .action-buttons { flex-direction: column; gap: 10px; }
-          .action-buttons button { width: 100%; }
-          .notification-card { padding: 12px !important; border-radius: 12px !important; }
-          .notification-card p { font-size: 13px !important; }
-          .notification-card .meta { text-align: right; min-width: 70px; }
-          .notification-card > div:first-child { min-width: 0; }
-        }
-      `}</style>
     </div>
   );
 }
+

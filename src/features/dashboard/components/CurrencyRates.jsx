@@ -193,12 +193,17 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
           if (t.asset_code && isSettled) interactedAssets.add(t.asset_code);
         });
         
-        // Ensure all wallets with >0 balance are included
+        // Always include NGN
+        interactedAssets.add("NGN");
+
+        // Ensure all wallets with >0 balance are included (balance comes as string from API)
         wallets.forEach(w => {
-          if (w.balance > 0 || w.available_balance > 0) {
+          const bal = parseFloat(w.balance || w.available_balance || 0);
+          if (bal > 0) {
             interactedAssets.add(w.asset);
           }
         });
+
 
         const computedAssets = [];
         let colorIdx = 0;
@@ -212,16 +217,16 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
           };
           const cur = currencies.find((c) => (c.symbol || c.code) === symbol) || { name: symbol };
           
-          const bal = w.available_balance || w.balance || 0;
-          const priceNGN = cur.buy_rate || (symbol === "NGN" ? 1 : 0);
+          const bal = parseFloat(w.available_balance || w.balance || 0);
+          const priceNGN = parseFloat(cur.buy_rate || (symbol === "NGN" ? 1 : 0));
           const isNGN = symbol === "NGN";
-          const usdRate = cur.usd_rate || (isNGN ? 0 : (systemUsdRate ? priceNGN / systemUsdRate : 0));
+          const usdRate = parseFloat(cur.usd_rate || (isNGN ? 0 : (systemUsdRate ? priceNGN / systemUsdRate : 0)));
           
           computedAssets.push({
             symbol: symbol,
             name: cur.name || symbol,
             balance: bal,
-            balanceLabel: `${bal} ${symbol}`,
+            balanceLabel: symbol === "NGN" ? `${bal.toFixed(2)} ${symbol}` : `${bal.toFixed(4).replace(/\.?0+$/, "")} ${symbol}`,
             valueNGN: bal * priceNGN,
             valueUSD: isNGN ? 0 : bal * usdRate,
             priceNGN: priceNGN,
@@ -418,11 +423,12 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
           <div
             className="balance-card"
             style={{
-              background: T.blue,
+              background: "linear-gradient(135deg, #1A6FFF 0%, #0849B8 100%)",
               borderRadius: 24,
               padding: "36px 40px",
               position: "relative",
               overflow: "hidden",
+              boxShadow: "0 12px 32px rgba(26, 111, 255, 0.25)",
             }}
           >
             {/* Subtle bg rings */}
@@ -589,8 +595,8 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
                       display: "flex",
                       alignItems: "center",
                       gap: 8,
-                      padding: "10px 18px",
-                      borderRadius: 12,
+                      padding: "12px 22px",
+                      borderRadius: 14,
                       cursor: "pointer",
                       fontFamily: "'Sora', sans-serif",
                       fontSize: 13,
@@ -599,15 +605,22 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
                       color: primary ? T.blue : "#fff",
                       border: primary
                         ? "none"
-                        : "1px solid rgba(255,255,255,0.15)",
-                      transition: "all 0.15s",
+                        : "1px solid rgba(255,255,255,0.18)",
+                      transition: "all 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
                       whiteSpace: "nowrap",
+                      boxShadow: primary ? "0 4px 12px rgba(0,0,0,0.05)" : "none",
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.opacity = "0.88";
+                      e.currentTarget.style.transform = "translateY(-1.5px)";
+                      e.currentTarget.style.boxShadow = primary 
+                        ? "0 6px 16px rgba(0,0,0,0.1)" 
+                        : "0 6px 16px rgba(255,255,255,0.08)";
+                      e.currentTarget.style.background = primary ? "#ffffff" : "rgba(255,255,255,0.18)";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.opacity = "1";
+                      e.currentTarget.style.transform = "none";
+                      e.currentTarget.style.boxShadow = primary ? "0 4px 12px rgba(0,0,0,0.05)" : "none";
+                      e.currentTarget.style.background = primary ? "#fff" : "rgba(255,255,255,0.12)";
                     }}
                   >
                     <Icon size={16} strokeWidth={2.5} />
@@ -1122,7 +1135,7 @@ const CurrencyRates = ({ onNavigate, searchQuery = "", kycStatus = "unverified",
                   }}
                 >
                   {asset.isNGN
-                    ? `₦${fmtCompact(asset.valueNGN)}`
+                    ? `₦${fmt(asset.valueNGN)}`
                     : `$${fmtCompactUSD(asset.valueUSD)}`}
                 </p>
               </div>
