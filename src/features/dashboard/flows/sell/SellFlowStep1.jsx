@@ -333,7 +333,7 @@ export default function SellFlowStep1({
                       {selectedAsset.symbol}
                     </p>
                     <div style={{ padding: "2px 6px", borderRadius: 4, background: T.surface, border: `1px solid ${T.border}`, fontSize: 10, color: T.text2, fontWeight: 600 }}>
-                      {selectedNetwork || selectedAsset.network}
+                      {selectedAsset.networks?.find(n => n.id === (selectedNetwork || selectedAsset.networks[0].id))?.label || selectedNetwork || selectedAsset.network}
                     </div>
                   </div>
                 </div>
@@ -441,33 +441,78 @@ export default function SellFlowStep1({
             <p style={{ fontSize: 11, fontWeight: 600, color: T.text3, textTransform: "uppercase", letterSpacing: "0.8px", marginBottom: 10, fontFamily: "'DM Sans',sans-serif" }}>
               Select Network
             </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {selectedAsset.networks.map((net) => {
                 const active = (selectedNetwork || selectedAsset.networks[0].id) === net.id;
-                const badgeColor = net.badge === "Cheapest" ? T.green
-                  : net.badge === "Cheap" ? T.blue
-                  : "#F59E0B";
-                const badgeBg = net.badge === "Cheapest" ? T.greenLight
-                  : net.badge === "Cheap" ? T.blueLight
-                  : "#FFFBEB";
+                const isCheapest = net.badge === "Cheapest";
                 return (
                   <button
                     key={net.id}
                     onClick={() => setSelectedNetwork(net.id)}
                     style={{
-                      display: "flex", flexDirection: "column", gap: 4,
-                      padding: "10px 14px", borderRadius: 12,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      padding: "14px 18px",
+                      borderRadius: 12,
                       border: `1.5px solid ${active ? T.blue : T.border}`,
-                      background: active ? T.blueLight : T.white,
-                      cursor: "pointer", transition: "all 0.18s", textAlign: "left",
+                      background: active ? `${T.blue}08` : T.white,
+                      cursor: "pointer",
+                      transition: "all 0.2s ease",
+                      textAlign: "left",
+                      width: "100%",
+                      boxShadow: active ? `0 4px 12px ${T.blue}0a` : "none",
                     }}
                   >
-                    <span style={{ fontFamily: "'Sora',sans-serif", fontSize: 12, fontWeight: 700, color: active ? T.blue : T.text }}>
-                      {net.label}
-                    </span>
-                    <span style={{ fontSize: 10, fontWeight: 600, color: badgeColor, background: badgeBg, borderRadius: 4, padding: "1px 6px", alignSelf: "flex-start" }}>
-                      {net.badge}
-                    </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      {/* Radio Indicator */}
+                      <div style={{
+                        width: 18,
+                        height: 18,
+                        borderRadius: "50%",
+                        border: `2px solid ${active ? T.blue : T.text3}`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        transition: "all 0.2s ease",
+                        background: active ? T.white : "transparent",
+                      }}>
+                        {active && (
+                          <div style={{
+                            width: 8,
+                            height: 8,
+                            borderRadius: "50%",
+                            background: T.blue,
+                          }} />
+                        )}
+                      </div>
+                      
+                      <span style={{
+                        fontFamily: "'Sora',sans-serif",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: active ? T.blue : T.text,
+                        transition: "color 0.2s ease",
+                      }}>
+                        {net.label}
+                      </span>
+                    </div>
+
+                    {isCheapest && (
+                      <span style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: T.greenText || T.green,
+                        background: T.greenLight,
+                        borderRadius: 6,
+                        padding: "3px 8px",
+                        letterSpacing: "0.5px",
+                        textTransform: "uppercase",
+                        fontFamily: "'DM Sans',sans-serif",
+                      }}>
+                        Cheapest
+                      </span>
+                    )}
                   </button>
                 );
               })}

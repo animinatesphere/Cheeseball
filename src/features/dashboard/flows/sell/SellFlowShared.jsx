@@ -6,18 +6,18 @@ export const ASSETS = [
   { id:"ethereum", symbol:"ETH", name:"Ethereum", network:"ERC20", price:4236420, change:-0.87, icon:"Ξ", color:"#627EEA", bg:"#EEEFFE" },
   { id:"tether", symbol:"USDT", name:"Tether", network:"TRC20", price:1412, change:0.01, icon:"₮", color:"#26A17B", bg:"#E6F7F2",
     networks: [
-      { id: "trc20", label: "TRON (TRC-20)",           badge: "Cheapest"  },
-      { id: "bep20", label: "BNB Smart Chain (BEP-20)", badge: "Cheap"     },
-      { id: "sol",   label: "Solana",                   badge: "Cheap"     },
-      { id: "erc20", label: "Ethereum (ERC-20)",         badge: "Expensive" },
+      { id: "sol",   label: "Solana",                   badge: "Cheapest"  },
+      { id: "bep20", label: "BNB Smart Chain (BEP-20)" },
+      { id: "trc20", label: "TRON (TRC-20)" },
+      { id: "erc20", label: "Ethereum (ERC-20)" },
     ]
   },
   { id:"usd-coin", symbol:"USDC", name:"USD Coin", network:"SOL", price:1412, change:0.00, icon:"$", color:"#2775CA", bg:"#E6F0FA",
     networks: [
       { id: "sol",   label: "Solana",                   badge: "Cheapest"  },
-      { id: "bep20", label: "BNB Smart Chain (BEP-20)", badge: "Cheap"     },
-      { id: "trc20", label: "TRON (TRC-20)",            badge: "Cheap"     },
-      { id: "erc20", label: "Ethereum (ERC-20)",         badge: "Expensive" },
+      { id: "bep20", label: "BNB Smart Chain (BEP-20)" },
+      { id: "trc20", label: "TRON (TRC-20)" },
+      { id: "erc20", label: "Ethereum (ERC-20)" },
     ]
   },
   { id:"bnb", symbol:"BNB", name:"BNB", network:"BEP20", price:847284, change:1.33, icon:"⬡", color:"#F0B90B", bg:"#FEF8E6" },

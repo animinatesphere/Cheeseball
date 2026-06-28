@@ -130,7 +130,7 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
   const handleSelectAsset = (asset) => {
     setSelectedAsset(asset);
     setStep(3);
-    setNetwork(asset.networks ? asset.networks[0].name : "Mainnet");
+    setNetwork(asset.networks ? asset.networks[0].id : "Mainnet");
   };
 
   const handleAmountChange = (val) => {
@@ -579,7 +579,7 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                 <div style={{ marginTop: 24 }}>
                   <CTA onClick={() => {
                     setStep(3);
-                    setNetwork(selectedAsset.networks ? selectedAsset.networks[0].name : "Mainnet");
+                    setNetwork(selectedAsset.networks ? selectedAsset.networks[0].id : "Mainnet");
                   }} disabled={!selectedAsset}>
                     Continue
                   </CTA>
@@ -867,8 +867,8 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                           }}
                         >
                           {selectedAsset.networks.map((n) => (
-                            <option key={n.name} value={n.name}>
-                              {n.name}
+                            <option key={n.id} value={n.id}>
+                              {n.label}
                             </option>
                           ))}
                         </select>
@@ -985,7 +985,9 @@ export default function SendCryptoFlow({ onNavigate, onBack }) {
                     {
                       label: "Network",
                       value:
-                        sendMethod === "internal" ? "Internal (Cheeseball)" : network,
+                        sendMethod === "internal"
+                          ? "Internal (Cheeseball)"
+                          : (selectedAsset.networks?.find(n => n.id === network)?.label || network),
                     },
                     {
                       label: "Fee",
