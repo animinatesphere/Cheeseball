@@ -27,7 +27,6 @@ export default function SellFlowStep1({
   setInputCurrency,
   searchQuery,
   setSearchQuery,
-  breadcrumbs,
   onBack,
   onQuoteFetched,
 }) {
@@ -212,7 +211,6 @@ export default function SellFlowStep1({
             Dashboard
           </button>
         )}
-        {breadcrumbs}
           <p
             style={{
               fontSize: 11,

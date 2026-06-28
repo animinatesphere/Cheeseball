@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { ASSETS, T } from "./SellFlowShared";
-import SellCryptoBreadcrumbs from "./SellCryptoBreadcrumbs";
 import SellFlowStep1 from "./SellFlowStep1";
 import SellFlowStep2 from "./SellFlowStep2";
 import SellFlowStep3 from "./SellFlowStep3";
@@ -148,16 +147,6 @@ const SellFlow = ({ onBack, onNavigate }) => {
   const nextStep = () => setStep((p) => Math.min(p + 1, 3));
   const prevStep = () => setStep((p) => Math.max(p - 1, 1));
 
-  const breadcrumbs = (
-    <SellCryptoBreadcrumbs
-      currentStep={step}
-      onStepClick={(s) => {
-        if (s < step) setStep(s);
-      }}
-      onBackToDashboard={onBack}
-    />
-  );
-
   const commonProps = {
     payAmount: quoteData?.crypto_amount || payAmount,
     receiveAmount,
@@ -165,7 +154,6 @@ const SellFlow = ({ onBack, onNavigate }) => {
     selectedNetwork,
     expiryTime,
     finalRate,
-    breadcrumbs,
   };
 
   return (
@@ -193,7 +181,6 @@ const SellFlow = ({ onBack, onNavigate }) => {
             setInputCurrency={setInputCurrency}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            breadcrumbs={breadcrumbs}
             onBack={onBack}
             onQuoteFetched={(quote) => {
               setQuoteData(quote);
@@ -237,7 +224,6 @@ const SellFlow = ({ onBack, onNavigate }) => {
             onBack={onBack}
             onNavigate={onNavigate}
             setStep={setStep}
-            breadcrumbs={breadcrumbs}
           />
         )}
       </div>
