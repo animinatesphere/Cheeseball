@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import authService from "@/services/authService";
 import { getCurrencies } from "@/services/api";
 import { paths } from "@/routes/paths";
+import premiumIllustration from "@/assets/cheeseball_premium_3d.png";
 
 
 /* ─── Tokens ─────────────────────────────────────────────────── */
@@ -212,24 +213,8 @@ export default function Auth() {
               </p>
             </div>
 
-            <div className="fadein-2 float" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, padding: "20px", marginBottom: 16, backdropFilter: "blur(8px)" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                <p style={{ fontFamily: "'Sora', sans-serif", fontSize: 13, fontWeight: 700, color: T.white }}>Live rates</p>
-                <div style={{ display: "flex", alignItems: "center", gap: 5, background: "rgba(0,196,140,0.12)", borderRadius: 20, padding: "3px 9px" }}>
-                  <div className="blink" style={{ width: 5, height: 5, borderRadius: "50%", background: T.green }} />
-                  <span style={{ fontSize: 10, fontWeight: 600, color: T.green }}>Live</span>
-                </div>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                {displayRates.map((r) => (
-                  <div key={r.sym} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 10px", borderRadius: 11 }}>
-                    <div style={{ width: 30, height: 30, borderRadius: 8, background: r.bg, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora', sans-serif", fontSize: 11, fontWeight: 700, color: r.color, flexShrink: 0 }}>{r.icon}</div>
-                    <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 700, color: T.white, flex: 1 }}>{r.sym}</span>
-                    <span style={{ fontFamily: "'Sora', sans-serif", fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>{r.rate}</span>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: r.pos ? T.mintGreen : "#FCA5A5", minWidth: 36, textAlign: "right" }}>{r.change}</span>
-                  </div>
-                ))}
-              </div>
+            <div className="fadein-2 float" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 20, padding: "8px", marginBottom: 16, backdropFilter: "blur(8px)", display: "flex", justifyContent: "center", alignItems: "center", overflow: "hidden", height: 180 }}>
+              <img src={premiumIllustration} alt="Cheeseball Premium Features" style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 12 }} />
             </div>
 
             <div className="fadein-3 float2" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 18, padding: "16px 18px", backdropFilter: "blur(8px)" }}>
